@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="report_to">
+        <item>@string/report_console</item>
+        <item>@string/report_nw</item>
+        <item>@string/report_both</item>
+        <item>@string/report_none</item>
+    </string-array>
+
+    <string-array name="target">
+        <item>@string/pressure1</item>
+        <item>@string/pressure2</item>
+        <item>@string/rgb</item>
+        <item>@string/iry</item>
+        <item>@string/accgyro</item>
+        <item>@string/timestamp</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="QUERY">
+        <Preference
+            android:key="@string/query"
+            android:summary="@string/query_summary"
+            android:title="click to query" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="FREQUENCY (80~1000Hz)">
+        <EditTextPreference
+            android:capitalize="words"
+            android:defaultValue="@string/default_freq"
+            android:inputType="numberDecimal"
+            android:key="@string/freq"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="@string/freq_summary"
+            android:title="click to control frequency rate" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="LED (0~100mA)">
+        <EditTextPreference
+            android:defaultValue="@string/default_led"
+            android:inputType="numberDecimal"
+            android:key="@string/led_red"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="click to control red mA"
+            android:title="red" />
+
+        <EditTextPreference
+            android:defaultValue="@string/default_led"
+            android:inputType="numberDecimal"
+            android:key="@string/led_green"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="click to control green mA"
+            android:title="green" />
+
+        <EditTextPreference
+            android:defaultValue="@string/default_led"
+            android:inputType="numberDecimal"
+            android:key="@string/led_blue"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="click to control blue mA"
+            android:title="blue" />
+
+        <EditTextPreference
+            android:defaultValue="@string/default_led"
+            android:inputType="numberDecimal"
+            android:key="@string/led_ir"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="click to control ir mA"
+            android:title="ir" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="TARGET (ON/OFF)">
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/pressure1"
+            android:title="@string/pressure1" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/pressure2"
+            android:title="@string/pressure2" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/rgb"
+            android:title="@string/rgb" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/iry"
+            android:title="@string/iry" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/accgyro"
+            android:title="@string/accgyro" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/timestamp"
+            android:title="@string/timestamp" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="REPORT TO">
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/report_to"
+            android:entryValues="@array/report_to"
+            android:key="reportTo"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="click to choose the way of reporting" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Wi-Fi">
+        <EditTextPreference
+            android:capitalize="words"
+            android:defaultValue="192.168.1.9"
+            android:inputType="textCapWords"
+            android:key="@string/ssid"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="click to input SSID"
+            android:title="AP's SSID" />
+
+        <EditTextPreference
+            android:capitalize="words"
+            android:inputType="textPassword"
+            android:key="@string/password"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="click to input password"
+            android:title="password" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="PROTOCOL">
+        <EditTextPreference
+            android:capitalize="words"
+            android:defaultValue="@string/default_time"
+            android:inputType="textCapWords"
+            android:key="@string/protocol"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="click to input protocol"
+            android:title="protocol" />
+
+        <EditTextPreference
+            android:capitalize="words"
+            android:defaultValue="@string/default_time"
+            android:inputType="textCapWords"
+            android:key="@string/port"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="click to input port number"
+            android:title="port number" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="SET TIME">
+        <EditTextPreference
+            android:capitalize="words"
+            android:defaultValue="@string/default_time"
+            android:inputType="datetime"
+            android:key="@string/set_time"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="@string/current_summary"
+            android:title="click to set current time" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="REBOOT">
+        <Preference
+            android:key="@string/reboot"
+            android:summary="@string/reboot_summary"
+            android:title="click to reboot" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

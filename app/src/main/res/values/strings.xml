@@ -1,0 +1,69 @@
+<resources>
+    <string name="app_name">CNU_BPG_WirelessSetting</string>
+
+    <string name="bluetooth_search_default">Search</string>
+    <string name="bluetooth_search_ing">Searching ...</string>
+
+    <string name="ble_not_supported">BLE is not supported</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="title_devices">BLE Device Scan</string>
+    <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
+
+    <!-- Setting name -->
+    <string name="query">QUERY</string>
+    <string name="query_summary">Query Present Configuration</string>
+    <string name="freq">FREQUENCY</string>
+    <string name="freq_summary">PRF(Pulse Repetition Freq.) Change</string>
+
+    <string name="start">START</string>
+    <string name="stop">STOP</string>
+    <string name="resume">RESUME</string>
+    <string name="resume_summary">Resume Measurement (M)</string>
+
+    <string name="led">LED</string>
+    <string name="led_summary">LED Current Change</string>
+    <string name="led_red">RED</string>
+    <string name="led_green">GREEN</string>
+    <string name="led_blue">BLUE</string>
+    <string name="led_yellow">YELLOW</string>
+    <string name="led_ir">IR</string>
+
+    <string name="target">TARGET</string>
+    <string name="pressure1">Pressure 1</string>
+    <string name="pressure2">Pressure 2</string>
+    <string name="rgb">Optical RGB</string>
+    <string name="iry">Optical IrY</string>
+    <string name="accgyro">AccGyro</string>
+    <string name="timestamp">TimeStamp</string>
+
+    <string name="wifi">WIFI</string>
+    <string name="ssid">SSID</string>
+    <string name="password">PASSWORD</string>
+
+    <string name="set_time">SET TIME</string>
+    <string name="current_summary">Set Current Date and Time</string>
+
+    <string name="report_to">REPORT</string>
+    <string name="reboot">REBOOT</string>
+    <string name="reboot_summary">Reboot to apply new parameters</string>
+
+    <string name="protocol">PROTOCOL</string>
+    <string name="port">PORT</string>
+
+    <string name="report_console">console</string>
+    <string name="report_nw">nw</string>
+    <string name="report_both">both</string>
+    <string name="report_none">none</string>
+
+    <string name="default_freq">100</string>
+    <string name="default_led">50</string>
+    <string name="default_switch">OFF</string>
+    <string name="default_delay">0</string>
+    <string name="default_report">console</string>
+    <string name="default_time">2017:01:01:00:01:59</string>
+
+    <string name="yes_dialog">YES</string>
+    <string name="no_dialog">NO</string>
+    <string name="close_dialog">CLOSE</string>
+</resources>
