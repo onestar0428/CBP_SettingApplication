@@ -40,64 +40,83 @@ public class ValueManager {
     }
 
     private void updateValue(String key, String value) {
+        String newValue = "";
+
         if (!key.equals("")) {
             switch (key) {
                 case "Pulse Rep. freq.":
                     value = value.replaceAll("Hz", "");
                     setFreq(Integer.parseInt(value));
+                    newValue = getFreq();
                     break;
                 case "RED Current":
                     value = value.replaceAll("mA", "");
                     setRed(Integer.parseInt(value));
+                    newValue = getRed() + "";
                     break;
                 case "GRN Current":
                     value = value.replaceAll("mA", "");
                     setGreen(Integer.parseInt(value));
+                    newValue = getGreen() + "";
                     break;
                 case "BLU Current":
                     value = value.replaceAll("mA", "");
                     setBlue(Integer.parseInt(value));
+                    newValue =getBlue();
                     break;
                 case "YEL Current":
                     value = value.replaceAll("mA", "");
                     setYellow(Integer.parseInt(value));
+                    newValue = getYellow();
                     break;
                 case "IR  Current":
                     value = value.replaceAll("mA", "");
                     setIr(Integer.parseInt(value));
+                    newValue = getIr();
                     break;
                 case "Pressure_1st Measurement":
                     setPressure1(stringToBool(value));
+                    newValue = isPressure1();
                     break;
                 case "Pressure_2nd Measurement":
                     setPressure2(stringToBool(value));
+                    newValue = isPressure2();
                     break;
                 case "Optical_RGB Measurement":
                     setRgb(stringToBool(value));
+                    newValue = isRgb();
                     break;
                 case "Optical_IrY Measurement":
                     setIry(stringToBool(value));
+                    newValue = isIry();
                     break;
                 case "Acc/Gyro Measurement":
                     setAccgyro(stringToBool(value));
+                    newValue = isAccgyro();
                     break;
                 case "Include TimeStamp":
                     setTimestamp(stringToBool(value));
+                    newValue = isTimestamp();
                     break;
                 case "Report to Console or NW":
-                    // report = value;
+                    setReport(value);
+                    newValue = getReport();
                     break;
                 case "Current Time":
                     setTime(value);
+                    newValue = getTime();
                     break;
                 case "UDP/TCP":
                     setProtocol(value);
+                    newValue = getProtocol();
                     break;
                 case "Port No.":
                     setPort(value);
+                    newValue = getPort();
                     break;
             }
         }
+        //updateView(key, newValue);
     }
 
     public boolean setValues(String key, String... args) {
@@ -105,29 +124,21 @@ public class ValueManager {
 
         if (key.equals(mContext.getResources().getString(R.string.freq))) {
             result = mCommander.freqCommand(args[0]);
-        }
-        else if (key.equals(mContext.getResources().getString(R.string.led))) {
+        } else if (key.equals(mContext.getResources().getString(R.string.led))) {
             result = mCommander.ledCommand(args[0], args[1], args[2], args[3], args[4]);
-        }
-        else if (key.equals(mContext.getResources().getString(R.string.target))) {
+        } else if (key.equals(mContext.getResources().getString(R.string.target))) {
             result = mCommander.targetCommand(args[0], args[1], args[2], args[3], args[4], args[5]);
-        }
-        else if (key.equals(mContext.getResources().getString(R.string.report_to))) {
+        } else if (key.equals(mContext.getResources().getString(R.string.report_to))) {
             result = mCommander.reportCommand(args[0]);
-        }
-        else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
+        } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
             result = mCommander.wifiCommand(args[0], args[1]);
-        }
-        else if (key.equals(mContext.getResources().getString(R.string.protocol))) {
+        } else if (key.equals(mContext.getResources().getString(R.string.protocol))) {
             result = mCommander.protocolCommand(args[0], args[1]);
-        }
-        else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
+        } else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
             result = mCommander.setTimeCommand(args[0]);
-        }
-        else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
+        } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
             result = mCommander.wifiCommand(args[0], args[1]);
-        }
-        else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
+        } else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
             result = mCommander.rebootCommand(args[0]);
         }
 
@@ -146,104 +157,104 @@ public class ValueManager {
     // --------------------- GETTER & SETTER ---------------------
     // -----------------------------------------------------------
 
-    public int getFreq() {
-        return freq;
+    public String getFreq() {
+        return freq + "";
     }
 
-    private void setFreq(int freq){
+    private void setFreq(int freq) {
         this.freq = freq;
     }
 
-    public int getRed() {
-        return red;
+    public String getRed() {
+        return red + "";
     }
 
     private void setRed(int red) {
         this.red = red;
     }
 
-    public int getBlue() {
-        return blue;
+    public String getBlue() {
+        return blue + "";
     }
 
     private void setBlue(int blue) {
         this.blue = blue;
     }
 
-    public int getGreen() {
-        return green;
+    public String getGreen() {
+        return green + "";
     }
 
     private void setGreen(int green) {
         this.green = green;
     }
 
-    public int getYellow() {
-        return yellow;
+    public String getYellow() {
+        return yellow + "";
     }
 
     private void setYellow(int yellow) {
         this.yellow = yellow;
     }
 
-    public int getIr() {
-        return ir;
+    public String getIr() {
+        return ir + "";
     }
 
     private void setIr(int ir) {
         this.ir = ir;
     }
 
-    public int getDelay() {
-        return delay;
+    public String getDelay() {
+        return delay + "";
     }
 
     private void setDelay(int delay) {
         this.delay = delay;
     }
 
-    public boolean isPressure1() {
-        return pressure1;
+    public String isPressure1() {
+        return boolToString(pressure1);
     }
 
     private void setPressure1(boolean pressure1) {
         this.pressure1 = pressure1;
     }
 
-    public boolean isPressure2() {
-        return pressure2;
+    public String isPressure2() {
+        return boolToString(pressure2);
     }
 
     private void setPressure2(boolean pressure2) {
         this.pressure2 = pressure2;
     }
 
-    public boolean isRgb() {
-        return rgb;
+    public String isRgb() {
+        return boolToString(rgb);
     }
 
     private void setRgb(boolean rgb) {
         this.rgb = rgb;
     }
 
-    public boolean isIry() {
-        return iry;
+    public String isIry() {
+        return boolToString(iry);
     }
 
     private void setIry(boolean iry) {
         this.iry = iry;
     }
 
-    public boolean isAccgyro() {
-        return accgyro;
+    public String isAccgyro() {
+        return boolToString(accgyro);
     }
 
     private void setAccgyro(boolean accgyro) {
         this.accgyro = accgyro;
     }
 
-    public boolean isTimestamp() {
-        return timestamp;
+    public String isTimestamp() {
+        return boolToString(timestamp);
     }
 
     private void setTimestamp(boolean timestamp) {
@@ -297,6 +308,14 @@ public class ValueManager {
     private void setTime(String time) {
 //                        command = "SET_TIME:" + new SimpleDateFormat("yyyy:MM:dd:hh:mm:ss").format(new Date()).toString();
         this.time = time;
+    }
+
+    private String boolToString(boolean bool) {
+        if (bool) {
+            return 1 + "";
+        } else {
+            return 0 + "";
+        }
     }
 
     private class Commander {
@@ -353,7 +372,7 @@ public class ValueManager {
             return sendCommand(TARGET + p1 + ":" + p2 + ":" + rgb + ":" + iry + ":" + accgyro + ":" + timestamp);
         }
 
-        private boolean reportCommand(String report){
+        private boolean reportCommand(String report) {
             return sendCommand(REPORT_TO + report);
         }
 
@@ -365,20 +384,12 @@ public class ValueManager {
             return sendCommand(PROTOCOL + protocol + ":" + port);
         }
 
-        private boolean setTimeCommand(String time){
+        private boolean setTimeCommand(String time) {
             return sendCommand(SET_TIME + time);
         }
 
-        private boolean rebootCommand(String delay){
+        private boolean rebootCommand(String delay) {
             return sendCommand(REBOOT + delay);
-        }
-
-        private String boolToString(boolean bool) {
-            if (bool) {
-                return 1 + "";
-            } else {
-                return 0 + "";
-            }
         }
     }
 
