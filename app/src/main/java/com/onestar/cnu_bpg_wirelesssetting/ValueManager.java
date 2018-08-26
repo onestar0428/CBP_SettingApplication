@@ -5,15 +5,15 @@ import android.content.Context;
 public class ValueManager {
     private static ValueManager.Commander mCommander;
     private static Context mContext;
+    private static SettingsActivityListener settingsActivityListener;
 
     private final static int DEFAULT_RED = 50, DEFAULT_BLUE = 50, DEFAULT_GREEN = 50, DEFAULT_YELLOW = 50, DEFAULT_IR = 50;
     private final static int DEFAULT_FREQ = 100, DEFAULT_DELAY = 0;
     private final static boolean DEFAULT_BOOL = false;
     private final static String DEFAULT_REPORT = "console", DEFAULT_STRING = "", DEFAULT_TIME = "2017:01:01:00:01:59";
 
-    private int freq = DEFAULT_FREQ,
-            red = DEFAULT_RED, blue = DEFAULT_BLUE, green = DEFAULT_GREEN, yellow = DEFAULT_YELLOW, ir = DEFAULT_IR,
-            delay = DEFAULT_DELAY;
+    private int freq = DEFAULT_FREQ,delay = DEFAULT_DELAY,
+            red = DEFAULT_RED, blue = DEFAULT_BLUE, green = DEFAULT_GREEN, yellow = DEFAULT_YELLOW, ir = DEFAULT_IR            ;
     private boolean pressure1 = DEFAULT_BOOL, pressure2 = DEFAULT_BOOL,
             rgb = DEFAULT_BOOL, iry = DEFAULT_BOOL, accgyro = DEFAULT_BOOL, timestamp = DEFAULT_BOOL;
     private String report = DEFAULT_REPORT,
@@ -22,9 +22,10 @@ public class ValueManager {
             time = DEFAULT_TIME;
 
 
-    public ValueManager(Context context, BluetoothLEService service) {
+    public ValueManager(Context context, BluetoothLEService service, SettingsActivityListener listener) {
         mContext = context;
         mCommander = new ValueManager.Commander(service);
+        settingsActivityListener = listener;
     }
 
     public void update(String response) {
@@ -52,12 +53,12 @@ public class ValueManager {
                 case "RED Current":
                     value = value.replaceAll("mA", "");
                     setRed(Integer.parseInt(value));
-                    newValue = getRed() + "";
+                    newValue = getRed();
                     break;
                 case "GRN Current":
                     value = value.replaceAll("mA", "");
                     setGreen(Integer.parseInt(value));
-                    newValue = getGreen() + "";
+                    newValue = getGreen();
                     break;
                 case "BLU Current":
                     value = value.replaceAll("mA", "");
@@ -116,7 +117,7 @@ public class ValueManager {
                     break;
             }
         }
-        //updateView(key, newValue);
+        settingsActivityListener.onValueUpdated(key, newValue);
     }
 
     public boolean setValues(String key, String... args) {
@@ -136,8 +137,6 @@ public class ValueManager {
             result = mCommander.protocolCommand(args[0], args[1]);
         } else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
             result = mCommander.setTimeCommand(args[0]);
-        } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
-            result = mCommander.wifiCommand(args[0], args[1]);
         } else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
             result = mCommander.rebootCommand(args[0]);
         }
@@ -331,7 +330,7 @@ public class ValueManager {
         private final static String SET_TIME = "SET_TIME:";
         private final static String REBOOT = "REBOOT:";
 
-        private final static String START = "STAR:";
+        private final static String START = "START:";
         private final static String RESUME = "RESUME";
         private final static String STOP = "STOP";
 
@@ -349,8 +348,8 @@ public class ValueManager {
         private boolean sendCommand(String command) {
             boolean result = mBluetoothLEService.sendCommand(command + ":");
 
-            if (result) {
-                return queryCommand();
+            if (!command.equals(QUERY) && result) {
+                return mBluetoothLEService.sendCommand(QUERY + ":");
             }
 
             return result;
@@ -377,7 +376,7 @@ public class ValueManager {
         }
 
         private boolean wifiCommand(String ssid, String password) {
-            return sendCommand(PROTOCOL + ssid + ":" + password);
+            return sendCommand(WIFI + ssid + ":" + password);
         }
 
         private boolean protocolCommand(String protocol, String port) {

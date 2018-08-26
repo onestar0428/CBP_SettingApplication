@@ -1,0 +1,53 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <Switch
+        android:id="@+id/switch_pressure1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:switchMinWidth="56dp"
+        android:text="@string/pressure1" />
+
+    <Switch
+        android:id="@+id/switch_pressure2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:switchMinWidth="56dp"
+        android:text="@string/pressure2"/>
+
+    <Switch
+        android:id="@+id/switch_rgb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:switchMinWidth="56dp"
+        android:text="@string/rgb"/>
+
+    <Switch
+        android:id="@+id/switch_iry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:switchMinWidth="56dp"
+        android:text="@string/iry"/>
+
+    <Switch
+        android:id="@+id/switch_accgyro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:switchMinWidth="56dp"
+        android:text="@string/accgyro" />
+
+    <Switch
+        android:id="@+id/switch_timestamp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:switchMinWidth="56dp"
+        android:text="@string/timestamp" />
+</LinearLayout>
