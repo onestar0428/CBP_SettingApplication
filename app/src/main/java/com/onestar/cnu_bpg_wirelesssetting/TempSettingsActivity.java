@@ -169,8 +169,8 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
     }
 
     @Override
-    public void onDialogValueChanged(String key, String... args) {
-        boolean result = mValueManager.setValues(key, args);
+    public void onDialogValueChanged(String key, String params) {
+        boolean result = mValueManager.setValues(key, params);
         //Toast result
     }
 

@@ -7,19 +7,34 @@ public class ValueManager {
     private static Context mContext;
     private static SettingsActivityListener settingsActivityListener;
 
+    //TODO: change to ENUM
     private final static int DEFAULT_RED = 50, DEFAULT_BLUE = 50, DEFAULT_GREEN = 50, DEFAULT_YELLOW = 50, DEFAULT_IR = 50;
     private final static int DEFAULT_FREQ = 100, DEFAULT_DELAY = 0;
     private final static boolean DEFAULT_BOOL = false;
     private final static String DEFAULT_REPORT = "console", DEFAULT_STRING = "", DEFAULT_TIME = "2017:01:01:00:01:59";
 
-    private int freq = DEFAULT_FREQ,delay = DEFAULT_DELAY,
-            red = DEFAULT_RED, blue = DEFAULT_BLUE, green = DEFAULT_GREEN, yellow = DEFAULT_YELLOW, ir = DEFAULT_IR            ;
+    private int freq = DEFAULT_FREQ, delay = DEFAULT_DELAY,
+            red = DEFAULT_RED, blue = DEFAULT_BLUE, green = DEFAULT_GREEN, yellow = DEFAULT_YELLOW, ir = DEFAULT_IR;
     private boolean pressure1 = DEFAULT_BOOL, pressure2 = DEFAULT_BOOL,
             rgb = DEFAULT_BOOL, iry = DEFAULT_BOOL, accgyro = DEFAULT_BOOL, timestamp = DEFAULT_BOOL;
     private String report = DEFAULT_REPORT,
             ssid = DEFAULT_STRING, password = DEFAULT_STRING,
             protocol = DEFAULT_STRING, port = DEFAULT_STRING,
             time = DEFAULT_TIME;
+
+    private final static String QUERY = "QUERY";
+    private final static String FREQUENCY = "FREQUENCY:";
+    private final static String LED = "LED:";
+    private final static String TARGET = "TARGET:";
+    private final static String REPORT_TO = "REPORT_TO:";
+    private final static String WIFI = "WIFI:";
+    private final static String PROTOCOL = "PROTOCOL:";
+    private final static String SET_TIME = "SET_TIME:";
+    private final static String REBOOT = "REBOOT:";
+
+    private final static String START = "START:";
+    private final static String RESUME = "RESUME";
+    private final static String STOP = "STOP";
 
 
     public ValueManager(Context context, BluetoothLEService service, SettingsActivityListener listener) {
@@ -34,7 +49,7 @@ public class ValueManager {
 
     private void parseResponse(String response) {
         String parseAsterisk = response.replace(" * ", "");
-        String key = parseAsterisk.split(":")[0].replace(" ", "");
+        String key = parseAsterisk.split(":")[0].split(" ")[0];
         String value = parseAsterisk.split(":")[1].replace(" ", "");
 
         updateValue(key, value);
@@ -45,65 +60,65 @@ public class ValueManager {
 
         if (!key.equals("")) {
             switch (key) {
-                case "Pulse Rep. freq.":
+                case "Pulse":
                     value = value.replaceAll("Hz", "");
                     setFreq(Integer.parseInt(value));
                     newValue = getFreq();
                     break;
-                case "RED Current":
+                case "RED":
                     value = value.replaceAll("mA", "");
                     setRed(Integer.parseInt(value));
                     newValue = getRed();
                     break;
-                case "GRN Current":
+                case "GRN":
                     value = value.replaceAll("mA", "");
                     setGreen(Integer.parseInt(value));
                     newValue = getGreen();
                     break;
-                case "BLU Current":
+                case "BLU":
                     value = value.replaceAll("mA", "");
                     setBlue(Integer.parseInt(value));
-                    newValue =getBlue();
+                    newValue = getBlue();
                     break;
-                case "YEL Current":
+                case "YEL":
                     value = value.replaceAll("mA", "");
                     setYellow(Integer.parseInt(value));
                     newValue = getYellow();
                     break;
-                case "IR  Current":
+                case "IR":
                     value = value.replaceAll("mA", "");
                     setIr(Integer.parseInt(value));
                     newValue = getIr();
                     break;
-                case "Pressure_1st Measurement":
+                case "Pressure_1st":
                     setPressure1(stringToBool(value));
                     newValue = isPressure1();
                     break;
-                case "Pressure_2nd Measurement":
+                case "Pressure_2nd":
                     setPressure2(stringToBool(value));
                     newValue = isPressure2();
                     break;
-                case "Optical_RGB Measurement":
+                case "Optical_RGB":
                     setRgb(stringToBool(value));
                     newValue = isRgb();
                     break;
-                case "Optical_IrY Measurement":
+                case "Optical_IrY":
                     setIry(stringToBool(value));
                     newValue = isIry();
                     break;
-                case "Acc/Gyro Measurement":
+                case "Acc/Gyro":
                     setAccgyro(stringToBool(value));
                     newValue = isAccgyro();
                     break;
-                case "Include TimeStamp":
+                case "Include":
                     setTimestamp(stringToBool(value));
                     newValue = isTimestamp();
                     break;
-                case "Report to Console or NW":
+                case "Report":
                     setReport(value);
                     newValue = getReport();
                     break;
-                case "Current Time":
+                case "Current":
                     setTime(value);
                     newValue = getTime();
                     break;
@@ -111,7 +126,7 @@ public class ValueManager {
                     setProtocol(value);
                     newValue = getProtocol();
                     break;
-                case "Port No.":
+                case "Port":
                     setPort(value);
                     newValue = getPort();
                     break;
@@ -120,27 +135,34 @@ public class ValueManager {
         settingsActivityListener.onValueUpdated(key, newValue);
     }
 
-    public boolean setValues(String key, String... args) {
+    public boolean setValues(String key, String params) {
         boolean result = false;
 
-        if (key.equals(mContext.getResources().getString(R.string.freq))) {
-            result = mCommander.freqCommand(args[0]);
-        } else if (key.equals(mContext.getResources().getString(R.string.led))) {
-            result = mCommander.ledCommand(args[0], args[1], args[2], args[3], args[4]);
-        } else if (key.equals(mContext.getResources().getString(R.string.target))) {
-            result = mCommander.targetCommand(args[0], args[1], args[2], args[3], args[4], args[5]);
-        } else if (key.equals(mContext.getResources().getString(R.string.report_to))) {
-            result = mCommander.reportCommand(args[0]);
-        } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
-            result = mCommander.wifiCommand(args[0], args[1]);
-        } else if (key.equals(mContext.getResources().getString(R.string.protocol))) {
-            result = mCommander.protocolCommand(args[0], args[1]);
-        } else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
-            result = mCommander.setTimeCommand(args[0]);
-        } else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
-            result = mCommander.rebootCommand(args[0]);
-        }
+        if (!key.equals("") && !params.equals("")) {
+            String header = "";
 
+            if (key.equals(mContext.getResources().getString(R.string.freq))) {
+                header = FREQUENCY;
+            } else if (key.equals(mContext.getResources().getString(R.string.led))) {
+                header = LED;
+            } else if (key.equals(mContext.getResources().getString(R.string.target))) {
+                header = TARGET;
+            } else if (key.equals(mContext.getResources().getString(R.string.report_to))) {
+                header = REPORT_TO;
+            } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
+                header = WIFI;
+            } else if (key.equals(mContext.getResources().getString(R.string.protocol))) {
+                header = PROTOCOL;
+            } else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
+                header = SET_TIME;
+            } else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
+                header = REBOOT;
+            }
+
+            if (!header.equals("")) {
+                result = mCommander.sendCommand(header + params);
+            }
+        }
         return result;
     }
 
@@ -320,76 +342,26 @@ public class ValueManager {
     private class Commander {
         private BluetoothLEService mBluetoothLEService;
 
-        private final static String QUERY = "QUERY";
-        private final static String FREQUENCY = "FREQUENCY:";
-        private final static String LED = "LED:";
-        private final static String TARGET = "TARGET:";
-        private final static String REPORT_TO = "REPORT_TO:";
-        private final static String WIFI = "WIFI:";
-        private final static String PROTOCOL = "PROTOCOL:";
-        private final static String SET_TIME = "SET_TIME:";
-        private final static String REBOOT = "REBOOT:";
-
-        private final static String START = "START:";
-        private final static String RESUME = "RESUME";
-        private final static String STOP = "STOP";
-
-
         public Commander(BluetoothLEService mService) {
             if (mBluetoothLEService == null) {
                 mBluetoothLEService = mService;
             }
 
             if (mBluetoothLEService != null) {
-                queryCommand();
+                sendCommand(QUERY);
             }
         }
 
         private boolean sendCommand(String command) {
-            boolean result = mBluetoothLEService.sendCommand(command + ":");
+            boolean result = mBluetoothLEService.sendCommand(command);
 
-            if (!command.equals(QUERY) && result) {
+            if (result && !command.equals(QUERY)) {
                 return mBluetoothLEService.sendCommand(QUERY + ":");
             }
 
             return result;
         }
 
-        public boolean queryCommand() {
-            return sendCommand(QUERY);
-        }
-
-        private boolean freqCommand(String freq) {
-            return sendCommand(FREQUENCY + freq);
-        }
-
-        private boolean ledCommand(String red, String green, String blue, String yellow, String ir) {
-            return sendCommand(LED + red + ":" + green + ":" + blue + ":" + yellow + ":" + ir);
-        }
-
-        private boolean targetCommand(String p1, String p2, String rgb, String iry, String accgyro, String timestamp) {
-            return sendCommand(TARGET + p1 + ":" + p2 + ":" + rgb + ":" + iry + ":" + accgyro + ":" + timestamp);
-        }
-
-        private boolean reportCommand(String report) {
-            return sendCommand(REPORT_TO + report);
-        }
-
-        private boolean wifiCommand(String ssid, String password) {
-            return sendCommand(WIFI + ssid + ":" + password);
-        }
-
-        private boolean protocolCommand(String protocol, String port) {
-            return sendCommand(PROTOCOL + protocol + ":" + port);
-        }
-
-        private boolean setTimeCommand(String time) {
-            return sendCommand(SET_TIME + time);
-        }
-
-        private boolean rebootCommand(String delay) {
-            return sendCommand(REBOOT + delay);
-        }
     }
 
     interface ValueManagerListener {

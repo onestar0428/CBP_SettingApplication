@@ -6,9 +6,11 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Switch;
+import android.widget.TimePicker;
 
 import java.util.ArrayList;
 
@@ -70,11 +72,20 @@ public class DialogBuilder implements DialogInterface.OnClickListener, DialogInt
                         Switch accgyroSwitch = (Switch) view.findViewById(R.id.switch_accgyro);
                         Switch timestampSwitch = (Switch) view.findViewById(R.id.switch_timestamp);
 
-                        passParameters(pressure1Switch.isChecked() + "", pressure2Switch.isChecked() + "",
-                                rgbSwitch.isChecked() + "", irySwitch.isChecked() + "",
-                                accgyroSwitch.isChecked() + "", timestampSwitch.isChecked() + "");
+                        passParameters(boolToInt(pressure1Switch.isChecked()) + ":"
+                                + boolToInt(pressure2Switch.isChecked()) + ":" + boolToInt(rgbSwitch.isChecked())
+                                + ":" + boolToInt(irySwitch.isChecked()) + ":" + boolToInt(accgyroSwitch.isChecked())
+                                + ":" + boolToInt(timestampSwitch.isChecked()));
 
                         dialog.dismiss();
+                    }
+
+                    private int boolToInt(boolean bool) {
+                        if (bool) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
                     }
                 });
     }
@@ -95,9 +106,9 @@ public class DialogBuilder implements DialogInterface.OnClickListener, DialogInt
                         NumberPicker yellowPicker = (NumberPicker) view.findViewById(R.id.numberPicker_yellow);
                         NumberPicker irPicker = (NumberPicker) view.findViewById(R.id.numberPicker_ir);
 
-                        passParameters(redPicker.getValue() + "", greenPicker.getValue() + "",
-                                bluePicker.getValue() + "", yellowPicker.getValue() + "",
-                                irPicker.getValue() + "");
+                        passParameters(redPicker.getValue() + ":" + greenPicker.getValue() + ":" +
+                                bluePicker.getValue() + ":" + yellowPicker.getValue() + ":" +
+                                irPicker.getValue());
 
                         dialog.dismiss();
                     }
@@ -147,7 +158,7 @@ public class DialogBuilder implements DialogInterface.OnClickListener, DialogInt
                             EditText editText1 = (EditText) view.findViewById(R.id.edit_text_1);
                             EditText editText2 = (EditText) view.findViewById(R.id.edit_text_2);
 
-                            passParameters(editText1.getText().toString(), editText2.getText().toString());
+                            passParameters(editText1.getText().toString() + ":" + editText2.getText().toString());
 
                             dialog.dismiss();
                         }
@@ -179,7 +190,7 @@ public class DialogBuilder implements DialogInterface.OnClickListener, DialogInt
                 .setPositiveButton(R.string.yes_dialog, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        int position = ((AlertDialog)dialog).getListView().getCheckedItemPosition();
+                        int position = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
                         passParameters(reportList[position] + "");
                         dialog.dismiss();
                     }
@@ -187,12 +198,31 @@ public class DialogBuilder implements DialogInterface.OnClickListener, DialogInt
     }
 
     private void makeTimePicker(AlertDialog.Builder builder) {
-        // TODO: set time
         final View view = mInflater.inflate(R.layout.dialog_time, null);
+
+        builder.setTitle("Pick the date and time")
+                .setSingleChoiceItems(R.array.report_to, 0, null)
+                .setPositiveButton(R.string.yes_dialog, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DatePicker datePicker = (DatePicker) view.findViewById(R.id.datePicker);
+                        TimePicker timePicker = (TimePicker) view.findViewById(R.id.timePicker);
+
+                        //yyyy:m:dd:hh:mm:ss
+                        //cannot support 0 for front space..
+
+                        //String params = datePicker.getYear() + ":" + datePicker.getMonth() + ":" + datePicker.getDayOfMonth() + ":" +
+                        //        timePicker.getHour() + ":" + timePicker.getMinute() + ":" + 0;
+
+                        //TODO: handling seconds (timepicker doesn't support I see) and others either
+                        passParameters("");
+                        dialog.dismiss();
+                    }
+                });
     }
 
-    private void passParameters(String... args) {
-        mListener.onDialogValueChanged(mKey, args);
+    private void passParameters(String params) {
+        mListener.onDialogValueChanged(mKey, params);
     }
 
     @Override
@@ -209,6 +239,6 @@ public class DialogBuilder implements DialogInterface.OnClickListener, DialogInt
     }
 
     public interface dialogBuilderListener {
-        void onDialogValueChanged(String key, String... params);
+        void onDialogValueChanged(String key, String params);
     }
 }

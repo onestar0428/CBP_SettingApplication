@@ -104,8 +104,8 @@ public class BluetoothLEService extends Service {
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
             broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-            // NOTIFY
 
+            // NOTIFY
             if (characteristic.getUuid().equals(DATA_NOTIFY_UUID)) {
                 String response = new String(characteristic.getValue());
 
