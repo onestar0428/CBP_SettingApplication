@@ -188,6 +188,7 @@ public class DialogBuilder implements DialogInterface.OnClickListener, DialogInt
 
     private void makeTimePicker(AlertDialog.Builder builder) {
         // TODO: set time
+        final View view = mInflater.inflate(R.layout.dialog_time, null);
     }
 
     private void passParameters(String... args) {
