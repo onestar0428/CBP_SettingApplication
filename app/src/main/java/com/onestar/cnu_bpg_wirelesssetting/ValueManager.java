@@ -7,11 +7,26 @@ public class ValueManager {
     private static Context mContext;
     private static SettingsActivityListener settingsActivityListener;
 
+    //TODO: bound in one enum?
+    private enum DefaultInt{
+        DEFAULT_RED(50), DEFAULT_BLUE(50), DEFAULT_GREEN (50), DEFAULT_YELLOW(50), DEFAULT_IR(50),
+        DEFAULT_FREQ(100), DEFAULT_DELAY(0);
+
+        private int value;
+        DefaultInt(int value){
+            this.value = value;
+        }
+    }
+
     //TODO: change to ENUM
     private final static int DEFAULT_RED = 50, DEFAULT_BLUE = 50, DEFAULT_GREEN = 50, DEFAULT_YELLOW = 50, DEFAULT_IR = 50;
     private final static int DEFAULT_FREQ = 100, DEFAULT_DELAY = 0;
     private final static boolean DEFAULT_BOOL = false;
     private final static String DEFAULT_REPORT = "console", DEFAULT_STRING = "", DEFAULT_TIME = "2017:01:01:00:01:59";
+
+    private enum DefaultString{
+
+    }
 
     private int freq = DEFAULT_FREQ, delay = DEFAULT_DELAY,
             red = DEFAULT_RED, blue = DEFAULT_BLUE, green = DEFAULT_GREEN, yellow = DEFAULT_YELLOW, ir = DEFAULT_IR;
@@ -37,6 +52,7 @@ public class ValueManager {
     private final static String STOP = "STOP";
 
 
+    //TODO: static factory
     public ValueManager(Context context, BluetoothLEService service, SettingsActivityListener listener) {
         mContext = context;
         mCommander = new ValueManager.Commander(service);
@@ -339,6 +355,7 @@ public class ValueManager {
         }
     }
 
+    //TODO: transform to enum
     private class Commander {
         private BluetoothLEService mBluetoothLEService;
 
@@ -353,7 +370,7 @@ public class ValueManager {
         }
 
         private boolean sendCommand(String command) {
-            boolean result = mBluetoothLEService.sendCommand(command);
+            boolean result = mBluetoothLEService.sendCommand(command + ":");
 
             if (result && !command.equals(QUERY)) {
                 return mBluetoothLEService.sendCommand(QUERY + ":");
@@ -361,10 +378,32 @@ public class ValueManager {
 
             return result;
         }
-
     }
+
+//    private enum Command{
+//        QUERY("QUERY"), FREQUENCY("FREQUENCY:"), LED("LED:"), TARGET("TARGET:"),
+//        REPORT_TO("REPORT_TO:"), WIFI("WIFI:"), PROTOCOL("PROTOCOL:"), SET_TIME("SET_TIME:"),
+//        REBOOT("REBOOT:"), START("START:"), RESUME("RESUME"), STOP("STOP");
+//
+//        private String command;
+//
+//        Command (String command){
+//            this.command = command;
+//        }
+//
+//        private boolean sendCommand(String command) {
+//            boolean result = mBluetoothLEService.sendCommand(command + ":");
+//
+//            if (result && !command.equals(QUERY)) {
+//                return mBluetoothLEService.sendCommand(QUERY + ":");
+//            }
+//
+//            return result;
+//        }
+//    }
 
     interface ValueManagerListener {
         void onBLEResponseReceived(String response);
+        void onBLEServiceConnected();
     }
 }

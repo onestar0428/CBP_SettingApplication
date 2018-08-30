@@ -14,12 +14,13 @@ import android.widget.TimePicker;
 
 import java.util.ArrayList;
 
-public class DialogBuilder implements DialogInterface.OnClickListener, DialogInterface.OnMultiChoiceClickListener, NumberPicker.OnValueChangeListener {
+public class DialogBuilder {
     private static Context mContext;
     private static LayoutInflater mInflater;
     private static DialogBuilder.dialogBuilderListener mListener;
     private String mKey = "";
 
+    //TODO: static factory
     public DialogBuilder(Context context, DialogBuilder.dialogBuilderListener listener) {
         mContext = context;
         mListener = listener;
@@ -31,7 +32,6 @@ public class DialogBuilder implements DialogInterface.OnClickListener, DialogInt
 
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(mContext);
         mBuilder.setTitle(key);
-        mBuilder.setNeutralButton(mContext.getResources().getString(R.string.close_dialog), this);
 
         if (key.equals(mContext.getResources().getString(R.string.freq))) {
             makeNumberPicker(mBuilder);
@@ -55,7 +55,6 @@ public class DialogBuilder implements DialogInterface.OnClickListener, DialogInt
     }
 
     private void makeSwitcher(AlertDialog.Builder builder) {
-        final ArrayList<String> mSelectedItems = new ArrayList();
         final View view = mInflater.inflate(R.layout.dialog_switch, null);
 
         //TODO: set default
@@ -93,18 +92,28 @@ public class DialogBuilder implements DialogInterface.OnClickListener, DialogInt
     private void makeNumberPickers(AlertDialog.Builder builder) {
         final View view = mInflater.inflate(R.layout.dialog_numpicks, null);
 
-        //TODO: set default
+        //TODO: set default & max value is strange
+        final NumberPicker redPicker = (NumberPicker) view.findViewById(R.id.numberPicker_red);
+        redPicker.setMinValue(0);
+        redPicker.setMaxValue(100);
+        final NumberPicker greenPicker = (NumberPicker) view.findViewById(R.id.numberPicker_green);
+        greenPicker.setMinValue(0);
+        greenPicker.setMaxValue(100);
+        final NumberPicker bluePicker = (NumberPicker) view.findViewById(R.id.numberPicker_blue);
+        bluePicker.setMinValue(0);
+        bluePicker.setMaxValue(100);
+        final NumberPicker yellowPicker = (NumberPicker) view.findViewById(R.id.numberPicker_yellow);
+        yellowPicker.setMinValue(0);
+        yellowPicker.setMaxValue(100);
+        final NumberPicker irPicker = (NumberPicker) view.findViewById(R.id.numberPicker_ir);
+        irPicker.setMinValue(0);
+        irPicker.setMaxValue(100);
 
         builder.setView(view)
                 .setTitle("Set mA of each LED")
                 .setPositiveButton(R.string.yes_dialog, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        NumberPicker redPicker = (NumberPicker) view.findViewById(R.id.numberPicker_red);
-                        NumberPicker greenPicker = (NumberPicker) view.findViewById(R.id.numberPicker_green);
-                        NumberPicker bluePicker = (NumberPicker) view.findViewById(R.id.numberPicker_blue);
-                        NumberPicker yellowPicker = (NumberPicker) view.findViewById(R.id.numberPicker_yellow);
-                        NumberPicker irPicker = (NumberPicker) view.findViewById(R.id.numberPicker_ir);
 
                         passParameters(redPicker.getValue() + ":" + greenPicker.getValue() + ":" +
                                 bluePicker.getValue() + ":" + yellowPicker.getValue() + ":" +
@@ -118,26 +127,24 @@ public class DialogBuilder implements DialogInterface.OnClickListener, DialogInt
     private void makeNumberPicker(AlertDialog.Builder builder) {
         final View view = mInflater.inflate(R.layout.dialog_numpick, null);
 
-        final NumberPicker np = (NumberPicker) view.findViewById(R.id.numberPicker1);
-        np.setWrapSelectorWheel(false);
-        np.setOnValueChangedListener(this);
+        final NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.numberPicker);
 
         //TODO: set default
-
+        builder.setView(view);
         if (mKey.equals(mContext.getResources().getString(R.string.reboot))) {
-            np.setMaxValue(60); // 1min
-            np.setMinValue(0);
+            numberPicker.setMaxValue(60); // 1 min
+            numberPicker.setMinValue(0);
             builder.setTitle("Input Reboot Delay (0 ~ )s");
         } else if (mKey.equals(mContext.getResources().getString(R.string.freq))) {
-            np.setMaxValue(500);
-            np.setMinValue(80);
+            numberPicker.setMaxValue(500);
+            numberPicker.setMinValue(80);
             builder.setTitle("Input FREQUENCY ( ~ )Hz");
         }
 
         builder.setPositiveButton(mContext.getResources().getString(R.string.yes_dialog), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                passParameters(np.getValue() + "");
+                passParameters(numberPicker.getValue() + "");
                 dialog.dismiss();
             }
         });
@@ -223,19 +230,6 @@ public class DialogBuilder implements DialogInterface.OnClickListener, DialogInt
 
     private void passParameters(String params) {
         mListener.onDialogValueChanged(mKey, params);
-    }
-
-    @Override
-    public void onClick(DialogInterface dialog, int id) {
-    }
-
-    @Override
-    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-    }
-
-    @Override
-    public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-
     }
 
     public interface dialogBuilderListener {

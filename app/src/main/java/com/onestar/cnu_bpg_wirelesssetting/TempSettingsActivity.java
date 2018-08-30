@@ -76,10 +76,7 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
                 mDialog = ProgressDialog.show(TempSettingsActivity.this, mDeviceName, "Connecting ...", true, true);
                 final boolean result = mBluetoothLEService.connect(mDeviceAddress);
 
-                if (result && mValueManager == null) {
-                    mValueManager = new ValueManager(TempSettingsActivity.this, mBluetoothLEService, TempSettingsActivity.this);
-                    mBluetoothLEService.setValueManagerListener(TempSettingsActivity.this);
-                }
+                mBluetoothLEService.setValueManagerListener(TempSettingsActivity.this);
 
                 Log.d(TAG, "Connect request result=" + result);
             }
@@ -113,6 +110,7 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
         bindService(new Intent(this, BluetoothLEService.class), mServiceConnection, BIND_AUTO_CREATE);
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
 
+        //TODO: use butterknife
         //------ UI -------
         freqView = (TextView) findViewById(R.id.frequencyTextView);
         timeView = (TextView) findViewById(R.id.setTimeTextView);
@@ -176,64 +174,72 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
 
     @Override
     public void onBLEResponseReceived(String response) {
+
         mValueManager.update(response);
         //Toast result
+    }
+
+    @Override
+    public void onBLEServiceConnected() {
+        if (mBluetoothLEService != null && mValueManager == null) {
+            mValueManager = new ValueManager(TempSettingsActivity.this, mBluetoothLEService, TempSettingsActivity.this);
+        }
     }
 
     @Override
     public void onValueUpdated(String key, String newValue) {
         if (!key.equals("")) {
             switch (key) {
-                case "Pulse Rep. freq.":
+                case "Pulse":
                     freqView.setText(newValue);
                     break;
-                case "RED Current":
+                case "RED":
                     redView.setText(newValue);
                     break;
-                case "GRN Current":
+                case "GRN":
                     greenView.setText(newValue);
                     break;
-                case "BLU Current":
+                case "BLU":
                     blueView.setText(newValue);
                     break;
-                case "YEL Current":
+                case "YEL":
                     yellowView.setText(newValue);
                     break;
-                case "IR  Current":
+                case "IR":
                     irView.setText(newValue);
                     break;
-                case "Pressure_1st Measurement":
+                case "Pressure_1st":
                     pressure1View.setText(newValue);
                     break;
-                case "Pressure_2nd Measurement":
+                case "Pressure_2nd":
                     pressure2View.setText(newValue);
                     break;
-                case "Optical_RGB Measurement":
+                case "Optical_RGB":
                     rgbView.setText(newValue);
                     break;
-                case "Optical_IrY Measurement":
+                case "Optical_IrY":
                     iryView.setText(newValue);
                     break;
-                case "Acc/Gyro Measurement":
+                case "Acc/Gyro":
                     accgyroView.setText(newValue);
                     break;
-                case "Include TimeStamp":
+                case "Include":
                     timestampView.setText(newValue);
                     break;
-                case "Report to Console or NW":
+                case "Report":
                     reportView.setText(newValue);
                     break;
-                case "Current Time":
+                case "Current":
                     timeView.setText(newValue);
                     break;
                 case "UDP/TCP":
                     protocolView.setText(newValue);
                     break;
-                case "Port No.":
+                case "Port":
                     portView.setText(newValue);
                     break;
             }
-            Toast.makeText(TempSettingsActivity.this, "Set " + key  + " to new value: " + newValue, Toast.LENGTH_SHORT).show();
+            Toast.makeText(TempSettingsActivity.this, "Set " + key + " to new value: " + newValue, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -243,7 +249,9 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
 
         if (mConnected == false) {
             registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+
         }
+        //TODO: Handle service disconnection
     }
 
     @Override
@@ -251,19 +259,25 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
         super.onStop();
         getDelegate().onStop();
 
-        if (mBluetoothLEService != null)
+        if (mBluetoothLEService != null){
             mBluetoothLEService.disconnect();
+            mBluetoothLEService = null;
+        }
 
         if (mGattUpdateReceiver != null)
             unregisterReceiver(mGattUpdateReceiver);
+
+        unbindService(mServiceConnection);
+
+        if (mBluetoothLEService != null) {
+            mBluetoothLEService.disconnect();
+            mBluetoothLEService = null;
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-//        if (mGattUpdateReceiver != null)
-//            unregisterReceiver(mGattUpdateReceiver);
     }
 
     @Override
@@ -271,9 +285,16 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
         super.onDestroy();
         getDelegate().onDestroy();
 
-        unbindService(mServiceConnection);
-        mBluetoothLEService.disconnect();
-        mBluetoothLEService = null;
+        //TODO: Handle disconnection
+//        if (mGattUpdateReceiver != null )
+//            unregisterReceiver(mGattUpdateReceiver);
+
+//        unbindService(mServiceConnection);
+
+        if (mBluetoothLEService != null) {
+            mBluetoothLEService.disconnect();
+            mBluetoothLEService = null;
+        }
     }
 
 }
