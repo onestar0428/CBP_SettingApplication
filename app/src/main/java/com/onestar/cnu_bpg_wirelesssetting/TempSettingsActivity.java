@@ -16,6 +16,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 public class TempSettingsActivity extends AppCompatActivity implements Button.OnClickListener,
         ValueManager.ValueManagerListener, DialogBuilder.dialogBuilderListener, SettingsActivityListener {
@@ -27,15 +30,43 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
 
     private String mDeviceName = "DEVICE_NAME";
     private String mDeviceAddress = "DEVICE_ADDRESS";
-    private boolean mConnected = false;
+
+    private ConnectionStatus mGattConnected = ConnectionStatus.STATE_DISCONNECTED;
+    private ConnectionStatus mServiceConnected = ConnectionStatus.STATE_DISCONNECTED;
 
     private ProgressDialog mDialog;
-    private Button freqBtn, setTimeBtn, rebootBtn, reportBtn,
-            wifiBtn, ledBtn, targetBtn, protocolBtn, startBtn, stopBtn;
-    private TextView freqView, timeView, delayView, reportView, ssidView, passwordView,
-            redView, greenView, blueView, yellowView, irView,
-            pressure1View, pressure2View, rgbView, iryView, accgyroView, timestampView,
-            protocolView, portView;
+
+    @BindView(R.id.frequencyButton) Button freqBtn;
+    @BindView(R.id.setTimeButton) Button setTimeBtn;
+    @BindView(R.id.rebootButton) Button rebootBtn;
+    @BindView(R.id.reportButton) Button reportBtn;
+    @BindView(R.id.ledButton) Button ledBtn;
+    @BindView(R.id.targetButton) Button targetBtn;
+    @BindView(R.id.wifiButton) Button wifiBtn;
+    @BindView(R.id.protocolButton) Button protocolBtn;
+    @BindView(R.id.startButton) Button startBtn;
+    @BindView(R.id.stopButton) Button stopBtn;
+
+    @BindView(R.id.frequencyTextView) TextView freqView;
+    @BindView(R.id.setTimeTextView) TextView timeView;
+    @BindView(R.id.rebootTextView) TextView delayView;
+    @BindView(R.id.reportTextView) TextView reportView;
+    @BindView(R.id.ssidTextView) TextView ssidView;
+    @BindView(R.id.passwordTextView) TextView passwordView;
+    @BindView(R.id.redTextView) TextView redView;
+    @BindView(R.id.greenTextView) TextView greenView;
+    @BindView(R.id.blueTextView) TextView blueView;
+    @BindView(R.id.yellowTextView) TextView yellowView;
+    @BindView(R.id.irTextView) TextView irView;
+    @BindView(R.id.pressure1TextView) TextView pressure1View;
+    @BindView(R.id.pressure2TextView) TextView pressure2View;
+    @BindView(R.id.rgbTextView) TextView rgbView;
+    @BindView(R.id.iryTextView) TextView iryView;
+    @BindView(R.id.accgyroTextView) TextView accgyroView;
+    @BindView(R.id.timestampTextView) TextView timestampView;
+    @BindView(R.id.protocolTextView) TextView protocolView;
+    @BindView(R.id.protocolTextView) TextView portView;
+
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -45,24 +76,21 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
             if (mDialog.isShowing())
                 mDialog.hide();
 
-            switch (action) {
-                case BluetoothLEService.ACTION_DATA_AVAILABLE:
-                case BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED:
-                    mConnected = true;
-                    break;
-                case BluetoothLEService.ACTION_GATT_DISCONNECTED:
-                    mConnected = false;
-                    mBluetoothLEService.disconnect();
+            if (action.equals(BluetoothLEService.GattStatus.ACTION_DATA_AVAILABLE.getStatus())
+                    || action.equals(BluetoothLEService.GattStatus.ACTION_GATT_SERVICES_DISCOVERED.getStatus())) {
+                mGattConnected = ConnectionStatus.STATE_CONNECTED;
+            } else if (action.equals(BluetoothLEService.GattStatus.ACTION_GATT_DISCONNECTED.getStatus())) {
+                mGattConnected = ConnectionStatus.STATE_DISCONNECTED;
+                mBluetoothLEService.disconnect();
 
-                    Toast.makeText(TempSettingsActivity.this, "BLE Connection is Unstable.", Toast.LENGTH_SHORT).show();
-
-                    finish();
-                    break;
+                Toast.makeText(TempSettingsActivity.this, "BLE Connection is Unstable.", Toast.LENGTH_SHORT).show();
+                finish();
             }
         }
     };
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
+
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLEService = ((BluetoothLEService.LocalBinder) service).getService();
@@ -78,6 +106,7 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
 
                 mBluetoothLEService.setValueManagerListener(TempSettingsActivity.this);
 
+                mServiceConnected = ConnectionStatus.STATE_CONNECTED;
                 Log.d(TAG, "Connect request result=" + result);
             }
         }
@@ -85,16 +114,20 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             mBluetoothLEService = null;
+            mValueManager = null;
+            mDialogBuilder = null;
+
+            mServiceConnected = ConnectionStatus.STATE_DISCONNECTED;
         }
     };
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
 
-        intentFilter.addAction(BluetoothLEService.ACTION_GATT_CONNECTED);
-        intentFilter.addAction(BluetoothLEService.ACTION_GATT_DISCONNECTED);
-        intentFilter.addAction(BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED);
-        intentFilter.addAction(BluetoothLEService.ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(BluetoothLEService.GattStatus.ACTION_GATT_CONNECTED.getStatus());
+        intentFilter.addAction(BluetoothLEService.GattStatus.ACTION_GATT_DISCONNECTED.getStatus());
+        intentFilter.addAction(BluetoothLEService.GattStatus.ACTION_GATT_SERVICES_DISCOVERED.getStatus());
+        intentFilter.addAction(BluetoothLEService.GattStatus.ACTION_DATA_AVAILABLE.getStatus());
 
         return intentFilter;
     }
@@ -110,38 +143,7 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
         bindService(new Intent(this, BluetoothLEService.class), mServiceConnection, BIND_AUTO_CREATE);
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
 
-        //TODO: use butterknife
-        //------ UI -------
-        freqView = (TextView) findViewById(R.id.frequencyTextView);
-        timeView = (TextView) findViewById(R.id.setTimeTextView);
-        delayView = (TextView) findViewById(R.id.rebootTextView);
-        reportView = (TextView) findViewById(R.id.reportTextView);
-        ssidView = (TextView) findViewById(R.id.ssidTextView);
-        passwordView = (TextView) findViewById(R.id.passwordTextView);
-        redView = (TextView) findViewById(R.id.redTextView);
-        greenView = (TextView) findViewById(R.id.greenTextView);
-        blueView = (TextView) findViewById(R.id.blueTextView);
-        yellowView = (TextView) findViewById(R.id.yellowTextView);
-        irView = (TextView) findViewById(R.id.irTextView);
-        pressure1View = (TextView) findViewById(R.id.pressure1TextView);
-        pressure2View = (TextView) findViewById(R.id.pressure2TextView);
-        rgbView = (TextView) findViewById(R.id.rgbTextView);
-        iryView = (TextView) findViewById(R.id.iryTextView);
-        accgyroView = (TextView) findViewById(R.id.accgyroTextView);
-        timestampView = (TextView) findViewById(R.id.timestampTextView);
-        protocolView = (TextView) findViewById(R.id.protocolTextView);
-        portView = (TextView) findViewById(R.id.portTextView);
-
-        freqBtn = (Button) findViewById(R.id.frequencyButton);
-        setTimeBtn = (Button) findViewById(R.id.setTimeButton);
-        rebootBtn = (Button) findViewById(R.id.rebootButton);
-        reportBtn = (Button) findViewById(R.id.reportButton);
-        ledBtn = (Button) findViewById(R.id.ledButton);
-        targetBtn = (Button) findViewById(R.id.targetButton);
-        wifiBtn = (Button) findViewById(R.id.wifiButton);
-        protocolBtn = (Button) findViewById(R.id.protocolButton);
-        startBtn = (Button) findViewById(R.id.start);
-        stopBtn = (Button) findViewById(R.id.stop);
+        ButterKnife.bind(this);
 
         freqBtn.setOnClickListener(this);
         setTimeBtn.setOnClickListener(this);
@@ -168,8 +170,7 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
 
     @Override
     public void onDialogValueChanged(String key, String params) {
-        boolean result = mValueManager.setValues(key, params);
-        //Toast result
+        mValueManager.setValues(key, params);
     }
 
     @Override
@@ -238,6 +239,7 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
                 case "Port":
                     portView.setText(newValue);
                     break;
+                //TODO: case for wifi (ssid, pw)
             }
             Toast.makeText(TempSettingsActivity.this, "Set " + key + " to new value: " + newValue, Toast.LENGTH_SHORT).show();
         }
@@ -247,11 +249,12 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
     protected void onResume() {
         super.onResume();
 
-        if (mConnected == false) {
+        if (mGattConnected == ConnectionStatus.STATE_DISCONNECTED) {
             registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-
         }
-        //TODO: Handle service disconnection
+        if (mServiceConnected == ConnectionStatus.STATE_DISCONNECTED){
+            bindService(new Intent(this, BluetoothLEService.class), mServiceConnection, BIND_AUTO_CREATE);
+        }
     }
 
     @Override
@@ -259,25 +262,34 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
         super.onStop();
         getDelegate().onStop();
 
-        if (mBluetoothLEService != null){
-            mBluetoothLEService.disconnect();
-            mBluetoothLEService = null;
-        }
-
-        if (mGattUpdateReceiver != null)
-            unregisterReceiver(mGattUpdateReceiver);
-
-        unbindService(mServiceConnection);
+//        if (mGattUpdateReceiver != null && mGattConnected == ConnectionStatus.STATE_CONNECTED){
+//            unregisterReceiver(mGattUpdateReceiver);
+//        }
+//
+//        if(mServiceConnected == ConnectionStatus.STATE_CONNECTED){
+//            unbindService(mServiceConnection);
+//        }
 
         if (mBluetoothLEService != null) {
             mBluetoothLEService.disconnect();
             mBluetoothLEService = null;
         }
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+
+        //TODO: Handle service disconnection
+
+        if (mGattUpdateReceiver != null && mGattConnected == ConnectionStatus.STATE_CONNECTED){
+            unregisterReceiver(mGattUpdateReceiver);
+        }
+
+        if(mServiceConnected == ConnectionStatus.STATE_CONNECTED){
+            unbindService(mServiceConnection);
+        }
     }
 
     @Override
@@ -286,17 +298,12 @@ public class TempSettingsActivity extends AppCompatActivity implements Button.On
         getDelegate().onDestroy();
 
         //TODO: Handle disconnection
-//        if (mGattUpdateReceiver != null )
-//            unregisterReceiver(mGattUpdateReceiver);
-
-//        unbindService(mServiceConnection);
 
         if (mBluetoothLEService != null) {
             mBluetoothLEService.disconnect();
             mBluetoothLEService = null;
         }
     }
-
 }
 
 interface SettingsActivityListener {

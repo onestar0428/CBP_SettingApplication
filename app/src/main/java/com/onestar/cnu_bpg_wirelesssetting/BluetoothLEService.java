@@ -27,20 +27,15 @@ public class BluetoothLEService extends Service {
     private BluetoothGattService mBluetoothGattService;
     private BluetoothGatt mBluetoothGatt;
     private BluetoothGattCharacteristic mWriteCharacteristic, mNotifyCharacteristic;
-    private String mBluetoothDeviceAddress;
 
     private ValueManager.ValueManagerListener valueManagerListener;
+    private ConnectionStatus mConnectionState = ConnectionStatus.STATE_DISCONNECTED;
+
 
     private final IBinder mBinder = new LocalBinder();
 
-    //TODO: transform to enum
-    private int mConnectionState = STATE_DISCONNECTED;
-    private static final int STATE_DISCONNECTED = 0;
-    private static final int STATE_CONNECTING = 1;
-    private static final int STATE_CONNECTED = 2;
-
+    private String mBluetoothDeviceAddress;
     private static final int REQUEST_MAX_MTU = 100;
-
 
     public enum GattStatus {
         ACTION_GATT_CONNECTED("com.example.bluetooth.le.ACTION_GATT_CONNECTED"),
@@ -53,6 +48,10 @@ public class BluetoothLEService extends Service {
 
         GattStatus(String status) {
             this.status = status;
+        }
+
+        public String getStatus(){
+            return this.status;
         }
     }
 
@@ -75,7 +74,7 @@ public class BluetoothLEService extends Service {
             String intentAction;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 intentAction = GattStatus.ACTION_GATT_CONNECTED.status;
-                mConnectionState = STATE_CONNECTED;
+                mConnectionState = ConnectionStatus.STATE_CONNECTED;
 
                 Log.i(TAG, "Connected to GATT server.");
                 broadcastUpdate(intentAction);
@@ -86,7 +85,7 @@ public class BluetoothLEService extends Service {
                         mBluetoothGatt.discoverServices());
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = GattStatus.ACTION_GATT_DISCONNECTED.status;
-                mConnectionState = STATE_DISCONNECTED;
+                mConnectionState = ConnectionStatus.STATE_DISCONNECTED;
 
                 Log.i(TAG, "Disconnected from GATT server.");
 
@@ -150,11 +149,10 @@ public class BluetoothLEService extends Service {
                 //Toast "Send command successfully"
 
                 if ((mNotifyCharacteristic.getProperties() | BluetoothGattCharacteristic.PROPERTY_READ | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-                    // If there is an active notification on a characteristic, clear
-                    // it first so it doesn't update the data field on the user interface.
                     if (mNotifyCharacteristic != null) {
                         setCharacteristicNotification(mNotifyCharacteristic, true);
                     }
+
                     mBluetoothGatt.readCharacteristic(mNotifyCharacteristic);
                 }
             }
@@ -195,9 +193,6 @@ public class BluetoothLEService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
-        // After using a given device, you should make sure that BluetoothGatt.close() is called
-        // such that resources are cleaned up properly.  In this particular example, close() is
-        // invoked when the UI is disconnected from the Service.
         close();
         return super.onUnbind(intent);
     }
@@ -297,7 +292,7 @@ public class BluetoothLEService extends Service {
                 && mBluetoothGatt != null) {
             Log.d(TAG, "Trying to use an existing mBluetoothGatt for connection.");
             if (mBluetoothGatt.connect()) {
-                mConnectionState = STATE_CONNECTING;
+                mConnectionState = ConnectionStatus.STATE_CONNECTING;
                 return true;
             } else {
                 return false;
@@ -312,7 +307,7 @@ public class BluetoothLEService extends Service {
 
         mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
         mBluetoothDeviceAddress = address;
-        mConnectionState = STATE_CONNECTING;
+        mConnectionState = ConnectionStatus.STATE_CONNECTING;
 
         return true;
     }

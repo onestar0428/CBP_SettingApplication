@@ -3,60 +3,53 @@ package com.onestar.cnu_bpg_wirelesssetting;
 import android.content.Context;
 
 public class ValueManager {
-    private static ValueManager.Commander mCommander;
+//    private static ValueManager.Commander mCommander;
     private static Context mContext;
-    private static SettingsActivityListener settingsActivityListener;
+    private SettingsActivityListener settingsActivityListener;
+    private BluetoothLEService mBluetoothLEService;
 
-    //TODO: bound in one enum?
-    private enum DefaultInt{
-        DEFAULT_RED(50), DEFAULT_BLUE(50), DEFAULT_GREEN (50), DEFAULT_YELLOW(50), DEFAULT_IR(50),
-        DEFAULT_FREQ(100), DEFAULT_DELAY(0);
+    private enum Default{
+        DEFAULT_LED(50), DEFAULT_FREQ(100), DEFAULT_DELAY(0),
+        DEFAULT_BOOL(false),
+        DEFAULT_REPORT("console"), DEFAULT_STRING(""), DEFAULT_TIME("2017:01:01:00:01:59");
 
-        private int value;
-        DefaultInt(int value){
-            this.value = value;
+        //TODO: right member variable?
+        private int defaultInt;
+        private boolean defaultBoolean;
+        private String defaultString;
+
+        Default(int value){
+            this.defaultInt = value;
+        }
+        Default(boolean value){
+            this.defaultBoolean = value;
+        }
+        Default(String value){
+            this.defaultString = value;
         }
     }
 
-    //TODO: change to ENUM
-    private final static int DEFAULT_RED = 50, DEFAULT_BLUE = 50, DEFAULT_GREEN = 50, DEFAULT_YELLOW = 50, DEFAULT_IR = 50;
-    private final static int DEFAULT_FREQ = 100, DEFAULT_DELAY = 0;
-    private final static boolean DEFAULT_BOOL = false;
-    private final static String DEFAULT_REPORT = "console", DEFAULT_STRING = "", DEFAULT_TIME = "2017:01:01:00:01:59";
+    //TODO: try to transform values into ENUM with setter
+    private int freq = Default.DEFAULT_FREQ.defaultInt, delay = Default.DEFAULT_DELAY.defaultInt,
+            red = Default.DEFAULT_LED.defaultInt, blue = Default.DEFAULT_LED.defaultInt,
+            green = Default.DEFAULT_LED.defaultInt, yellow = Default.DEFAULT_LED.defaultInt,
+            ir = Default.DEFAULT_LED.defaultInt;
+    private boolean pressure1 = Default.DEFAULT_BOOL.defaultBoolean, pressure2 = Default.DEFAULT_BOOL.defaultBoolean,
+            rgb = Default.DEFAULT_BOOL.defaultBoolean, iry = Default.DEFAULT_BOOL.defaultBoolean,
+            accgyro = Default.DEFAULT_BOOL.defaultBoolean, timestamp = Default.DEFAULT_BOOL.defaultBoolean;
+    private String report = Default.DEFAULT_REPORT.defaultString,
+            ssid = Default.DEFAULT_STRING.defaultString, password = Default.DEFAULT_STRING.defaultString,
+            protocol = Default.DEFAULT_STRING.defaultString, port = Default.DEFAULT_STRING.defaultString,
+            time = Default.DEFAULT_TIME.defaultString;
 
-    private enum DefaultString{
-
-    }
-
-    private int freq = DEFAULT_FREQ, delay = DEFAULT_DELAY,
-            red = DEFAULT_RED, blue = DEFAULT_BLUE, green = DEFAULT_GREEN, yellow = DEFAULT_YELLOW, ir = DEFAULT_IR;
-    private boolean pressure1 = DEFAULT_BOOL, pressure2 = DEFAULT_BOOL,
-            rgb = DEFAULT_BOOL, iry = DEFAULT_BOOL, accgyro = DEFAULT_BOOL, timestamp = DEFAULT_BOOL;
-    private String report = DEFAULT_REPORT,
-            ssid = DEFAULT_STRING, password = DEFAULT_STRING,
-            protocol = DEFAULT_STRING, port = DEFAULT_STRING,
-            time = DEFAULT_TIME;
-
-    private final static String QUERY = "QUERY";
-    private final static String FREQUENCY = "FREQUENCY:";
-    private final static String LED = "LED:";
-    private final static String TARGET = "TARGET:";
-    private final static String REPORT_TO = "REPORT_TO:";
-    private final static String WIFI = "WIFI:";
-    private final static String PROTOCOL = "PROTOCOL:";
-    private final static String SET_TIME = "SET_TIME:";
-    private final static String REBOOT = "REBOOT:";
-
-    private final static String START = "START:";
-    private final static String RESUME = "RESUME";
-    private final static String STOP = "STOP";
-
-
-    //TODO: static factory
+    //TODO: static factory or singleton
     public ValueManager(Context context, BluetoothLEService service, SettingsActivityListener listener) {
         mContext = context;
-        mCommander = new ValueManager.Commander(service);
+//        mCommander = new ValueManager.Commander(service);
+        mBluetoothLEService = service;
         settingsActivityListener = listener;
+
+        sendCommand(Command.QUERY.header);
     }
 
     public void update(String response) {
@@ -155,31 +148,42 @@ public class ValueManager {
         boolean result = false;
 
         if (!key.equals("") && !params.equals("")) {
-            String header = "";
+            String command = "";
 
             if (key.equals(mContext.getResources().getString(R.string.freq))) {
-                header = FREQUENCY;
+                command = Command.FREQUENCY.makeCommand(params);
             } else if (key.equals(mContext.getResources().getString(R.string.led))) {
-                header = LED;
+                command = Command.LED.makeCommand(params);
             } else if (key.equals(mContext.getResources().getString(R.string.target))) {
-                header = TARGET;
+                command = Command.TARGET.makeCommand(params);
             } else if (key.equals(mContext.getResources().getString(R.string.report_to))) {
-                header = REPORT_TO;
+                command = Command.REPORT_TO.makeCommand(params);
             } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
-                header = WIFI;
+                command = Command.WIFI.makeCommand(params);
             } else if (key.equals(mContext.getResources().getString(R.string.protocol))) {
-                header = PROTOCOL;
+                command = Command.PROTOCOL.makeCommand(params);
             } else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
-                header = SET_TIME;
+                command = Command.SET_TIME.makeCommand(params);
             } else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
-                header = REBOOT;
+                command = Command.REBOOT.makeCommand(params);
             }
 
-            if (!header.equals("")) {
-                result = mCommander.sendCommand(header + params);
-            }
+            result = sendCommand(command);
         }
         return result;
+    }
+
+    private boolean sendCommand(String command){
+        //TODO: Handle about QUERY more efficient
+        //send command
+        if (!command.equals("")) {
+            boolean result = mBluetoothLEService.sendCommand(command + ":");
+
+            if (result && !command.startsWith(Command.QUERY.header)) {
+                return mBluetoothLEService.sendCommand(Command.QUERY.header + ":");
+            }
+        }
+        return false;
     }
 
     private boolean stringToBool(String value) {
@@ -356,39 +360,17 @@ public class ValueManager {
     }
 
     //TODO: transform to enum
-    private class Commander {
-        private BluetoothLEService mBluetoothLEService;
-
-        public Commander(BluetoothLEService mService) {
-            if (mBluetoothLEService == null) {
-                mBluetoothLEService = mService;
-            }
-
-            if (mBluetoothLEService != null) {
-                sendCommand(QUERY);
-            }
-        }
-
-        private boolean sendCommand(String command) {
-            boolean result = mBluetoothLEService.sendCommand(command + ":");
-
-            if (result && !command.equals(QUERY)) {
-                return mBluetoothLEService.sendCommand(QUERY + ":");
-            }
-
-            return result;
-        }
-    }
-
-//    private enum Command{
-//        QUERY("QUERY"), FREQUENCY("FREQUENCY:"), LED("LED:"), TARGET("TARGET:"),
-//        REPORT_TO("REPORT_TO:"), WIFI("WIFI:"), PROTOCOL("PROTOCOL:"), SET_TIME("SET_TIME:"),
-//        REBOOT("REBOOT:"), START("START:"), RESUME("RESUME"), STOP("STOP");
+//    private class Commander {
+//        private BluetoothLEService mBluetoothLEService;
 //
-//        private String command;
+//        public Commander(BluetoothLEService mService) {
+//            if (mBluetoothLEService == null) {
+//                mBluetoothLEService = mService;
+//            }
 //
-//        Command (String command){
-//            this.command = command;
+//            if (mBluetoothLEService != null) {
+//                sendCommand(QUERY);
+//            }
 //        }
 //
 //        private boolean sendCommand(String command) {
@@ -401,6 +383,22 @@ public class ValueManager {
 //            return result;
 //        }
 //    }
+
+    private enum Command{
+        QUERY("QUERY"), FREQUENCY("FREQUENCY:"), LED("LED:"), TARGET("TARGET:"),
+        REPORT_TO("REPORT_TO:"), WIFI("WIFI:"), PROTOCOL("PROTOCOL:"), SET_TIME("SET_TIME:"),
+        REBOOT("REBOOT:"), START("START:"), RESUME("RESUME"), STOP("STOP");
+
+        private String header;
+
+        Command (String header){
+            this.header = header;
+        }
+
+        private String makeCommand(String body){
+            return header + body + ":";
+        }
+    }
 
     interface ValueManagerListener {
         void onBLEResponseReceived(String response);

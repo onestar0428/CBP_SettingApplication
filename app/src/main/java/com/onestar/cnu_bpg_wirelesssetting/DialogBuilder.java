@@ -14,13 +14,17 @@ import android.widget.TimePicker;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.BindViews;
+import butterknife.ButterKnife;
+
 public class DialogBuilder {
     private static Context mContext;
     private static LayoutInflater mInflater;
     private static DialogBuilder.dialogBuilderListener mListener;
     private String mKey = "";
 
-    //TODO: static factory
+    //TODO: static factory or singleton
     public DialogBuilder(Context context, DialogBuilder.dialogBuilderListener listener) {
         mContext = context;
         mListener = listener;
@@ -92,7 +96,7 @@ public class DialogBuilder {
     private void makeNumberPickers(AlertDialog.Builder builder) {
         final View view = mInflater.inflate(R.layout.dialog_numpicks, null);
 
-        //TODO: set default & max value is strange
+        // TODO: set default & max value is strange
         final NumberPicker redPicker = (NumberPicker) view.findViewById(R.id.numberPicker_red);
         redPicker.setMinValue(0);
         redPicker.setMaxValue(100);
