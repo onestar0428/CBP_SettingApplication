@@ -1,14 +1,19 @@
 package com.onestar.cnu_bpg_wirelesssetting;
 
 import android.content.Context;
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+import android.databinding.BindingConversion;
 
-public class ValueManager {
-//    private static ValueManager.Commander mCommander;
+import com.android.databinding.library.baseAdapters.BR;
+
+public class ValueManager extends BaseObservable {
+    //    private static ValueManager.Commander mCommander;
     private static Context mContext;
     private SettingsActivityListener settingsActivityListener;
     private BluetoothLEService mBluetoothLEService;
 
-    private enum Default{
+    private enum Default {
         DEFAULT_LED(50), DEFAULT_FREQ(100), DEFAULT_DELAY(0),
         DEFAULT_BOOL(false),
         DEFAULT_REPORT("console"), DEFAULT_STRING(""), DEFAULT_TIME("2017:01:01:00:01:59");
@@ -18,13 +23,15 @@ public class ValueManager {
         private boolean defaultBoolean;
         private String defaultString;
 
-        Default(int value){
+        Default(int value) {
             this.defaultInt = value;
         }
-        Default(boolean value){
+
+        Default(boolean value) {
             this.defaultBoolean = value;
         }
-        Default(String value){
+
+        Default(String value) {
             this.defaultString = value;
         }
     }
@@ -101,27 +108,27 @@ public class ValueManager {
                     break;
                 case "Pressure_1st":
                     setPressure1(stringToBool(value));
-                    newValue = isPressure1();
+                    newValue = getPressure1();
                     break;
                 case "Pressure_2nd":
                     setPressure2(stringToBool(value));
-                    newValue = isPressure2();
+                    newValue = getPressure2();
                     break;
                 case "Optical_RGB":
                     setRgb(stringToBool(value));
-                    newValue = isRgb();
+                    newValue = getRgb();
                     break;
                 case "Optical_IrY":
                     setIry(stringToBool(value));
-                    newValue = isIry();
+                    newValue = getIry();
                     break;
                 case "Acc/Gyro":
                     setAccgyro(stringToBool(value));
-                    newValue = isAccgyro();
+                    newValue = getAccgyro();
                     break;
                 case "Include":
                     setTimestamp(stringToBool(value));
-                    newValue = isTimestamp();
+                    newValue = getTimestamp();
                     break;
                 case "Report":
                     setReport(value);
@@ -173,7 +180,7 @@ public class ValueManager {
         return result;
     }
 
-    private boolean sendCommand(String command){
+    private boolean sendCommand(String command) {
         //TODO: Handle about QUERY more efficient
         //send command
         if (!command.equals("")) {
@@ -198,157 +205,214 @@ public class ValueManager {
     // --------------------- GETTER & SETTER ---------------------
     // -----------------------------------------------------------
 
+    @Bindable
     public String getFreq() {
         return freq + "";
     }
 
     private void setFreq(int freq) {
         this.freq = freq;
+        notifyPropertyChanged(BR.freq);
     }
 
+    @Bindable
     public String getRed() {
         return red + "";
     }
 
     private void setRed(int red) {
         this.red = red;
+        notifyPropertyChanged(BR.red);
     }
 
+    @Bindable
     public String getBlue() {
         return blue + "";
     }
 
     private void setBlue(int blue) {
         this.blue = blue;
+        notifyPropertyChanged(BR.blue);
     }
 
+    @Bindable
     public String getGreen() {
         return green + "";
     }
 
     private void setGreen(int green) {
         this.green = green;
+        notifyPropertyChanged(BR.green);
     }
 
+    @Bindable
     public String getYellow() {
         return yellow + "";
     }
 
     private void setYellow(int yellow) {
         this.yellow = yellow;
+        notifyPropertyChanged(BR.yellow);
     }
 
+    @Bindable
     public String getIr() {
         return ir + "";
     }
 
     private void setIr(int ir) {
         this.ir = ir;
+        notifyPropertyChanged(BR.ir);
     }
 
+    @Bindable
     public String getDelay() {
         return delay + "";
     }
 
     private void setDelay(int delay) {
         this.delay = delay;
+        notifyPropertyChanged(BR.delay);
     }
 
-    public String isPressure1() {
-        return boolToString(pressure1);
+    @Bindable
+    public String getPressure1() {
+        if (pressure1) {
+            return "ON";
+        }
+        return "OFF";
     }
 
     private void setPressure1(boolean pressure1) {
         this.pressure1 = pressure1;
+        notifyPropertyChanged(BR.pressure1);
     }
 
-    public String isPressure2() {
-        return boolToString(pressure2);
+    @Bindable
+    public String getPressure2() {
+        if (pressure2) {
+            return "ON";
+        }
+        return "OFF";
     }
 
     private void setPressure2(boolean pressure2) {
         this.pressure2 = pressure2;
+        notifyPropertyChanged(BR.pressure2);
     }
 
-    public String isRgb() {
-        return boolToString(rgb);
+    @Bindable
+    public String getRgb() {
+        if (rgb) {
+            return "ON";
+        }
+        return "OFF";
     }
 
     private void setRgb(boolean rgb) {
         this.rgb = rgb;
+        notifyPropertyChanged(BR.rgb);
     }
 
-    public String isIry() {
-        return boolToString(iry);
+    @Bindable
+    public String getIry() {
+        if (iry) {
+            return "ON";
+        }
+        return "OFF";
     }
 
-    private void setIry(boolean iry) {
+    public void setIry(boolean iry) {
         this.iry = iry;
+        notifyPropertyChanged(BR.iry);
     }
 
-    public String isAccgyro() {
-        return boolToString(accgyro);
+    @Bindable
+    public String  getAccgyro() {
+        if (accgyro) {
+            return "ON";
+        }
+        return "OFF";
     }
 
     private void setAccgyro(boolean accgyro) {
         this.accgyro = accgyro;
+        notifyPropertyChanged(BR.accgyro);
     }
 
-    public String isTimestamp() {
-        return boolToString(timestamp);
+    @Bindable
+    public String getTimestamp() {
+        if (timestamp) {
+            return "ON";
+        }
+        return "OFF";
     }
 
     private void setTimestamp(boolean timestamp) {
         this.timestamp = timestamp;
+        notifyPropertyChanged(BR.timestamp);
     }
 
+    @Bindable
     public String getReport() {
         return report;
     }
 
     private void setReport(String report) {
         this.report = report;
+        notifyPropertyChanged(BR.report);
     }
 
+    @Bindable
     public String getSsid() {
         return ssid;
     }
 
     private void setSsid(String ssid) {
         this.ssid = ssid;
+        notifyPropertyChanged(BR.ssid);
     }
 
+    @Bindable
     public String getPassword() {
         return password;
     }
 
     private void setPassword(String password) {
         this.password = password;
+        notifyPropertyChanged(BR.password);
     }
 
+    @Bindable
     public String getProtocol() {
         return protocol;
     }
 
     private void setProtocol(String protocol) {
         this.protocol = protocol;
+        notifyPropertyChanged(BR.protocol);
     }
 
+    @Bindable
     public String getPort() {
         return port;
     }
 
     private void setPort(String port) {
         this.port = port;
+        notifyPropertyChanged(BR.port);
     }
 
+    @Bindable
     public String getTime() {
         return time;
     }
 
     private void setTime(String time) {
 //                        command = "SET_TIME:" + new SimpleDateFormat("yyyy:MM:dd:hh:mm:ss").format(new Date()).toString();
+//        new SimpleDateFormat("yyyy.MM.dd").format(date);
         this.time = time;
+        notifyPropertyChanged(BR.time);
     }
 
     private String boolToString(boolean bool) {
@@ -359,7 +423,6 @@ public class ValueManager {
         }
     }
 
-    //TODO: transform to enum
 //    private class Commander {
 //        private BluetoothLEService mBluetoothLEService;
 //
@@ -384,24 +447,25 @@ public class ValueManager {
 //        }
 //    }
 
-    private enum Command{
+    private enum Command {
         QUERY("QUERY"), FREQUENCY("FREQUENCY:"), LED("LED:"), TARGET("TARGET:"),
         REPORT_TO("REPORT_TO:"), WIFI("WIFI:"), PROTOCOL("PROTOCOL:"), SET_TIME("SET_TIME:"),
         REBOOT("REBOOT:"), START("START:"), RESUME("RESUME"), STOP("STOP");
 
         private String header;
 
-        Command (String header){
+        Command(String header) {
             this.header = header;
         }
 
-        private String makeCommand(String body){
+        private String makeCommand(String body) {
             return header + body + ":";
         }
     }
 
     interface ValueManagerListener {
         void onBLEResponseReceived(String response);
+
         void onBLEServiceConnected();
     }
 }

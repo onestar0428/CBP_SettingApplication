@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                 mDeviceName = mLeDevices.get(position).get("name");
                 mDeviceAddress = mLeDevices.get(position).get("address");
 
-                Intent intent = new Intent(MainActivity.this, TempSettingsActivity.class);
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 intent.putExtra("name", mDeviceName);
                 intent.putExtra("address", mDeviceAddress);
 

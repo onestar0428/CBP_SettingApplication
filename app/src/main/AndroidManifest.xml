@@ -22,8 +22,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity"/>
-        <activity android:name=".TempSettingsActivity"/>
-        <activity android:name=".SensorDataControlActivity"/>
         <service android:name=".BluetoothLEService" android:enabled="true"/>
 
     </application>
