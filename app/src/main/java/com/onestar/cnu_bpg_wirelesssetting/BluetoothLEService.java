@@ -129,6 +129,9 @@ public class BluetoothLEService extends Service {
                 if (response.startsWith(" * ")) {
                     valueManagerListener.onBLEResponseReceived(response);
                 }
+                if (response.startsWith("OFF")||response.startsWith("ON")){
+                    valueManagerListener.onBLEResponseReceived(response.split(".")[0]);
+                }
             }
         }
 
@@ -242,6 +245,7 @@ public class BluetoothLEService extends Service {
             byte[] value = command.getBytes();
             mWriteCharacteristic.setValue(value);
             response = mBluetoothGatt.writeCharacteristic(mWriteCharacteristic);
+            //TODO: try to send at most 3 times when failed
         }
 
         return response;

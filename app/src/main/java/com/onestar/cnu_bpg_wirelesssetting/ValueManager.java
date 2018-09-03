@@ -13,6 +13,19 @@ public class ValueManager extends BaseObservable {
     private SettingsActivityListener settingsActivityListener;
     private BluetoothLEService mBluetoothLEService;
 
+    //TODO: try to transform values into ENUM with setter or OBSERVABLEFIELD
+    private int freq = Default.DEFAULT_FREQ.defaultInt, delay = Default.DEFAULT_DELAY.defaultInt,
+            red = Default.DEFAULT_LED.defaultInt, blue = Default.DEFAULT_LED.defaultInt,
+            green = Default.DEFAULT_LED.defaultInt, yellow = Default.DEFAULT_LED.defaultInt,
+            ir = Default.DEFAULT_LED.defaultInt;
+    private boolean pressure1 = Default.DEFAULT_BOOL.defaultBoolean, pressure2 = Default.DEFAULT_BOOL.defaultBoolean,
+            rgb = Default.DEFAULT_BOOL.defaultBoolean, iry = Default.DEFAULT_BOOL.defaultBoolean,
+            accgyro = Default.DEFAULT_BOOL.defaultBoolean, timestamp = Default.DEFAULT_BOOL.defaultBoolean;
+    private String report = Default.DEFAULT_REPORT.defaultString,
+            ssid = Default.DEFAULT_STRING.defaultString, password = Default.DEFAULT_STRING.defaultString,
+            protocol = Default.DEFAULT_STRING.defaultString, port = Default.DEFAULT_STRING.defaultString,
+            time = Default.DEFAULT_TIME.defaultString;
+
     private enum Default {
         DEFAULT_LED(50), DEFAULT_FREQ(100), DEFAULT_DELAY(0),
         DEFAULT_BOOL(false),
@@ -36,119 +49,113 @@ public class ValueManager extends BaseObservable {
         }
     }
 
-    //TODO: try to transform values into ENUM with setter
-    private int freq = Default.DEFAULT_FREQ.defaultInt, delay = Default.DEFAULT_DELAY.defaultInt,
-            red = Default.DEFAULT_LED.defaultInt, blue = Default.DEFAULT_LED.defaultInt,
-            green = Default.DEFAULT_LED.defaultInt, yellow = Default.DEFAULT_LED.defaultInt,
-            ir = Default.DEFAULT_LED.defaultInt;
-    private boolean pressure1 = Default.DEFAULT_BOOL.defaultBoolean, pressure2 = Default.DEFAULT_BOOL.defaultBoolean,
-            rgb = Default.DEFAULT_BOOL.defaultBoolean, iry = Default.DEFAULT_BOOL.defaultBoolean,
-            accgyro = Default.DEFAULT_BOOL.defaultBoolean, timestamp = Default.DEFAULT_BOOL.defaultBoolean;
-    private String report = Default.DEFAULT_REPORT.defaultString,
-            ssid = Default.DEFAULT_STRING.defaultString, password = Default.DEFAULT_STRING.defaultString,
-            protocol = Default.DEFAULT_STRING.defaultString, port = Default.DEFAULT_STRING.defaultString,
-            time = Default.DEFAULT_TIME.defaultString;
-
     //TODO: static factory or singleton
     public ValueManager(Context context, BluetoothLEService service, SettingsActivityListener listener) {
         mContext = context;
 //        mCommander = new ValueManager.Commander(service);
         mBluetoothLEService = service;
         settingsActivityListener = listener;
+    }
 
-        sendCommand(Command.QUERY.header);
+    public boolean initialize(){
+        return sendCommand(Command.QUERY.header);
     }
 
     public void update(String response) {
-        parseResponse(response);
+        if (response.startsWith("!!")){
+            //TODO: need new parser..
+        }
+        else{
+            parseQuery(response);
+        }
     }
 
-    private void parseResponse(String response) {
+    private void parseQuery(String response) {
         String parseAsterisk = response.replace(" * ", "");
         String key = parseAsterisk.split(":")[0].split(" ")[0];
         String value = parseAsterisk.split(":")[1].replace(" ", "");
 
-        updateValue(key, value);
+        updateValues(key, value);
     }
 
-    private void updateValue(String key, String value) {
+    //TODO: Consider how to reduce code lines
+    private void updateValues(String key, String value) {
         String newValue = "";
 
         if (!key.equals("")) {
             switch (key) {
                 case "Pulse":
-                    value = value.replaceAll("Hz", "");
+                    value = value.replaceAll("Hz", "").replaceAll("\n", "");
                     setFreq(Integer.parseInt(value));
-                    newValue = getFreq();
+                    settingsActivityListener.onValueUpdated(key, getFreq());
                     break;
                 case "RED":
-                    value = value.replaceAll("mA", "");
+                    value = value.replaceAll("mA", "").replaceAll("\n", "");
                     setRed(Integer.parseInt(value));
-                    newValue = getRed();
+                    settingsActivityListener.onValueUpdated(key, getRed());
                     break;
                 case "GRN":
-                    value = value.replaceAll("mA", "");
+                    value = value.replaceAll("mA", "").replaceAll("\n", "");
                     setGreen(Integer.parseInt(value));
-                    newValue = getGreen();
+                    settingsActivityListener.onValueUpdated(key, getGreen());
                     break;
                 case "BLU":
-                    value = value.replaceAll("mA", "");
+                    value = value.replaceAll("mA", "").replaceAll("\n", "");
                     setBlue(Integer.parseInt(value));
-                    newValue = getBlue();
+                    settingsActivityListener.onValueUpdated(key, getBlue());
                     break;
                 case "YEL":
-                    value = value.replaceAll("mA", "");
+                    value = value.replaceAll("mA", "").replaceAll("\n", "");
                     setYellow(Integer.parseInt(value));
-                    newValue = getYellow();
+                    settingsActivityListener.onValueUpdated(key, getYellow());
                     break;
                 case "IR":
-                    value = value.replaceAll("mA", "");
+                    value = value.replaceAll("mA", "").replaceAll("\n", "");
                     setIr(Integer.parseInt(value));
-                    newValue = getIr();
+                    settingsActivityListener.onValueUpdated(key, getIr());
                     break;
                 case "Pressure_1st":
                     setPressure1(stringToBool(value));
-                    newValue = getPressure1();
+                    settingsActivityListener.onValueUpdated(key, getPressure1());
                     break;
                 case "Pressure_2nd":
                     setPressure2(stringToBool(value));
-                    newValue = getPressure2();
+                    settingsActivityListener.onValueUpdated(key, getPressure2());
                     break;
                 case "Optical_RGB":
                     setRgb(stringToBool(value));
-                    newValue = getRgb();
+                    settingsActivityListener.onValueUpdated(key, getRgb());
                     break;
                 case "Optical_IrY":
                     setIry(stringToBool(value));
-                    newValue = getIry();
+                    settingsActivityListener.onValueUpdated(key, getIry());
                     break;
                 case "Acc/Gyro":
                     setAccgyro(stringToBool(value));
-                    newValue = getAccgyro();
+                    settingsActivityListener.onValueUpdated(key, getAccgyro());
                     break;
                 case "Include":
                     setTimestamp(stringToBool(value));
-                    newValue = getTimestamp();
+                    settingsActivityListener.onValueUpdated(key, getTimestamp());
                     break;
                 case "Report":
-                    setReport(value);
-                    newValue = getReport();
+                    setReport(value.replaceAll("\n", ""));
+                    settingsActivityListener.onValueUpdated(key, getReport());
                     break;
                 case "Current":
-                    setTime(value);
-                    newValue = getTime();
+                    setTime(value.replaceAll("\n", ""));
+                    settingsActivityListener.onValueUpdated(key, getTime());
                     break;
                 case "UDP/TCP":
-                    setProtocol(value);
-                    newValue = getProtocol();
+                    setProtocol(value.replaceAll("\n", ""));
+                    settingsActivityListener.onValueUpdated(key, getProtocol());
                     break;
                 case "Port":
-                    setPort(value);
-                    newValue = getPort();
+                    setPort(value.replaceAll("\n", ""));
+                    settingsActivityListener.onValueUpdated(key, getPort());
                     break;
             }
         }
-        settingsActivityListener.onValueUpdated(key, newValue);
     }
 
     public boolean setValues(String key, String params) {
@@ -184,16 +191,17 @@ public class ValueManager extends BaseObservable {
         //TODO: Handle about QUERY more efficient
         //send command
         if (!command.equals("")) {
-            boolean result = mBluetoothLEService.sendCommand(command + ":");
+            boolean result = mBluetoothLEService.sendCommand(command);
 
             if (result && !command.startsWith(Command.QUERY.header)) {
-                return mBluetoothLEService.sendCommand(Command.QUERY.header + ":");
+                return mBluetoothLEService.sendCommand(Command.QUERY.header);
             }
         }
         return false;
     }
 
     private boolean stringToBool(String value) {
+        value = value.replaceAll("\n", "");
         if (value.equals("Yes")) {
             return true;
         } else {
@@ -448,7 +456,7 @@ public class ValueManager extends BaseObservable {
 //    }
 
     private enum Command {
-        QUERY("QUERY"), FREQUENCY("FREQUENCY:"), LED("LED:"), TARGET("TARGET:"),
+        QUERY("QUERY:"), FREQUENCY("FREQUENCY:"), LED("LED:"), TARGET("TARGET:"),
         REPORT_TO("REPORT_TO:"), WIFI("WIFI:"), PROTOCOL("PROTOCOL:"), SET_TIME("SET_TIME:"),
         REBOOT("REBOOT:"), START("START:"), RESUME("RESUME"), STOP("STOP");
 

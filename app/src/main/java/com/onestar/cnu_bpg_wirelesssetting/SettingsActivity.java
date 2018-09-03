@@ -38,6 +38,7 @@ public class SettingsActivity extends AppCompatActivity
     private ProgressDialog mDialog;
 
     //TODO: try to use DATABINDING instead of Butterknife
+    //TODO: add a refresh button which sends QUERY command
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -87,7 +88,6 @@ public class SettingsActivity extends AppCompatActivity
             mBluetoothLEService = null;
             mValueManager = null;
             mDialogBuilder = null;
-
             mServiceConnected = ConnectionStatus.STATE_DISCONNECTED;
         }
     };
@@ -128,12 +128,12 @@ public class SettingsActivity extends AppCompatActivity
 
     @Override
     public void onDialogValueChanged(String key, String params) {
+//        mDialog.show(SettingsActivity.this, mDeviceName, "Setting Values ...", true, true);
         mValueManager.setValues(key, params);
     }
 
     @Override
     public void onBLEResponseReceived(String response) {
-
         mValueManager.update(response);
         //Toast result
     }
@@ -142,63 +142,69 @@ public class SettingsActivity extends AppCompatActivity
     public void onBLEServiceConnected() {
         if (mBluetoothLEService != null && mValueManager == null) {
             mValueManager = new ValueManager(SettingsActivity.this, mBluetoothLEService, SettingsActivity.this);
+            binding.setValue(mValueManager);
+            mValueManager.initialize(); //return boolean
         }
     }
 
     @Override
     public void onValueUpdated(String key, String newValue) {
         if (!key.equals("")) {
-            switch (key) {
-                case "Pulse":
-                    binding.frequencyTextView.setText(newValue);
-                    break;
-                case "RED":
-                    binding.redTextView.setText(newValue);
-                    break;
-                case "GRN":
-                    binding.greenTextView.setText(newValue);
-                    break;
-                case "BLU":
-                    binding.blueTextView.setText(newValue);
-                    break;
-                case "YEL":
-                    binding.yellowTextView.setText(newValue);
-                    break;
-                case "IR":
-                    binding.irTextView.setText(newValue);
-                    break;
-                case "Pressure_1st":
-                    binding.pressure1TextView.setText(newValue);
-                    break;
-                case "Pressure_2nd":
-                    binding.pressure2TextView.setText(newValue);
-                    break;
-                case "Optical_RGB":
-                    binding.rgbTextView.setText(newValue);
-                    break;
-                case "Optical_IrY":
-                    binding.iryTextView.setText(newValue);
-                    break;
-                case "Acc/Gyro":
-                    binding.accgyroTextView.setText(newValue);
-                    break;
-                case "Include":
-                    binding.timestampTextView.setText(newValue);
-                    break;
-                case "Report":
-                    binding.reportTextView.setText(newValue);
-                    break;
-                case "Current":
-                    binding.setTimeTextView.setText(newValue);
-                    break;
-                case "UDP/TCP":
-                    binding.protocolTextView.setText(newValue);
-                    break;
-                case "Port":
-                    binding.portTextView.setText(newValue);
-                    break;
-//                TODO: case for wifi (ssid, pw)
-            }
+//            switch (key) {
+//                case "Pulse":
+//                    binding.frequencyTextView.setText(newValue);
+//                    break;
+//                case "RED":
+//                    binding.redTextView.setText(newValue);
+//                    break;
+//                case "GRN":
+//                    binding.greenTextView.setText(newValue);
+//                    break;
+//                case "BLU":
+//                    binding.blueTextView.setText(newValue);
+//                    break;
+//                case "YEL":
+//                    binding.yellowTextView.setText(newValue);
+//                    break;
+//                case "IR":
+//                    binding.irTextView.setText(newValue);
+//                    break;
+//                case "Pressure_1st":
+//                    binding.pressure1TextView.setText(newValue);
+//                    break;
+//                case "Pressure_2nd":
+//                    binding.pressure2TextView.setText(newValue);
+//                    break;
+//                case "Optical_RGB":
+//                    binding.rgbTextView.setText(newValue);
+//                    break;
+//                case "Optical_IrY":
+//                    binding.iryTextView.setText(newValue);
+//                    break;
+//                case "Acc/Gyro":
+//                    binding.accgyroTextView.setText(newValue);
+//                    break;
+//                case "Include":
+//                    binding.timestampTextView.setText(newValue);
+//                    break;
+//                case "Report":
+//                    binding.reportTextView.setText(newValue);
+//                    break;
+//                case "Current":
+//                    binding.setTimeTextView.setText(newValue);
+//                    break;
+//                case "UDP/TCP":
+//                    binding.protocolTextView.setText(newValue);
+//                    break;
+//                case "Port":
+//                    binding.portTextView.setText(newValue);
+//                    break;
+////                TODO: case for wifi (ssid, pw)
+//            }
+
+            if(mDialog.isShowing())
+                mDialog.hide();
+
             Toast.makeText(SettingsActivity.this, "Set " + key + " to new value: " + newValue, Toast.LENGTH_SHORT).show();
         }
     }
