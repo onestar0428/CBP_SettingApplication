@@ -8,7 +8,6 @@ import android.databinding.BindingConversion;
 import com.android.databinding.library.baseAdapters.BR;
 
 public class ValueManager extends BaseObservable {
-    //    private static ValueManager.Commander mCommander;
     private static Context mContext;
     private SettingsActivityListener settingsActivityListener;
     private BluetoothLEService mBluetoothLEService;
@@ -47,12 +46,12 @@ public class ValueManager extends BaseObservable {
         Default(String value) {
             this.defaultString = value;
         }
+        //TODO: setter?
     }
 
     //TODO: static factory or singleton
     public ValueManager(Context context, BluetoothLEService service, SettingsActivityListener listener) {
         mContext = context;
-//        mCommander = new ValueManager.Commander(service);
         mBluetoothLEService = service;
         settingsActivityListener = listener;
     }
@@ -61,28 +60,10 @@ public class ValueManager extends BaseObservable {
         return sendCommand(Command.QUERY.header);
     }
 
-    public void update(String response) {
-        if (response.startsWith("!!")){
-            //TODO: need new parser..
-        }
-        else{
-            parseQuery(response);
-        }
-    }
-
-    private void parseQuery(String response) {
-        String parseAsterisk = response.replace(" * ", "");
-        String key = parseAsterisk.split(":")[0].split(" ")[0];
-        String value = parseAsterisk.split(":")[1].replace(" ", "");
-
-        updateValues(key, value);
-    }
-
-    //TODO: Consider how to reduce code lines
-    private void updateValues(String key, String value) {
-        String newValue = "";
-
+    public void update(String key, String value) {
         if (!key.equals("")) {
+            //TODO: ENUM?
+            //TODO: don't know certain expression of led (int? double?)
             switch (key) {
                 case "Pulse":
                     value = value.replaceAll("Hz", "").replaceAll("\n", "");
@@ -189,7 +170,7 @@ public class ValueManager extends BaseObservable {
 
     private boolean sendCommand(String command) {
         //TODO: Handle about QUERY more efficient
-        //send command
+
         if (!command.equals("")) {
             boolean result = mBluetoothLEService.sendCommand(command);
 
@@ -428,46 +409,6 @@ public class ValueManager extends BaseObservable {
             return 1 + "";
         } else {
             return 0 + "";
-        }
-    }
-
-//    private class Commander {
-//        private BluetoothLEService mBluetoothLEService;
-//
-//        public Commander(BluetoothLEService mService) {
-//            if (mBluetoothLEService == null) {
-//                mBluetoothLEService = mService;
-//            }
-//
-//            if (mBluetoothLEService != null) {
-//                sendCommand(QUERY);
-//            }
-//        }
-//
-//        private boolean sendCommand(String command) {
-//            boolean result = mBluetoothLEService.sendCommand(command + ":");
-//
-//            if (result && !command.equals(QUERY)) {
-//                return mBluetoothLEService.sendCommand(QUERY + ":");
-//            }
-//
-//            return result;
-//        }
-//    }
-
-    private enum Command {
-        QUERY("QUERY:"), FREQUENCY("FREQUENCY:"), LED("LED:"), TARGET("TARGET:"),
-        REPORT_TO("REPORT_TO:"), WIFI("WIFI:"), PROTOCOL("PROTOCOL:"), SET_TIME("SET_TIME:"),
-        REBOOT("REBOOT:"), START("START:"), RESUME("RESUME"), STOP("STOP");
-
-        private String header;
-
-        Command(String header) {
-            this.header = header;
-        }
-
-        private String makeCommand(String body) {
-            return header + body + ":";
         }
     }
 

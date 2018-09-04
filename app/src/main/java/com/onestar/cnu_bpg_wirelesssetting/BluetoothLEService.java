@@ -28,9 +28,9 @@ public class BluetoothLEService extends Service {
     private BluetoothGatt mBluetoothGatt;
     private BluetoothGattCharacteristic mWriteCharacteristic, mNotifyCharacteristic;
 
+    private ResponseParser mParser = new ResponseParser();
     private ValueManager.ValueManagerListener valueManagerListener;
     private ConnectionStatus mConnectionState = ConnectionStatus.STATE_DISCONNECTED;
-
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -123,15 +123,9 @@ public class BluetoothLEService extends Service {
             // NOTIFY
             if (characteristic.getUuid().equals(Uuid.DATA_NOTIFY_UUID.uuid)) {
                 String response = new String(characteristic.getValue());
+                valueManagerListener.onBLEResponseReceived(response);
 
                 Log.i(TAG, "COMMAND_RESULT: " + response);
-
-                if (response.startsWith(" * ")) {
-                    valueManagerListener.onBLEResponseReceived(response);
-                }
-                if (response.startsWith("OFF")||response.startsWith("ON")){
-                    valueManagerListener.onBLEResponseReceived(response.split(".")[0]);
-                }
             }
         }
 
@@ -177,7 +171,6 @@ public class BluetoothLEService extends Service {
                 for (byte byteChar : data)
                     stringBuilder.append(String.format("%02X ", byteChar));
                 intent.putExtra(GattStatus.EXTRA_DATA.status, new String(data) + "\n" + stringBuilder.toString());
-                Log.d(TAG, "COMMAND_RESPONSE: " + new String(data) + "\n" + stringBuilder.toString());
             }
         }
         sendBroadcast(intent);

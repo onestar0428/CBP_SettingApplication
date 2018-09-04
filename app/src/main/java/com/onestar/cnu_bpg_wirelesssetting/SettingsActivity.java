@@ -14,7 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.onestar.cnu_bpg_wirelesssetting.databinding.ActivitySettingsBinding;
@@ -28,6 +27,7 @@ public class SettingsActivity extends AppCompatActivity
     private static BluetoothLEService mBluetoothLEService;
     private ValueManager mValueManager;
     private DialogBuilder mDialogBuilder;
+    private ResponseParser mParser;
 
     private String mDeviceName = "DEVICE_NAME";
     private String mDeviceAddress = "DEVICE_ADDRESS";
@@ -36,9 +36,11 @@ public class SettingsActivity extends AppCompatActivity
     private ConnectionStatus mServiceConnected = ConnectionStatus.STATE_DISCONNECTED;
 
     private ProgressDialog mDialog;
+    private static int tryConnect = 0;
 
     //TODO: try to use DATABINDING instead of Butterknife
     //TODO: add a refresh button which sends QUERY command
+    //TODO: HANDLE DISCONNECTION WHEN REBOOT..
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -134,13 +136,15 @@ public class SettingsActivity extends AppCompatActivity
 
     @Override
     public void onBLEResponseReceived(String response) {
-        mValueManager.update(response);
+        mParser.parse(response);
+        mValueManager.update(mParser.getKey(), mParser.getValue());
         //Toast result
     }
 
     @Override
     public void onBLEServiceConnected() {
         if (mBluetoothLEService != null && mValueManager == null) {
+            mParser = new ResponseParser();
             mValueManager = new ValueManager(SettingsActivity.this, mBluetoothLEService, SettingsActivity.this);
             binding.setValue(mValueManager);
             mValueManager.initialize(); //return boolean
@@ -204,8 +208,6 @@ public class SettingsActivity extends AppCompatActivity
 
             if(mDialog.isShowing())
                 mDialog.hide();
-
-            Toast.makeText(SettingsActivity.this, "Set " + key + " to new value: " + newValue, Toast.LENGTH_SHORT).show();
         }
     }
 
