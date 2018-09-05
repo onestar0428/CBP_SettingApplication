@@ -11,19 +11,13 @@ public class ResponseParser {
     }
 
     public void parse(String response) {
-        // TODO: switch to each parser
+        // TODO: FUCKING PARSING
+        // TODO: Some commands don't receive their response, like FREQUENCY..
+        // So unify the way of updating values
+        // by using response of QUERY (necessary to send it after sending command)
 
         if (response.startsWith(" * ")) {
             parseQuery(response);
-        }
-        else{
-            if (response.startsWith("!!")){
-                // this is for key
-            }
-            if (response.startsWith("OFF") || response.startsWith("ON")) {
-                // this is for value
-                // response.split(".")[0];
-            }
         }
     }
 
@@ -81,10 +75,6 @@ public class ResponseParser {
     //!! Time Stamp is
     //NOT included.
     private void parseResponse(String response){
-        // TODO: FUCKING PARSING
-        // TODO: Some commands don't receive their response, like FREQUENCY..
-        // So unify the way of updating values
-        // by using response of QUERY (necessary to send it after sending command)
     }
 
     public String getKey() {

@@ -1,6 +1,7 @@
 package com.onestar.cnu_bpg_wirelesssetting;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ public class DialogBuilder {
     private static LayoutInflater mInflater;
     private static DialogBuilder.dialogBuilderListener mListener;
     private String mKey = "";
+    private boolean isShowing = false;
 
     //TODO: static factory or singleton
     public DialogBuilder(Context context, DialogBuilder.dialogBuilderListener listener) {
@@ -33,9 +35,15 @@ public class DialogBuilder {
 
     public void makeDialog(String key) {
         mKey = key;
+        isShowing = true;
 
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(mContext);
-        mBuilder.setTitle(key);
+        mBuilder.setNeutralButton(R.string.close_dialog, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                dismiss(dialog);
+            }
+        });
 
         if (key.equals(mContext.getResources().getString(R.string.freq))) {
             makeNumberPicker(mBuilder);
@@ -80,7 +88,7 @@ public class DialogBuilder {
                                 + ":" + boolToInt(irySwitch.isChecked()) + ":" + boolToInt(accgyroSwitch.isChecked())
                                 + ":" + boolToInt(timestampSwitch.isChecked()));
 
-                        dialog.dismiss();
+                        dismiss(dialog);
                     }
 
                     private int boolToInt(boolean bool) {
@@ -123,7 +131,7 @@ public class DialogBuilder {
                                 bluePicker.getValue() + ":" + yellowPicker.getValue() + ":" +
                                 irPicker.getValue());
 
-                        dialog.dismiss();
+                        dismiss(dialog);
                     }
                 });
     }
@@ -149,7 +157,7 @@ public class DialogBuilder {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 passParameters(numberPicker.getValue() + "");
-                dialog.dismiss();
+                dismiss(dialog);
             }
         });
     }
@@ -171,7 +179,7 @@ public class DialogBuilder {
 
                             passParameters(editText1.getText().toString() + ":" + editText2.getText().toString());
 
-                            dialog.dismiss();
+                            dismiss(dialog);
                         }
                     });
         } else if (mKey.equals(mContext.getResources().getString(R.string.protocol))) {
@@ -186,7 +194,7 @@ public class DialogBuilder {
 
                             //passParameters(editText1.getText().toString(), editText2.getText().toString());
 
-                            dialog.dismiss();
+                            dismiss(dialog);
                         }
                     });
         }
@@ -203,7 +211,7 @@ public class DialogBuilder {
                     public void onClick(DialogInterface dialog, int which) {
                         int position = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
                         passParameters(reportList[position] + "");
-                        dialog.dismiss();
+                        dismiss(dialog);
                     }
                 });
     }
@@ -212,7 +220,7 @@ public class DialogBuilder {
         final View view = mInflater.inflate(R.layout.dialog_time, null);
 
         builder.setTitle("Pick the date and time")
-                .setSingleChoiceItems(R.array.report_to, 0, null)
+                .setView(view)
                 .setPositiveButton(R.string.yes_dialog, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -227,13 +235,22 @@ public class DialogBuilder {
 
                         //TODO: handling seconds (timepicker doesn't support I see) and others either
                         passParameters("");
-                        dialog.dismiss();
+                        dismiss(dialog);
                     }
                 });
     }
 
     private void passParameters(String params) {
         mListener.onDialogValueChanged(mKey, params);
+    }
+
+    private void dismiss(DialogInterface dialog) {
+        isShowing = false;
+        dialog.dismiss();
+    }
+
+    public boolean isShowing() {
+        return isShowing;
     }
 
     public interface dialogBuilderListener {

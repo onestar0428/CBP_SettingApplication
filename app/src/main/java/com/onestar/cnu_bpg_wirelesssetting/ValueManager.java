@@ -3,7 +3,7 @@ package com.onestar.cnu_bpg_wirelesssetting;
 import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.databinding.BindingConversion;
+import android.widget.Toast;
 
 import com.android.databinding.library.baseAdapters.BR;
 
@@ -56,14 +56,12 @@ public class ValueManager extends BaseObservable {
         settingsActivityListener = listener;
     }
 
-    public boolean initialize(){
-        return sendCommand(Command.QUERY.header);
-    }
-
     public void update(String key, String value) {
+//        Toast.makeText(mContext, "update", Toast.LENGTH_SHORT).show();
         if (!key.equals("")) {
             //TODO: ENUM?
             //TODO: don't know certain expression of led (int? double?)
+            //TODO: update only value was changed
             switch (key) {
                 case "Pulse":
                     value = value.replaceAll("Hz", "").replaceAll("\n", "");
@@ -139,47 +137,35 @@ public class ValueManager extends BaseObservable {
         }
     }
 
-    public boolean setValues(String key, String params) {
-        boolean result = false;
+//    public String getCommand(String key, String params) {
+//        String command = "";
+//
+//        //TODO: ? just concat key and params;
+//        if (!key.equals("") && !params.equals("")) {
+//            //TODO: consider using ENUM instead of Resources
+//            if (key.equals(mContext.getResources().getString(R.string.freq))) {
+//                command = Command.FREQUENCY.makeCommand(params);
+//            } else if (key.equals(mContext.getResources().getString(R.string.led))) {
+//                command = Command.LED.makeCommand(params);
+//            } else if (key.equals(mContext.getResources().getString(R.string.target))) {
+//                command = Command.TARGET.makeCommand(params);
+//            } else if (key.equals(mContext.getResources().getString(R.string.report_to))) {
+//                command = Command.REPORT_TO.makeCommand(params);
+//            } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
+//                command = Command.WIFI.makeCommand(params);
+//            } else if (key.equals(mContext.getResources().getString(R.string.protocol))) {
+//                command = Command.PROTOCOL.makeCommand(params);
+//            } else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
+//                command = Command.SET_TIME.makeCommand(params);
+//            } else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
+//                command = Command.REBOOT.makeCommand(params);
+//            }
+//        }
+//        Toast.makeText(mContext, "getCommand " + command, Toast.LENGTH_SHORT).show();
+//
+//        return command;
+//    }
 
-        if (!key.equals("") && !params.equals("")) {
-            String command = "";
-
-            if (key.equals(mContext.getResources().getString(R.string.freq))) {
-                command = Command.FREQUENCY.makeCommand(params);
-            } else if (key.equals(mContext.getResources().getString(R.string.led))) {
-                command = Command.LED.makeCommand(params);
-            } else if (key.equals(mContext.getResources().getString(R.string.target))) {
-                command = Command.TARGET.makeCommand(params);
-            } else if (key.equals(mContext.getResources().getString(R.string.report_to))) {
-                command = Command.REPORT_TO.makeCommand(params);
-            } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
-                command = Command.WIFI.makeCommand(params);
-            } else if (key.equals(mContext.getResources().getString(R.string.protocol))) {
-                command = Command.PROTOCOL.makeCommand(params);
-            } else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
-                command = Command.SET_TIME.makeCommand(params);
-            } else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
-                command = Command.REBOOT.makeCommand(params);
-            }
-
-            result = sendCommand(command);
-        }
-        return result;
-    }
-
-    private boolean sendCommand(String command) {
-        //TODO: Handle about QUERY more efficient
-
-        if (!command.equals("")) {
-            boolean result = mBluetoothLEService.sendCommand(command);
-
-            if (result && !command.startsWith(Command.QUERY.header)) {
-                return mBluetoothLEService.sendCommand(Command.QUERY.header);
-            }
-        }
-        return false;
-    }
 
     private boolean stringToBool(String value) {
         value = value.replaceAll("\n", "");
@@ -193,6 +179,26 @@ public class ValueManager extends BaseObservable {
     // -----------------------------------------------------------
     // --------------------- GETTER & SETTER ---------------------
     // -----------------------------------------------------------
+
+    public String getParams(String key){
+        StringBuilder params = new StringBuilder("");
+
+        //TODO: consider using ENUM instead of Resources
+        //TODO: consider using a function for common condition
+        if (key.equals(mContext.getResources().getString(R.string.freq))) {
+            params.append(getFreq());
+        } else if (key.equals(mContext.getResources().getString(R.string.led))) {
+            params.append(getRed());
+        } else if (key.equals(mContext.getResources().getString(R.string.target))) {
+        } else if (key.equals(mContext.getResources().getString(R.string.report_to))) {
+        } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
+        } else if (key.equals(mContext.getResources().getString(R.string.protocol))) {
+        } else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
+        } else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
+        }
+
+        return params.toString();
+    }
 
     @Bindable
     public String getFreq() {

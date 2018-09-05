@@ -28,7 +28,6 @@ public class BluetoothLEService extends Service {
     private BluetoothGatt mBluetoothGatt;
     private BluetoothGattCharacteristic mWriteCharacteristic, mNotifyCharacteristic;
 
-    private ResponseParser mParser = new ResponseParser();
     private ValueManager.ValueManagerListener valueManagerListener;
     private ConnectionStatus mConnectionState = ConnectionStatus.STATE_DISCONNECTED;
 
