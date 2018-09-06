@@ -1,221 +1,70 @@
 package com.onestar.cnu_bpg_wirelesssetting;
 
-import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.widget.Toast;
 
 import com.android.databinding.library.baseAdapters.BR;
 
 public class ValueManager extends BaseObservable {
-    private static Context mContext;
     private SettingsActivityListener settingsActivityListener;
-    private BluetoothLEService mBluetoothLEService;
-
-    //TODO: try to transform values into ENUM with setter or OBSERVABLEFIELD
-    private int freq = Default.DEFAULT_FREQ.defaultInt, delay = Default.DEFAULT_DELAY.defaultInt,
-            red = Default.DEFAULT_LED.defaultInt, blue = Default.DEFAULT_LED.defaultInt,
-            green = Default.DEFAULT_LED.defaultInt, yellow = Default.DEFAULT_LED.defaultInt,
-            ir = Default.DEFAULT_LED.defaultInt;
-    private boolean pressure1 = Default.DEFAULT_BOOL.defaultBoolean, pressure2 = Default.DEFAULT_BOOL.defaultBoolean,
-            rgb = Default.DEFAULT_BOOL.defaultBoolean, iry = Default.DEFAULT_BOOL.defaultBoolean,
-            accgyro = Default.DEFAULT_BOOL.defaultBoolean, timestamp = Default.DEFAULT_BOOL.defaultBoolean;
-    private String report = Default.DEFAULT_REPORT.defaultString,
-            ssid = Default.DEFAULT_STRING.defaultString, password = Default.DEFAULT_STRING.defaultString,
-            protocol = Default.DEFAULT_STRING.defaultString, port = Default.DEFAULT_STRING.defaultString,
-            time = Default.DEFAULT_TIME.defaultString;
-
-    private enum Default {
-        DEFAULT_LED(50), DEFAULT_FREQ(100), DEFAULT_DELAY(0),
-        DEFAULT_BOOL(false),
-        DEFAULT_REPORT("console"), DEFAULT_STRING(""), DEFAULT_TIME("2017:01:01:00:01:59");
-
-        //TODO: right member variable?
-        private int defaultInt;
-        private boolean defaultBoolean;
-        private String defaultString;
-
-        Default(int value) {
-            this.defaultInt = value;
-        }
-
-        Default(boolean value) {
-            this.defaultBoolean = value;
-        }
-
-        Default(String value) {
-            this.defaultString = value;
-        }
-        //TODO: setter?
-    }
+    private String freq = Value.FREQ.value,
+            delay = Value.DELAY.value,
+            red = Value.RED.value,
+            blue = Value.BLUE.value,
+            green = Value.GREEN.value,
+            yellow = Value.YELLOW.value,
+            ir = Value.IR.value,
+            pressure1 = Value.PRESSURE1.value,
+            pressure2 = Value.PRESSURE2.value,
+            rgb = Value.RGB.value,
+            iry = Value.IRY.value,
+            accgyro = Value.ACCGYRO.value,
+            timestamp = Value.TIMESTAMP.value,
+            report = Value.REPORT.value,
+            ssid = Value.SSID.value,
+            password = Value.PASSWORD.value,
+            protocol = Value.PROTOCOL.value,
+            port = Value.PORT.value,
+            time = Value.TIME.value;
 
     //TODO: static factory or singleton
-    public ValueManager(Context context, BluetoothLEService service, SettingsActivityListener listener) {
-        mContext = context;
-        mBluetoothLEService = service;
+    public ValueManager(SettingsActivityListener listener) {
         settingsActivityListener = listener;
     }
 
     public void update(String key, String value) {
-//        Toast.makeText(mContext, "update", Toast.LENGTH_SHORT).show();
-        if (!key.equals("")) {
-            //TODO: ENUM?
-            //TODO: don't know certain expression of led (int? double?)
-            //TODO: update only value was changed
-            switch (key) {
-                case "Pulse":
-                    value = value.replaceAll("Hz", "").replaceAll("\n", "");
-                    setFreq(Integer.parseInt(value));
-                    settingsActivityListener.onValueUpdated(key, getFreq());
-                    break;
-                case "RED":
-                    value = value.replaceAll("mA", "").replaceAll("\n", "");
-                    setRed(Integer.parseInt(value));
-                    settingsActivityListener.onValueUpdated(key, getRed());
-                    break;
-                case "GRN":
-                    value = value.replaceAll("mA", "").replaceAll("\n", "");
-                    setGreen(Integer.parseInt(value));
-                    settingsActivityListener.onValueUpdated(key, getGreen());
-                    break;
-                case "BLU":
-                    value = value.replaceAll("mA", "").replaceAll("\n", "");
-                    setBlue(Integer.parseInt(value));
-                    settingsActivityListener.onValueUpdated(key, getBlue());
-                    break;
-                case "YEL":
-                    value = value.replaceAll("mA", "").replaceAll("\n", "");
-                    setYellow(Integer.parseInt(value));
-                    settingsActivityListener.onValueUpdated(key, getYellow());
-                    break;
-                case "IR":
-                    value = value.replaceAll("mA", "").replaceAll("\n", "");
-                    setIr(Integer.parseInt(value));
-                    settingsActivityListener.onValueUpdated(key, getIr());
-                    break;
-                case "Pressure_1st":
-                    setPressure1(stringToBool(value));
-                    settingsActivityListener.onValueUpdated(key, getPressure1());
-                    break;
-                case "Pressure_2nd":
-                    setPressure2(stringToBool(value));
-                    settingsActivityListener.onValueUpdated(key, getPressure2());
-                    break;
-                case "Optical_RGB":
-                    setRgb(stringToBool(value));
-                    settingsActivityListener.onValueUpdated(key, getRgb());
-                    break;
-                case "Optical_IrY":
-                    setIry(stringToBool(value));
-                    settingsActivityListener.onValueUpdated(key, getIry());
-                    break;
-                case "Acc/Gyro":
-                    setAccgyro(stringToBool(value));
-                    settingsActivityListener.onValueUpdated(key, getAccgyro());
-                    break;
-                case "Include":
-                    setTimestamp(stringToBool(value));
-                    settingsActivityListener.onValueUpdated(key, getTimestamp());
-                    break;
-                case "Report":
-                    setReport(value.replaceAll("\n", ""));
-                    settingsActivityListener.onValueUpdated(key, getReport());
-                    break;
-                case "Current":
-                    setTime(value.replaceAll("\n", ""));
-                    settingsActivityListener.onValueUpdated(key, getTime());
-                    break;
-                case "UDP/TCP":
-                    setProtocol(value.replaceAll("\n", ""));
-                    settingsActivityListener.onValueUpdated(key, getProtocol());
-                    break;
-                case "Port":
-                    setPort(value.replaceAll("\n", ""));
-                    settingsActivityListener.onValueUpdated(key, getPort());
-                    break;
-            }
-        }
+
     }
 
-//    public String getCommand(String key, String params) {
-//        String command = "";
-//
-//        //TODO: ? just concat key and params;
-//        if (!key.equals("") && !params.equals("")) {
-//            //TODO: consider using ENUM instead of Resources
-//            if (key.equals(mContext.getResources().getString(R.string.freq))) {
-//                command = Command.FREQUENCY.makeCommand(params);
-//            } else if (key.equals(mContext.getResources().getString(R.string.led))) {
-//                command = Command.LED.makeCommand(params);
-//            } else if (key.equals(mContext.getResources().getString(R.string.target))) {
-//                command = Command.TARGET.makeCommand(params);
-//            } else if (key.equals(mContext.getResources().getString(R.string.report_to))) {
-//                command = Command.REPORT_TO.makeCommand(params);
-//            } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
-//                command = Command.WIFI.makeCommand(params);
-//            } else if (key.equals(mContext.getResources().getString(R.string.protocol))) {
-//                command = Command.PROTOCOL.makeCommand(params);
-//            } else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
-//                command = Command.SET_TIME.makeCommand(params);
-//            } else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
-//                command = Command.REBOOT.makeCommand(params);
-//            }
+//    private boolean stringToBool(String value) {
+//        value = value.replaceAll("\n", "");
+//        if (value.equals("Yes")) {
+//            return true;
+//        } else {
+//            return false;
 //        }
-//        Toast.makeText(mContext, "getCommand " + command, Toast.LENGTH_SHORT).show();
-//
-//        return command;
 //    }
-
-
-    private boolean stringToBool(String value) {
-        value = value.replaceAll("\n", "");
-        if (value.equals("Yes")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     // -----------------------------------------------------------
     // --------------------- GETTER & SETTER ---------------------
     // -----------------------------------------------------------
 
-    public String getParams(String key){
-        StringBuilder params = new StringBuilder("");
-
-        //TODO: consider using ENUM instead of Resources
-        //TODO: consider using a function for common condition
-        if (key.equals(mContext.getResources().getString(R.string.freq))) {
-            params.append(getFreq());
-        } else if (key.equals(mContext.getResources().getString(R.string.led))) {
-            params.append(getRed());
-        } else if (key.equals(mContext.getResources().getString(R.string.target))) {
-        } else if (key.equals(mContext.getResources().getString(R.string.report_to))) {
-        } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
-        } else if (key.equals(mContext.getResources().getString(R.string.protocol))) {
-        } else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
-        } else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
-        }
-
-        return params.toString();
-    }
-
     @Bindable
     public String getFreq() {
-        return freq + "";
+        return freq;
     }
 
-    private void setFreq(int freq) {
+    private void setFreq(String freq) {
         this.freq = freq;
         notifyPropertyChanged(BR.freq);
     }
 
     @Bindable
     public String getRed() {
-        return red + "";
+        return red;
     }
 
-    private void setRed(int red) {
+    private void setRed(String red) {
         this.red = red;
         notifyPropertyChanged(BR.red);
     }
@@ -225,7 +74,7 @@ public class ValueManager extends BaseObservable {
         return blue + "";
     }
 
-    private void setBlue(int blue) {
+    private void setBlue(String blue) {
         this.blue = blue;
         notifyPropertyChanged(BR.blue);
     }
@@ -235,7 +84,7 @@ public class ValueManager extends BaseObservable {
         return green + "";
     }
 
-    private void setGreen(int green) {
+    private void setGreen(String green) {
         this.green = green;
         notifyPropertyChanged(BR.green);
     }
@@ -245,7 +94,7 @@ public class ValueManager extends BaseObservable {
         return yellow + "";
     }
 
-    private void setYellow(int yellow) {
+    private void setYellow(String yellow) {
         this.yellow = yellow;
         notifyPropertyChanged(BR.yellow);
     }
@@ -255,7 +104,7 @@ public class ValueManager extends BaseObservable {
         return ir + "";
     }
 
-    private void setIr(int ir) {
+    private void setIr(String ir) {
         this.ir = ir;
         notifyPropertyChanged(BR.ir);
     }
@@ -265,85 +114,67 @@ public class ValueManager extends BaseObservable {
         return delay + "";
     }
 
-    private void setDelay(int delay) {
+    private void setDelay(String delay) {
         this.delay = delay;
         notifyPropertyChanged(BR.delay);
     }
 
     @Bindable
     public String getPressure1() {
-        if (pressure1) {
-            return "ON";
-        }
-        return "OFF";
+        return boolToString(pressure1);
     }
 
-    private void setPressure1(boolean pressure1) {
+    private void setPressure1(String pressure1) {
         this.pressure1 = pressure1;
         notifyPropertyChanged(BR.pressure1);
     }
 
     @Bindable
     public String getPressure2() {
-        if (pressure2) {
-            return "ON";
-        }
-        return "OFF";
+        return boolToString(pressure2);
     }
 
-    private void setPressure2(boolean pressure2) {
+    private void setPressure2(String pressure2) {
         this.pressure2 = pressure2;
         notifyPropertyChanged(BR.pressure2);
     }
 
     @Bindable
     public String getRgb() {
-        if (rgb) {
-            return "ON";
-        }
-        return "OFF";
+        return boolToString(rgb);
     }
 
-    private void setRgb(boolean rgb) {
+    private void setRgb(String rgb) {
         this.rgb = rgb;
         notifyPropertyChanged(BR.rgb);
     }
 
     @Bindable
     public String getIry() {
-        if (iry) {
-            return "ON";
-        }
-        return "OFF";
+        return boolToString(iry);
     }
 
-    public void setIry(boolean iry) {
+    public void setIry(String iry) {
         this.iry = iry;
         notifyPropertyChanged(BR.iry);
     }
 
     @Bindable
-    public String  getAccgyro() {
-        if (accgyro) {
-            return "ON";
-        }
-        return "OFF";
+    public String getAccgyro() {
+        return boolToString(accgyro);
     }
 
-    private void setAccgyro(boolean accgyro) {
+    private void setAccgyro(String accgyro) {
         this.accgyro = accgyro;
         notifyPropertyChanged(BR.accgyro);
     }
 
     @Bindable
     public String getTimestamp() {
-        if (timestamp) {
-            return "ON";
-        }
-        return "OFF";
+        return boolToString(timestamp);
     }
 
-    private void setTimestamp(boolean timestamp) {
+    private void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
         notifyPropertyChanged(BR.timestamp);
     }
@@ -410,11 +241,12 @@ public class ValueManager extends BaseObservable {
         notifyPropertyChanged(BR.time);
     }
 
-    private String boolToString(boolean bool) {
-        if (bool) {
-            return 1 + "";
+    //TODO: change method name
+    private String boolToString(String bool) {
+        if (bool.equals("true")) {
+            return "ON";
         } else {
-            return 0 + "";
+            return "OFF";
         }
     }
 

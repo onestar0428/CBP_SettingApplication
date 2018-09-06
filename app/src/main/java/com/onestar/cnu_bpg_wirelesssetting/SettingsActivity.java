@@ -27,7 +27,6 @@ public class SettingsActivity extends AppCompatActivity
     private static BluetoothLEService mBluetoothLEService;
     private ValueManager mValueManager;
     private DialogBuilder mDialogBuilder;
-    private ResponseParser mParser;
 
     private String mDeviceName = "DEVICE_NAME";
     private String mDeviceAddress = "DEVICE_ADDRESS";
@@ -38,6 +37,7 @@ public class SettingsActivity extends AppCompatActivity
     private ProgressDialog mDialog;
     private static int tryConnect = 0;
 
+    //TODO: Use StringBuilder instead of String
     //TODO: add a refresh button which sends QUERY command
     //TODO: HANDLE DISCONNECTION WHEN REBOOT..
 
@@ -53,16 +53,17 @@ public class SettingsActivity extends AppCompatActivity
                     || action.equals(BluetoothLEService.GattStatus.ACTION_GATT_SERVICES_DISCOVERED.getStatus())) {
                 mGattConnected = ConnectionStatus.STATE_CONNECTED;
                 tryConnect = 0;
+
+                onBLEServiceConnected();
             } else if (action.equals(BluetoothLEService.GattStatus.ACTION_GATT_DISCONNECTED.getStatus())) {
-                if (tryConnect++ > 3) {
+                if (++tryConnect > 3) {
                     mGattConnected = ConnectionStatus.STATE_DISCONNECTED;
                     mBluetoothLEService.disconnect();
 
                     Toast.makeText(SettingsActivity.this, "BLE Connection is Unstable.", Toast.LENGTH_SHORT).show();
                     finish();
                 } else {
-                    mDialog.show();
-                    bindService(new Intent(SettingsActivity.this, BluetoothLEService.class), mServiceConnection, BIND_AUTO_CREATE);
+                    //TODO:reconnect
 //                    mDialog.setMessage("Connecting ... (" + tryConnect + " / 3)");
                     Toast.makeText(SettingsActivity.this, "Reconnecting Service ... (" + tryConnect + "/3)", Toast.LENGTH_SHORT).show();
                 }
@@ -121,10 +122,13 @@ public class SettingsActivity extends AppCompatActivity
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_settings);
         binding.setActivity(this);
+        binding.setValue(mValueManager);
 
         bindService(new Intent(this, BluetoothLEService.class), mServiceConnection, BIND_AUTO_CREATE);
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
     }
+
+    //TODO: Add onClick event of "->" button
 
     public void onButtonClick(View view) {
         String key = ((Button) view).getText().toString();
@@ -141,22 +145,27 @@ public class SettingsActivity extends AppCompatActivity
     @Override
     public void onBLEServiceConnected() {
         if (mBluetoothLEService != null && mValueManager == null) {
-            mParser = new ResponseParser();
 
-            mValueManager = new ValueManager(SettingsActivity.this, mBluetoothLEService, SettingsActivity.this);
+            mValueManager = new ValueManager(SettingsActivity.this);
             binding.setValue(mValueManager);
 
             // request for initialize the setting values for UI
-            sendCommand(Command.QUERY.header);
+            sendCommand(Value.Command.QUERY.makeCommand());
         }
     }
 
     @Override
     public void onBLEResponseReceived(String response) {
-        mParser.parse(response);
+        String key = "", value = "";
 //        Toast.makeText(SettingsActivity.this, "BLEResponseReceived", Toast.LENGTH_SHORT).show();
 
-        mValueManager.update(mParser.getKey(), mParser.getValue());
+        if (response.startsWith(" * ")) {
+            String parseAsterisk = response.replace(" * ", "");
+            key = parseAsterisk.split(":")[0].split(" ")[0];
+            value = parseAsterisk.split(":")[1].replace(" ", "");
+        }
+
+        mValueManager.update(key, value);
     }
 
     @Override
@@ -172,11 +181,10 @@ public class SettingsActivity extends AppCompatActivity
         //TODO: Handle about QUERY more efficient
 
         if (!command.equals("")) {
-            Toast.makeText(SettingsActivity.this, "sendCommand " + command, Toast.LENGTH_SHORT).show();
             boolean result = mBluetoothLEService.sendCommand(command);
 
-            if (result && !command.startsWith(Command.QUERY.header)) {
-                return mBluetoothLEService.sendCommand(Command.QUERY.header);
+            if (result && !command.startsWith(Value.Command.QUERY.makeCommand())) {
+                return mBluetoothLEService.sendCommand(Value.Command.QUERY.makeCommand());
             }
         }
         return false;
@@ -185,64 +193,8 @@ public class SettingsActivity extends AppCompatActivity
     //TODO: delete function after verifying DATABINDING works well
     @Override
     public void onValueUpdated(String key, String newValue) {
-        if (!key.equals("")) {
-//            switch (key) {
-//                case "Pulse":
-//                    binding.frequencyTextView.setText(newValue);
-//                    break;
-//                case "RED":
-//                    binding.redTextView.setText(newValue);
-//                    break;
-//                case "GRN":
-//                    binding.greenTextView.setText(newValue);
-//                    break;
-//                case "BLU":
-//                    binding.blueTextView.setText(newValue);
-//                    break;
-//                case "YEL":
-//                    binding.yellowTextView.setText(newValue);
-//                    break;
-//                case "IR":
-//                    binding.irTextView.setText(newValue);
-//                    break;
-//                case "Pressure_1st":
-//                    binding.pressure1TextView.setText(newValue);
-//                    break;
-//                case "Pressure_2nd":
-//                    binding.pressure2TextView.setText(newValue);
-//                    break;
-//                case "Optical_RGB":
-//                    binding.rgbTextView.setText(newValue);
-//                    break;
-//                case "Optical_IrY":
-//                    binding.iryTextView.setText(newValue);
-//                    break;
-//                case "Acc/Gyro":
-//                    binding.accgyroTextView.setText(newValue);
-//                    break;
-//                case "Include":
-//                    binding.timestampTextView.setText(newValue);
-//                    break;
-//                case "Report":
-//                    binding.reportTextView.setText(newValue);
-//                    break;
-//                case "Current":
-//                    binding.setTimeTextView.setText(newValue);
-//                    break;
-//                case "UDP/TCP":
-//                    binding.protocolTextView.setText(newValue);
-//                    break;
-//                case "Port":
-//                    binding.portTextView.setText(newValue);
-//                    break;
-////                TODO: case for wifi (ssid, pw)
-//            }
-
-            if (mDialog.isShowing())
-                mDialog.hide();
-
-            Toast.makeText(SettingsActivity.this, "ValueUpdated", Toast.LENGTH_SHORT).show();
-        }
+        if (mDialog.isShowing())
+            mDialog.hide();
     }
 
     @Override
@@ -250,10 +202,10 @@ public class SettingsActivity extends AppCompatActivity
         super.onResume();
 
         if (mGattConnected == ConnectionStatus.STATE_DISCONNECTED) {
-            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+//            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         }
         if (mServiceConnected == ConnectionStatus.STATE_DISCONNECTED) {
-            bindService(new Intent(this, BluetoothLEService.class), mServiceConnection, BIND_AUTO_CREATE);
+//            bindService(new Intent(this, BluetoothLEService.class), mServiceConnection, BIND_AUTO_CREATE);
         }
     }
 

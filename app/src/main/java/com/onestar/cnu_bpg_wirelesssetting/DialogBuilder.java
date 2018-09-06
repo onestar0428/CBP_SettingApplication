@@ -105,6 +105,7 @@ public class DialogBuilder {
         final View view = mInflater.inflate(R.layout.dialog_numpicks, null);
 
         // TODO: set default & max value is strange
+
         final NumberPicker redPicker = (NumberPicker) view.findViewById(R.id.numberPicker_red);
         redPicker.setMinValue(0);
         redPicker.setMaxValue(100);
@@ -142,12 +143,14 @@ public class DialogBuilder {
         final NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.numberPicker);
 
         //TODO: set default
+
         builder.setView(view);
         if (mKey.equals(mContext.getResources().getString(R.string.reboot))) {
             numberPicker.setMaxValue(60); // 1 min
             numberPicker.setMinValue(0);
             builder.setTitle("Input Reboot Delay (0 ~ )s");
         } else if (mKey.equals(mContext.getResources().getString(R.string.freq))) {
+            //TODO: replace numberpicker to editText ?
             numberPicker.setMaxValue(500);
             numberPicker.setMinValue(80);
             builder.setTitle("Input FREQUENCY ( ~ )Hz");
@@ -189,6 +192,7 @@ public class DialogBuilder {
                     .setPositiveButton(R.string.yes_dialog, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
+                            //TODO:
                             // two check options
                             // one number picker
 
@@ -218,6 +222,11 @@ public class DialogBuilder {
 
     private void makeTimePicker(AlertDialog.Builder builder) {
         final View view = mInflater.inflate(R.layout.dialog_time, null);
+        final NumberPicker secondPicker = (NumberPicker) view.findViewById(R.id.secondPicker);
+        secondPicker.setMaxValue(60);
+        secondPicker.setMinValue(0);
+
+        //TODO: set default
 
         builder.setTitle("Pick the date and time")
                 .setView(view)
@@ -230,10 +239,10 @@ public class DialogBuilder {
                         //yyyy:m:dd:hh:mm:ss
                         //cannot support 0 for front space..
 
-                        //String params = datePicker.getYear() + ":" + datePicker.getMonth() + ":" + datePicker.getDayOfMonth() + ":" +
-                        //        timePicker.getHour() + ":" + timePicker.getMinute() + ":" + 0;
+                        //TODO: getHour & getMinute
+                        String params = datePicker.getYear() + ":" + datePicker.getMonth() + ":" + datePicker.getDayOfMonth() + ":" +
+                                timePicker.getHour() + ":" + timePicker.getMinute() + ":" + secondPicker.getValue();
 
-                        //TODO: handling seconds (timepicker doesn't support I see) and others either
                         passParameters("");
                         dismiss(dialog);
                     }
