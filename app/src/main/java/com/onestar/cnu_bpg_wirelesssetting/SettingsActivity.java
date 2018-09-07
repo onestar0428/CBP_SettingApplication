@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 import com.onestar.cnu_bpg_wirelesssetting.databinding.ActivitySettingsBinding;
 
-
 public class SettingsActivity extends AppCompatActivity
         implements ValueManager.ValueManagerListener, DialogBuilder.dialogBuilderListener, SettingsActivityListener {
     private final static String TAG = SettingsActivity.class.getSimpleName();
@@ -37,6 +36,10 @@ public class SettingsActivity extends AppCompatActivity
     private ProgressDialog mDialog;
     private static int tryConnect = 0;
 
+    public static final String QUERY = "QUERY:", FREQUENCY = "FREQUENCY:", LED = "LED:", TARGET = "TARGET:",
+            REPORT_TO = "REPORT_TO:", WIFI = "WIFI:", PROTOCOL = "PROTOCOL:", SET_TIME = "SET_TIME:",
+            REBOOT = "REBOOT:", START = "START:", RESUME = "RESUME", STOP = "STOP";
+
     //TODO: Use StringBuilder instead of String
     //TODO: add a refresh button which sends QUERY command
     //TODO: HANDLE DISCONNECTION WHEN REBOOT..
@@ -49,13 +52,13 @@ public class SettingsActivity extends AppCompatActivity
             if (mDialog.isShowing())
                 mDialog.hide();
 
-            if (action.equals(BluetoothLEService.GattStatus.ACTION_DATA_AVAILABLE.getStatus())
-                    || action.equals(BluetoothLEService.GattStatus.ACTION_GATT_SERVICES_DISCOVERED.getStatus())) {
+            if (action.equals(BluetoothLEService.ACTION_DATA_AVAILABLE)
+                    || action.equals(BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED)) {
                 mGattConnected = ConnectionStatus.STATE_CONNECTED;
                 tryConnect = 0;
 
                 onBLEServiceConnected();
-            } else if (action.equals(BluetoothLEService.GattStatus.ACTION_GATT_DISCONNECTED.getStatus())) {
+            } else if (action.equals(BluetoothLEService.ACTION_GATT_DISCONNECTED)) {
                 if (++tryConnect > 3) {
                     mGattConnected = ConnectionStatus.STATE_DISCONNECTED;
                     mBluetoothLEService.disconnect();
@@ -72,7 +75,6 @@ public class SettingsActivity extends AppCompatActivity
     };
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
-
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLEService = ((BluetoothLEService.LocalBinder) service).getService();
@@ -86,9 +88,9 @@ public class SettingsActivity extends AppCompatActivity
                 mDialog = ProgressDialog.show(SettingsActivity.this, mDeviceName, "Connecting ...", true, true);
                 final boolean result = mBluetoothLEService.connect(mDeviceAddress);
 
+                mServiceConnected = ConnectionStatus.STATE_CONNECTED;
                 mBluetoothLEService.setValueManagerListener(SettingsActivity.this);
 
-                mServiceConnected = ConnectionStatus.STATE_CONNECTED;
                 Log.d(TAG, "Connect request result=" + result);
             }
         }
@@ -105,10 +107,10 @@ public class SettingsActivity extends AppCompatActivity
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
 
-        intentFilter.addAction(BluetoothLEService.GattStatus.ACTION_GATT_CONNECTED.getStatus());
-        intentFilter.addAction(BluetoothLEService.GattStatus.ACTION_GATT_DISCONNECTED.getStatus());
-        intentFilter.addAction(BluetoothLEService.GattStatus.ACTION_GATT_SERVICES_DISCOVERED.getStatus());
-        intentFilter.addAction(BluetoothLEService.GattStatus.ACTION_DATA_AVAILABLE.getStatus());
+        intentFilter.addAction(BluetoothLEService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BluetoothLEService.ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED);
+        intentFilter.addAction(BluetoothLEService.ACTION_DATA_AVAILABLE);
 
         return intentFilter;
     }
@@ -150,7 +152,7 @@ public class SettingsActivity extends AppCompatActivity
             binding.setValue(mValueManager);
 
             // request for initialize the setting values for UI
-            sendCommand(Value.Command.QUERY.makeCommand());
+            sendCommand(QUERY);
         }
     }
 
@@ -183,8 +185,8 @@ public class SettingsActivity extends AppCompatActivity
         if (!command.equals("")) {
             boolean result = mBluetoothLEService.sendCommand(command);
 
-            if (result && !command.startsWith(Value.Command.QUERY.makeCommand())) {
-                return mBluetoothLEService.sendCommand(Value.Command.QUERY.makeCommand());
+            if (result && !command.startsWith(QUERY)) {
+                return mBluetoothLEService.sendCommand(QUERY);
             }
         }
         return false;
@@ -226,7 +228,6 @@ public class SettingsActivity extends AppCompatActivity
             mBluetoothLEService.disconnect();
             mBluetoothLEService = null;
         }
-
     }
 
     @Override

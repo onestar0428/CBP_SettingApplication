@@ -36,43 +36,28 @@ public class BluetoothLEService extends Service {
     private String mBluetoothDeviceAddress;
     private static final int REQUEST_MAX_MTU = 100;
 
-    public enum GattStatus {
-        ACTION_GATT_CONNECTED("com.example.bluetooth.le.ACTION_GATT_CONNECTED"),
-        ACTION_GATT_DISCONNECTED("com.example.bluetooth.le.ACTION_GATT_DISCONNECTED"),
-        ACTION_GATT_SERVICES_DISCOVERED("com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED"),
-        ACTION_DATA_AVAILABLE("com.example.bluetooth.le.ACTION_DATA_AVAILABLE"),
-        EXTRA_DATA("com.example.bluetooth.le.EXTRA_DATA");
+    public final static String ACTION_GATT_CONNECTED =
+            "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
+    public final static String ACTION_GATT_DISCONNECTED =
+            "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED";
+    public final static String ACTION_GATT_SERVICES_DISCOVERED =
+            "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
+    public final static String ACTION_DATA_AVAILABLE =
+            "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
+    public final static String EXTRA_DATA =
+            "com.example.bluetooth.le.EXTRA_DATA";
 
-        private String status;
-
-        GattStatus(String status) {
-            this.status = status;
-        }
-
-        public String getStatus(){
-            return this.status;
-        }
-    }
-
-    private enum Uuid {
-        SERVICE_UUID(UUID.fromString("0000ABF0-0000-1000-8000-00805F9B34FB")),
-        DATA_RECEIVE_UUID(UUID.fromString("0000ABF1-0000-1000-8000-00805F9B34FB")),
-        DATA_NOTIFY_UUID(UUID.fromString("0000ABF2-0000-1000-8000-00805F9B34FB")),
-        DATA_DESCRIPTOR_UUID(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"));
-
-        private UUID uuid;
-
-        Uuid(UUID uuid) {
-            this.uuid = uuid;
-        }
-    }
+    private final static UUID SERVICE_UUID = UUID.fromString("0000ABF0-0000-1000-8000-00805F9B34FB");
+    private final static UUID DATA_RECEIVE_UUID = UUID.fromString("0000ABF1-0000-1000-8000-00805F9B34FB");
+    private final static UUID DATA_NOTIFY_UUID = UUID.fromString("0000ABF2-0000-1000-8000-00805F9B34FB");
+    private final static UUID DATA_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                intentAction = GattStatus.ACTION_GATT_CONNECTED.status;
+                intentAction = ACTION_GATT_CONNECTED;
                 mConnectionState = ConnectionStatus.STATE_CONNECTED;
 
                 Log.i(TAG, "Connected to GATT server.");
@@ -83,7 +68,7 @@ public class BluetoothLEService extends Service {
                 Log.i(TAG, "Attempting to start service discovery:" +
                         mBluetoothGatt.discoverServices());
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                intentAction = GattStatus.ACTION_GATT_DISCONNECTED.status;
+                intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = ConnectionStatus.STATE_DISCONNECTED;
 
                 Log.i(TAG, "Disconnected from GATT server.");
@@ -95,17 +80,17 @@ public class BluetoothLEService extends Service {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(GattStatus.ACTION_GATT_SERVICES_DISCOVERED.status);
+                broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
 
                 if (gatt != null) {
-                    mBluetoothGattService = gatt.getService(Uuid.SERVICE_UUID.uuid);
+                    mBluetoothGattService = gatt.getService(SERVICE_UUID);
 
                     Log.i(TAG, "Service characteristic UUID found: " + mBluetoothGattService.getUuid().toString());
                 }
 
                 if (mBluetoothGattService != null) {
-                    mWriteCharacteristic = mBluetoothGattService.getCharacteristic(Uuid.DATA_RECEIVE_UUID.uuid);
-                    mNotifyCharacteristic = mBluetoothGattService.getCharacteristic(Uuid.DATA_NOTIFY_UUID.uuid);
+                    mWriteCharacteristic = mBluetoothGattService.getCharacteristic(DATA_RECEIVE_UUID);
+                    mNotifyCharacteristic = mBluetoothGattService.getCharacteristic(DATA_NOTIFY_UUID);
 
                     valueManagerListener.onBLEServiceConnected();
                 }
@@ -117,10 +102,10 @@ public class BluetoothLEService extends Service {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
-            broadcastUpdate(GattStatus.ACTION_DATA_AVAILABLE.status, characteristic);
+            broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
 
             // NOTIFY
-            if (characteristic.getUuid().equals(Uuid.DATA_NOTIFY_UUID.uuid)) {
+            if (characteristic.getUuid().equals(DATA_NOTIFY_UUID)) {
                 String response = new String(characteristic.getValue());
                 valueManagerListener.onBLEResponseReceived(response);
 
@@ -133,7 +118,7 @@ public class BluetoothLEService extends Service {
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(GattStatus.ACTION_DATA_AVAILABLE.status, characteristic);
+                broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
             }
         }
 
@@ -163,13 +148,14 @@ public class BluetoothLEService extends Service {
     private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
 
-        if (Uuid.DATA_NOTIFY_UUID.uuid.equals(characteristic.getUuid())) {
+        if (DATA_NOTIFY_UUID.equals(characteristic.getUuid())) {
             final byte[] data = characteristic.getValue();
             if (data != null && data.length > 0) {
                 final StringBuilder stringBuilder = new StringBuilder(data.length);
                 for (byte byteChar : data)
                     stringBuilder.append(String.format("%02X ", byteChar));
-                intent.putExtra(GattStatus.EXTRA_DATA.status, new String(data) + "\n" + stringBuilder.toString());
+                intent.putExtra(EXTRA_DATA, new String(data) + "\n" + stringBuilder.toString());
+//                Log.d(TAG, "COMMAND_RESPONSE: " + new String(data) + "\n" + stringBuilder.toString());
             }
         }
         sendBroadcast(intent);
@@ -207,8 +193,8 @@ public class BluetoothLEService extends Service {
         mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
 
         // This is specific to Heart Rate Measurement.
-        if (Uuid.DATA_NOTIFY_UUID.uuid.equals(characteristic.getUuid())) {
-            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(Uuid.DATA_DESCRIPTOR_UUID.uuid);
+        if (DATA_NOTIFY_UUID.equals(characteristic.getUuid())) {
+            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(DATA_DESCRIPTOR_UUID);
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor);
         }

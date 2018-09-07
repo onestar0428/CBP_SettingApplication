@@ -7,43 +7,148 @@ import com.android.databinding.library.baseAdapters.BR;
 
 public class ValueManager extends BaseObservable {
     private SettingsActivityListener settingsActivityListener;
-    private String freq = Value.FREQ.value,
-            delay = Value.DELAY.value,
-            red = Value.RED.value,
-            blue = Value.BLUE.value,
-            green = Value.GREEN.value,
-            yellow = Value.YELLOW.value,
-            ir = Value.IR.value,
-            pressure1 = Value.PRESSURE1.value,
-            pressure2 = Value.PRESSURE2.value,
-            rgb = Value.RGB.value,
-            iry = Value.IRY.value,
-            accgyro = Value.ACCGYRO.value,
-            timestamp = Value.TIMESTAMP.value,
-            report = Value.REPORT.value,
-            ssid = Value.SSID.value,
-            password = Value.PASSWORD.value,
-            protocol = Value.PROTOCOL.value,
-            port = Value.PORT.value,
-            time = Value.TIME.value;
+    private String freq = Default.DEFAULT_FREQ.value,
+            delay = Default.DEFAULT_DELAY.value,
+            red = Default.DEFAULT_LED.value,
+            blue = Default.DEFAULT_LED.value,
+            green = Default.DEFAULT_LED.value,
+            yellow = Default.DEFAULT_LED.value,
+            ir = Default.DEFAULT_LED.value,
+            pressure1 = Default.DEFAULT_BOOL.value,
+            pressure2 = Default.DEFAULT_BOOL.value,
+            rgb = Default.DEFAULT_BOOL.value,
+            iry = Default.DEFAULT_BOOL.value,
+            accgyro = Default.DEFAULT_BOOL.value,
+            timestamp = Default.DEFAULT_BOOL.value,
+            report = Default.DEFAULT_REPORT.value,
+            ssid = Default.DEFAULT_STRING.value,
+            password = Default.DEFAULT_STRING.value,
+            protocol = Default.DEFAULT_STRING.value,
+            port = Default.DEFAULT_STRING.value,
+            time = Default.DEFAULT_TIME.value;
 
     //TODO: static factory or singleton
+    //TODO: delete listener after verifying DataBinding works well
     public ValueManager(SettingsActivityListener listener) {
         settingsActivityListener = listener;
     }
 
     public void update(String key, String value) {
-
+        //TODO: Consider how to reduce code lines
+        String newValue = "";
+        if (!key.equals("")) {
+            switch (key) {
+                case "Pulse":
+                    value = value.replaceAll("Hz", "").replaceAll("\n", "");
+                    setFreq(value);
+                    newValue = getFreq();
+                    settingsActivityListener.onValueUpdated(key, getFreq());
+                    break;
+                case "RED":
+                    value = value.replaceAll("mA", "").replaceAll("\n", "");
+                    setRed(value);
+                    newValue = getRed();
+                    settingsActivityListener.onValueUpdated(key, getRed());
+                    break;
+                case "GRN":
+                    value = value.replaceAll("mA", "").replaceAll("\n", "");
+                    setGreen(value);
+                    newValue = getGreen();
+                    settingsActivityListener.onValueUpdated(key, getGreen());
+                    break;
+                case "BLU":
+                    value = value.replaceAll("mA", "").replaceAll("\n", "");
+                    setBlue(value);
+                    newValue = getBlue();
+                    settingsActivityListener.onValueUpdated(key, getBlue());
+                    break;
+                case "YEL":
+                    value = value.replaceAll("mA", "").replaceAll("\n", "");
+                    setYellow(value);
+                    newValue = getYellow();
+                    settingsActivityListener.onValueUpdated(key, getYellow());
+                    break;
+                case "IR":
+                    value = value.replaceAll("mA", "").replaceAll("\n", "");
+                    setIr(value);
+                    newValue = getIr();
+                    settingsActivityListener.onValueUpdated(key, getIr());
+                    break;
+                case "Pressure_1st":
+                    setPressure1(stringToBool(value));
+                    newValue = getPressure1();
+                    settingsActivityListener.onValueUpdated(key, getPressure1());
+                    break;
+                case "Pressure_2nd":
+                    setPressure2(stringToBool(value));
+                    newValue = getPressure2();
+                    settingsActivityListener.onValueUpdated(key, getPressure2());
+                    break;
+                case "Optical_RGB":
+                    setRgb(stringToBool(value));
+                    newValue = getRgb();
+                    settingsActivityListener.onValueUpdated(key, getRgb());
+                    break;
+                case "Optical_IrY":
+                    setIry(stringToBool(value));
+                    newValue = getIry();
+                    settingsActivityListener.onValueUpdated(key, getIry());
+                    break;
+                case "Acc/Gyro":
+                    setAccgyro(stringToBool(value));
+                    newValue = getAccgyro();
+                    settingsActivityListener.onValueUpdated(key, getAccgyro());
+                    break;
+                case "Include":
+                    setTimestamp(stringToBool(value));
+                    newValue = getTimestamp();
+                    settingsActivityListener.onValueUpdated(key, getTimestamp());
+                    break;
+                case "Report":
+                    setReport(value);
+                    newValue = getReport();
+                    setReport(value.replaceAll("\n", ""));
+                    settingsActivityListener.onValueUpdated(key, getReport());
+                    break;
+                case "Current":
+                    setTime(value);
+                    newValue = getTime();
+                    setTime(value.replaceAll("\n", ""));
+                    settingsActivityListener.onValueUpdated(key, getTime());
+                    break;
+                case "UDP/TCP":
+                    setProtocol(value);
+                    newValue = getProtocol();
+                    setProtocol(value.replaceAll("\n", ""));
+                    settingsActivityListener.onValueUpdated(key, getProtocol());
+                    break;
+                case "Port":
+                    setPort(value);
+                    newValue = getPort();
+                    setPort(value.replaceAll("\n", ""));
+                    settingsActivityListener.onValueUpdated(key, getPort());
+                    break;
+            }
+        }
+        settingsActivityListener.onValueUpdated(key, newValue);
     }
 
-//    private boolean stringToBool(String value) {
-//        value = value.replaceAll("\n", "");
-//        if (value.equals("Yes")) {
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
+    private String stringToBool(String value) {
+        value = value.replaceAll("\n", "");
+        if (value.equals("Yes")) {
+            return "ON";
+        } else {
+            return "OFF";
+        }
+    }
+
+    private String boolToString(String bool) {
+        if (bool.equals("true")) {
+            return "ON";
+        } else {
+            return "OFF";
+        }
+    }
 
     // -----------------------------------------------------------
     // --------------------- GETTER & SETTER ---------------------
@@ -241,18 +346,22 @@ public class ValueManager extends BaseObservable {
         notifyPropertyChanged(BR.time);
     }
 
-    //TODO: change method name
-    private String boolToString(String bool) {
-        if (bool.equals("true")) {
-            return "ON";
-        } else {
-            return "OFF";
-        }
-    }
-
     interface ValueManagerListener {
         void onBLEResponseReceived(String response);
 
         void onBLEServiceConnected();
     }
+
+    private enum Default {
+        DEFAULT_LED("50"), DEFAULT_FREQ("100"), DEFAULT_DELAY("0"),
+        DEFAULT_BOOL("false"),
+        DEFAULT_REPORT("console"), DEFAULT_STRING(""), DEFAULT_TIME("2017:01:01:00:01:59");
+
+        private String value;
+
+        Default(String value) {
+            this.value = value;
+        }
+    }
 }
+
