@@ -19,13 +19,19 @@ import android.widget.Toast;
 import com.onestar.cnu_bpg_wirelesssetting.databinding.ActivitySettingsBinding;
 
 public class SettingsActivity extends AppCompatActivity
-        implements ValueManager.ValueManagerListener, DialogBuilder.dialogBuilderListener, SettingsActivityListener {
-    private final static String TAG = SettingsActivity.class.getSimpleName();
-    private ActivitySettingsBinding binding;
+        implements ValueManager.ValueManagerListener, DialogBuilder.dialogBuilderListener {
 
+    private final static String TAG = SettingsActivity.class.getSimpleName();
+
+    private static ActivitySettingsBinding binding;
     private static BluetoothLEService mBluetoothLEService;
-    private ValueManager mValueManager;
-    private DialogBuilder mDialogBuilder;
+    private static ValueManager mValueManager;
+    private static DialogBuilder mDialogBuilder;
+
+    public static final String QUERY = "QUERY:", START = "START:", RESUME = "RESUME", STOP = "STOP";
+
+    private int tryConnect = 0;
+    private static int TRY_LIMIT = 3;
 
     private String mDeviceName = "DEVICE_NAME";
     private String mDeviceAddress = "DEVICE_ADDRESS";
@@ -34,11 +40,7 @@ public class SettingsActivity extends AppCompatActivity
     private ConnectionStatus mServiceConnected = ConnectionStatus.STATE_DISCONNECTED;
 
     private ProgressDialog mDialog;
-    private static int tryConnect = 0;
 
-    public static final String QUERY = "QUERY:", FREQUENCY = "FREQUENCY:", LED = "LED:", TARGET = "TARGET:",
-            REPORT_TO = "REPORT_TO:", WIFI = "WIFI:", PROTOCOL = "PROTOCOL:", SET_TIME = "SET_TIME:",
-            REBOOT = "REBOOT:", START = "START:", RESUME = "RESUME", STOP = "STOP";
 
     //TODO: Use StringBuilder instead of String
     //TODO: add a refresh button which sends QUERY command
@@ -54,22 +56,21 @@ public class SettingsActivity extends AppCompatActivity
 
             if (action.equals(BluetoothLEService.ACTION_DATA_AVAILABLE)
                     || action.equals(BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED)) {
+                Log.d(TAG, "BroadcastReceiver onReceive");
                 mGattConnected = ConnectionStatus.STATE_CONNECTED;
                 tryConnect = 0;
 
                 onBLEServiceConnected();
             } else if (action.equals(BluetoothLEService.ACTION_GATT_DISCONNECTED)) {
-                if (++tryConnect > 3) {
-                    mGattConnected = ConnectionStatus.STATE_DISCONNECTED;
-                    mBluetoothLEService.disconnect();
+                Log.d(TAG, "onReceive: Gatt is Disconnected");
 
-                    Toast.makeText(SettingsActivity.this, "BLE Connection is Unstable.", Toast.LENGTH_SHORT).show();
-                    finish();
-                } else {
-                    //TODO:reconnect
-//                    mDialog.setMessage("Connecting ... (" + tryConnect + " / 3)");
-                    Toast.makeText(SettingsActivity.this, "Reconnecting Service ... (" + tryConnect + "/3)", Toast.LENGTH_SHORT).show();
-                }
+                mGattConnected = ConnectionStatus.STATE_DISCONNECTED;
+                mBluetoothLEService.disconnect();
+
+                Toast.makeText(SettingsActivity.this, "BLE Connection is Unstable.", Toast.LENGTH_SHORT).show();
+                finish();
+//                if (tryConnect >= TRY_LIMIT) {
+//                }
             }
         }
     };
@@ -91,7 +92,7 @@ public class SettingsActivity extends AppCompatActivity
                 mServiceConnected = ConnectionStatus.STATE_CONNECTED;
                 mBluetoothLEService.setValueManagerListener(SettingsActivity.this);
 
-                Log.d(TAG, "Connect request result=" + result);
+                Log.d(TAG, "ServiceConnection=" + result);
             }
         }
 
@@ -127,28 +128,53 @@ public class SettingsActivity extends AppCompatActivity
         binding.setValue(mValueManager);
 
         bindService(new Intent(this, BluetoothLEService.class), mServiceConnection, BIND_AUTO_CREATE);
-        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
     }
 
-    //TODO: Add onClick event of "->" button
-
-    public void onButtonClick(View view) {
+    public void onControlButtonClick(View view) {
         String key = ((Button) view).getText().toString();
+        String command = "";
 
-        if (mDialogBuilder == null) {
-            mDialogBuilder = new DialogBuilder(this, this);
+        if (key.equals(getResources().getString(R.string.start))) {
+            ((Button) view).setText(getResources().getString(R.string.resume));
+            command = START;
+        } else if (key.equals(getResources().getString(R.string.resume))) {
+            ((Button) view).setText(getResources().getString(R.string.start));
+            command = RESUME;
+        } else if (key.equals(getResources().getString(R.string.stop))) {
+            command = STOP;
         }
 
-        //TODO: send with params to set default values in dialog
-        //TODO: add function returns params in a string in ValueManager
-        mDialogBuilder.makeDialog(key);
+        sendCommand(command);
+    }
+
+    public void onButtonClick(View view) {
+        if (view.getId() == R.id.changeLayoutButton) {
+            if (binding.buttonLayout.getVisibility() == View.VISIBLE) {
+                binding.buttonLayout.setVisibility(View.INVISIBLE);
+                binding.controlLayout.setVisibility(View.VISIBLE);
+                binding.changeLayoutButton.setText("←");
+            } else {
+                binding.buttonLayout.setVisibility(View.VISIBLE);
+                binding.controlLayout.setVisibility(View.INVISIBLE);
+                binding.changeLayoutButton.setText("→");
+            }
+        } else {
+            String key = ((Button) view).getText().toString();
+
+            if (mDialogBuilder == null) {
+                mDialogBuilder = new DialogBuilder(this, this, binding);
+            }
+
+            mDialogBuilder.makeDialog(key);
+        }
     }
 
     @Override
     public void onBLEServiceConnected() {
         if (mBluetoothLEService != null && mValueManager == null) {
+            Log.d(TAG, "onBLEServiceConnected");
 
-            mValueManager = new ValueManager(SettingsActivity.this);
+            mValueManager = new ValueManager();
             binding.setValue(mValueManager);
 
             // request for initialize the setting values for UI
@@ -159,44 +185,40 @@ public class SettingsActivity extends AppCompatActivity
     @Override
     public void onBLEResponseReceived(String response) {
         String key = "", value = "";
-//        Toast.makeText(SettingsActivity.this, "BLEResponseReceived", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onBLEResponseReceived");
 
         if (response.startsWith(" * ")) {
             String parseAsterisk = response.replace(" * ", "");
             key = parseAsterisk.split(":")[0].split(" ")[0];
             value = parseAsterisk.split(":")[1].replace(" ", "");
-        }
 
-        mValueManager.update(key, value);
+            mValueManager.update(key, value);
+        }
     }
 
     @Override
     public void onDialogValueChanged(String key, String params) {
-//        mDialog.show(SettingsActivity.this, mDeviceName, "Setting Values ...", true, true);
+        Log.d(TAG, "DialogValueChanged");
         Toast.makeText(SettingsActivity.this, "DialogValueChanged", Toast.LENGTH_SHORT).show();
 
-//        boolean result = sendCommand(mValueManager.getCommand(key, params));
-        sendCommand(key + ":" + params + ":");
+        if (!key.equals("") && !params.equals("")) {
+            sendCommand(key + ":" + params + ":");
+        }
     }
 
     private boolean sendCommand(String command) {
         //TODO: Handle about QUERY more efficient
+        boolean result = false;
+        Log.d(TAG, "sendCommand: " + command);
 
         if (!command.equals("")) {
-            boolean result = mBluetoothLEService.sendCommand(command);
+            result = mBluetoothLEService.sendCommand(command);
 
             if (result && !command.startsWith(QUERY)) {
-                return mBluetoothLEService.sendCommand(QUERY);
+                result = mBluetoothLEService.sendCommand(QUERY);
             }
         }
-        return false;
-    }
-
-    //TODO: delete function after verifying DATABINDING works well
-    @Override
-    public void onValueUpdated(String key, String newValue) {
-        if (mDialog.isShowing())
-            mDialog.hide();
+        return result;
     }
 
     @Override
@@ -204,10 +226,17 @@ public class SettingsActivity extends AppCompatActivity
         super.onResume();
 
         if (mGattConnected == ConnectionStatus.STATE_DISCONNECTED) {
-//            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         }
-        if (mServiceConnected == ConnectionStatus.STATE_DISCONNECTED) {
-//            bindService(new Intent(this, BluetoothLEService.class), mServiceConnection, BIND_AUTO_CREATE);
+
+        if (mBluetoothLEService != null) {
+            //TODO: Reconnect
+            while (++tryConnect < TRY_LIMIT && mGattConnected == ConnectionStatus.STATE_DISCONNECTED) {
+                final boolean result = mBluetoothLEService.connect(mDeviceAddress);
+                Log.d(TAG, "Connect request result=" + result);
+
+                Toast.makeText(SettingsActivity.this, "Reconnecting Service ... (" + tryConnect + "/3)", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -216,15 +245,8 @@ public class SettingsActivity extends AppCompatActivity
         super.onStop();
         getDelegate().onStop();
 
-//        if (mGattUpdateReceiver != null && mGattConnected == ConnectionStatus.STATE_CONNECTED){
-//            unregisterReceiver(mGattUpdateReceiver);
-//        }
-//
-//        if(mServiceConnected == ConnectionStatus.STATE_CONNECTED){
-//            unbindService(mServiceConnection);
-//        }
-
         if (mBluetoothLEService != null) {
+            Log.d(TAG, "onStop");
             mBluetoothLEService.disconnect();
             mBluetoothLEService = null;
         }
@@ -241,6 +263,7 @@ public class SettingsActivity extends AppCompatActivity
 
         if (mDialogBuilder == null ||
                 (mDialogBuilder != null && !mDialogBuilder.isShowing())) {
+            Log.d(TAG, "onPause");
             if (mGattUpdateReceiver != null && mGattConnected == ConnectionStatus.STATE_CONNECTED) {
                 unregisterReceiver(mGattUpdateReceiver);
             }
@@ -254,11 +277,5 @@ public class SettingsActivity extends AppCompatActivity
                 mBluetoothLEService = null;
             }
         }
-
     }
-
-}
-
-interface SettingsActivityListener {
-    void onValueUpdated(String key, String newValue);
 }

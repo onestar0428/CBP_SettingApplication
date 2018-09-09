@@ -2,11 +2,13 @@ package com.onestar.cnu_bpg_wirelesssetting;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.util.Log;
 
 import com.android.databinding.library.baseAdapters.BR;
 
 public class ValueManager extends BaseObservable {
-    private SettingsActivityListener settingsActivityListener;
+    private final static String TAG = ValueManager.class.getSimpleName();
+
     private String freq = Default.DEFAULT_FREQ.value,
             delay = Default.DEFAULT_DELAY.value,
             red = Default.DEFAULT_LED.value,
@@ -28,111 +30,69 @@ public class ValueManager extends BaseObservable {
             time = Default.DEFAULT_TIME.value;
 
     //TODO: static factory or singleton
-    //TODO: delete listener after verifying DataBinding works well
-    public ValueManager(SettingsActivityListener listener) {
-        settingsActivityListener = listener;
-    }
 
+    public void ValueManager(){
+        Log.d(TAG, "ValueManager Constructor");
+    }
     public void update(String key, String value) {
         //TODO: Consider how to reduce code lines
-        String newValue = "";
+        Log.d(TAG, "update" );
+
         if (!key.equals("")) {
             switch (key) {
                 case "Pulse":
-                    value = value.replaceAll("Hz", "").replaceAll("\n", "");
-                    setFreq(value);
-                    newValue = getFreq();
-                    settingsActivityListener.onValueUpdated(key, getFreq());
+                    setFreq(value.replaceAll("Hz", "").replaceAll("\n", ""));
                     break;
                 case "RED":
-                    value = value.replaceAll("mA", "").replaceAll("\n", "");
-                    setRed(value);
-                    newValue = getRed();
-                    settingsActivityListener.onValueUpdated(key, getRed());
+                    setRed(value.replaceAll("mA", "").replaceAll("\n", ""));
                     break;
                 case "GRN":
-                    value = value.replaceAll("mA", "").replaceAll("\n", "");
-                    setGreen(value);
-                    newValue = getGreen();
-                    settingsActivityListener.onValueUpdated(key, getGreen());
+                    setGreen(value.replaceAll("mA", "").replaceAll("\n", ""));
                     break;
                 case "BLU":
-                    value = value.replaceAll("mA", "").replaceAll("\n", "");
-                    setBlue(value);
-                    newValue = getBlue();
-                    settingsActivityListener.onValueUpdated(key, getBlue());
+                    setBlue(value.replaceAll("mA", "").replaceAll("\n", ""));
                     break;
                 case "YEL":
-                    value = value.replaceAll("mA", "").replaceAll("\n", "");
-                    setYellow(value);
-                    newValue = getYellow();
-                    settingsActivityListener.onValueUpdated(key, getYellow());
+                    setYellow(value.replaceAll("mA", "").replaceAll("\n", ""));
                     break;
                 case "IR":
-                    value = value.replaceAll("mA", "").replaceAll("\n", "");
-                    setIr(value);
-                    newValue = getIr();
-                    settingsActivityListener.onValueUpdated(key, getIr());
+                    setIr(value.replaceAll("mA", "").replaceAll("\n", ""));
                     break;
                 case "Pressure_1st":
                     setPressure1(stringToBool(value));
-                    newValue = getPressure1();
-                    settingsActivityListener.onValueUpdated(key, getPressure1());
                     break;
                 case "Pressure_2nd":
                     setPressure2(stringToBool(value));
-                    newValue = getPressure2();
-                    settingsActivityListener.onValueUpdated(key, getPressure2());
                     break;
                 case "Optical_RGB":
                     setRgb(stringToBool(value));
-                    newValue = getRgb();
-                    settingsActivityListener.onValueUpdated(key, getRgb());
                     break;
                 case "Optical_IrY":
                     setIry(stringToBool(value));
-                    newValue = getIry();
-                    settingsActivityListener.onValueUpdated(key, getIry());
                     break;
                 case "Acc/Gyro":
                     setAccgyro(stringToBool(value));
-                    newValue = getAccgyro();
-                    settingsActivityListener.onValueUpdated(key, getAccgyro());
                     break;
                 case "Include":
                     setTimestamp(stringToBool(value));
-                    newValue = getTimestamp();
-                    settingsActivityListener.onValueUpdated(key, getTimestamp());
                     break;
                 case "Report":
-                    setReport(value);
-                    newValue = getReport();
                     setReport(value.replaceAll("\n", ""));
-                    settingsActivityListener.onValueUpdated(key, getReport());
                     break;
                 case "Current":
-                    setTime(value);
-                    newValue = getTime();
                     setTime(value.replaceAll("\n", ""));
-                    settingsActivityListener.onValueUpdated(key, getTime());
                     break;
                 case "UDP/TCP":
-                    setProtocol(value);
-                    newValue = getProtocol();
                     setProtocol(value.replaceAll("\n", ""));
-                    settingsActivityListener.onValueUpdated(key, getProtocol());
                     break;
                 case "Port":
-                    setPort(value);
-                    newValue = getPort();
                     setPort(value.replaceAll("\n", ""));
-                    settingsActivityListener.onValueUpdated(key, getPort());
                     break;
             }
         }
-        settingsActivityListener.onValueUpdated(key, newValue);
     }
 
+    //TODO: change method name
     private String stringToBool(String value) {
         value = value.replaceAll("\n", "");
         if (value.equals("Yes")) {

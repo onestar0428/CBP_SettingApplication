@@ -51,6 +51,9 @@
     <string name="protocol">PROTOCOL</string>
     <string name="port">PORT</string>
 
+    <string name="tcp">TCP</string>
+    <string name="udp">UDP</string>
+
     <string name="report_console">console</string>
     <string name="report_nw">nw</string>
     <string name="report_both">both</string>

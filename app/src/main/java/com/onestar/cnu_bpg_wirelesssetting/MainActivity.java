@@ -97,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
         listDevice.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mScanning = false;
+                scanLeDevice(mScanning);
+
                 mDeviceName = mLeDevices.get(position).get("name");
                 mDeviceAddress = mLeDevices.get(position).get("address");
 

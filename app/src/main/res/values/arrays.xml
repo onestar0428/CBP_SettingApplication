@@ -16,4 +16,8 @@
         <item>@string/timestamp</item>
     </string-array>
 
+    <string-array name="protocol">
+        <item>@string/tcp</item>
+        <item>@string/udp</item>
+    </string-array>
 </resources>
