@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.onestar.cnu_bpg_wirelesssetting.databinding.ActivitySettingsBinding;
 
 public class SettingsActivity extends AppCompatActivity
-        implements ValueManager.ValueManagerListener, DialogBuilder.dialogBuilderListener {
+        implements DialogBuilder.dialogBuilderListener {
 
     private final static String TAG = SettingsActivity.class.getSimpleName();
 
@@ -50,22 +50,59 @@ public class SettingsActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
+            Bundle extras = intent.getExtras();
 
             if (mDialog.isShowing())
                 mDialog.hide();
 
-            if (action.equals(BluetoothLEService.ACTION_DATA_AVAILABLE)
-                    || action.equals(BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED)) {
-                Log.d(TAG, "BroadcastReceiver onReceive");
+            if (action.equals(BluetoothLEService.ACTION_DATA_AVAILABLE)) {
                 mGattConnected = ConnectionStatus.STATE_CONNECTED;
+                Log.d(TAG, "onReceive: Data Available");
+
+                if (extras.containsKey("value")) {
+                    String key = "", value = "";
+                    String response = extras.getString("value");
+
+                    Log.d(TAG, "OnReceive: " + response);
+
+                    if (response.startsWith(" * ")) {
+                        String[] parseAsterisk = response.replace(" * ", "").split(":");
+
+                        if (parseAsterisk.length > 1){
+                            key = parseAsterisk[0];
+                            if (parseAsterisk[0].contains(" ")) {
+                                key = parseAsterisk[0].split(" ")[0];
+                            }
+
+                            value = value.replaceAll("\n","");
+                            if (parseAsterisk[1].contains(" ")){
+                                value = parseAsterisk[1].replace(" ", "").replaceAll("\n","");
+                            }
+
+                            mValueManager.update(key, value);
+                        }
+                    }
+                }
+            } else if (action.equals(BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED)) {
+                Log.d(TAG, "onReceive: Gatt Services Discovered");
                 tryConnect = 0;
 
-                onBLEServiceConnected();
+                if (mBluetoothLEService != null && mValueManager == null) {
+                    Log.d(TAG, "onBLEServiceConnected");
+
+                    mValueManager = new ValueManager();
+                    binding.setValue(mValueManager);
+
+                    // request for initialize the setting values for UI
+                    sendCommand(QUERY);
+                }
             } else if (action.equals(BluetoothLEService.ACTION_GATT_DISCONNECTED)) {
                 Log.d(TAG, "onReceive: Gatt is Disconnected");
 
                 mGattConnected = ConnectionStatus.STATE_DISCONNECTED;
-                mBluetoothLEService.disconnect();
+                if (mBluetoothLEService != null) {
+                    mBluetoothLEService.disconnect();
+                }
 
                 Toast.makeText(SettingsActivity.this, "BLE Connection is Unstable.", Toast.LENGTH_SHORT).show();
                 finish();
@@ -87,10 +124,8 @@ public class SettingsActivity extends AppCompatActivity
 
             if (mBluetoothLEService != null) {
                 mDialog = ProgressDialog.show(SettingsActivity.this, mDeviceName, "Connecting ...", true, true);
-                final boolean result = mBluetoothLEService.connect(mDeviceAddress);
-
+                final boolean result = mBluetoothLEService.connect(mDeviceAddress, SettingsActivity.this);
                 mServiceConnected = ConnectionStatus.STATE_CONNECTED;
-                mBluetoothLEService.setValueManagerListener(SettingsActivity.this);
 
                 Log.d(TAG, "ServiceConnection=" + result);
             }
@@ -170,33 +205,6 @@ public class SettingsActivity extends AppCompatActivity
     }
 
     @Override
-    public void onBLEServiceConnected() {
-        if (mBluetoothLEService != null && mValueManager == null) {
-            Log.d(TAG, "onBLEServiceConnected");
-
-            mValueManager = new ValueManager();
-            binding.setValue(mValueManager);
-
-            // request for initialize the setting values for UI
-            sendCommand(QUERY);
-        }
-    }
-
-    @Override
-    public void onBLEResponseReceived(String response) {
-        String key = "", value = "";
-        Log.d(TAG, "onBLEResponseReceived");
-
-        if (response.startsWith(" * ")) {
-            String parseAsterisk = response.replace(" * ", "");
-            key = parseAsterisk.split(":")[0].split(" ")[0];
-            value = parseAsterisk.split(":")[1].replace(" ", "");
-
-            mValueManager.update(key, value);
-        }
-    }
-
-    @Override
     public void onDialogValueChanged(String key, String params) {
         Log.d(TAG, "DialogValueChanged");
         Toast.makeText(SettingsActivity.this, "DialogValueChanged", Toast.LENGTH_SHORT).show();
@@ -226,13 +234,13 @@ public class SettingsActivity extends AppCompatActivity
         super.onResume();
 
         if (mGattConnected == ConnectionStatus.STATE_DISCONNECTED) {
-            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());//
         }
 
         if (mBluetoothLEService != null) {
             //TODO: Reconnect
             while (++tryConnect < TRY_LIMIT && mGattConnected == ConnectionStatus.STATE_DISCONNECTED) {
-                final boolean result = mBluetoothLEService.connect(mDeviceAddress);
+                final boolean result = mBluetoothLEService.connect(mDeviceAddress, this);
                 Log.d(TAG, "Connect request result=" + result);
 
                 Toast.makeText(SettingsActivity.this, "Reconnecting Service ... (" + tryConnect + "/3)", Toast.LENGTH_SHORT).show();

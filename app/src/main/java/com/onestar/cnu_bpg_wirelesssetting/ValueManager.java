@@ -36,6 +36,7 @@ public class ValueManager extends BaseObservable {
     }
     public void update(String key, String value) {
         //TODO: Consider how to reduce code lines
+        //TODO: split "." doesn't effect to LED values. Need to consider another way ******************
         Log.d(TAG, "update" );
 
         if (!key.equals("")) {
@@ -59,22 +60,22 @@ public class ValueManager extends BaseObservable {
                     setIr(value.replaceAll("mA", "").replaceAll("\n", ""));
                     break;
                 case "Pressure_1st":
-                    setPressure1(stringToBool(value));
+                    setPressure1(value);
                     break;
                 case "Pressure_2nd":
-                    setPressure2(stringToBool(value));
+                    setPressure2(value);
                     break;
                 case "Optical_RGB":
-                    setRgb(stringToBool(value));
+                    setRgb(value);
                     break;
                 case "Optical_IrY":
-                    setIry(stringToBool(value));
+                    setIry(value);
                     break;
                 case "Acc/Gyro":
-                    setAccgyro(stringToBool(value));
+                    setAccgyro(value);
                     break;
                 case "Include":
-                    setTimestamp(stringToBool(value));
+                    setTimestamp(value);
                     break;
                 case "Report":
                     setReport(value.replaceAll("\n", ""));
@@ -89,24 +90,6 @@ public class ValueManager extends BaseObservable {
                     setPort(value.replaceAll("\n", ""));
                     break;
             }
-        }
-    }
-
-    //TODO: change method name
-    private String stringToBool(String value) {
-        value = value.replaceAll("\n", "");
-        if (value.equals("Yes")) {
-            return "ON";
-        } else {
-            return "OFF";
-        }
-    }
-
-    private String boolToString(String bool) {
-        if (bool.equals("true")) {
-            return "ON";
-        } else {
-            return "OFF";
         }
     }
 
@@ -186,7 +169,7 @@ public class ValueManager extends BaseObservable {
 
     @Bindable
     public String getPressure1() {
-        return boolToString(pressure1);
+        return pressure1;
     }
 
     private void setPressure1(String pressure1) {
@@ -196,7 +179,7 @@ public class ValueManager extends BaseObservable {
 
     @Bindable
     public String getPressure2() {
-        return boolToString(pressure2);
+        return pressure2;
     }
 
     private void setPressure2(String pressure2) {
@@ -206,7 +189,7 @@ public class ValueManager extends BaseObservable {
 
     @Bindable
     public String getRgb() {
-        return boolToString(rgb);
+        return rgb;
     }
 
     private void setRgb(String rgb) {
@@ -216,7 +199,7 @@ public class ValueManager extends BaseObservable {
 
     @Bindable
     public String getIry() {
-        return boolToString(iry);
+        return iry;
     }
 
     public void setIry(String iry) {
@@ -226,7 +209,7 @@ public class ValueManager extends BaseObservable {
 
     @Bindable
     public String getAccgyro() {
-        return boolToString(accgyro);
+        return accgyro;
     }
 
     private void setAccgyro(String accgyro) {
@@ -236,7 +219,7 @@ public class ValueManager extends BaseObservable {
 
     @Bindable
     public String getTimestamp() {
-        return boolToString(timestamp);
+        return timestamp;
     }
 
     private void setTimestamp(String timestamp) {
@@ -304,12 +287,6 @@ public class ValueManager extends BaseObservable {
 //        new SimpleDateFormat("yyyy.MM.dd").format(date);
         this.time = time;
         notifyPropertyChanged(BR.time);
-    }
-
-    interface ValueManagerListener {
-        void onBLEResponseReceived(String response);
-
-        void onBLEServiceConnected();
     }
 
     private enum Default {

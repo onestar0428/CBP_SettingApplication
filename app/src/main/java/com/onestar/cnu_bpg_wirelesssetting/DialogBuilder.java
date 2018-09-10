@@ -78,27 +78,27 @@ public class DialogBuilder extends BaseObservable {
 
         //TODO: improve conditions
         final Switch pressure1Switch = (Switch) view.findViewById(R.id.switch_pressure1);
-        if (mBinding.pressure1TextView.getText().toString().equals("ON")) {
+        if (mBinding.pressure1TextView.getText().toString().equals("Yes")) {
             pressure1Switch.setChecked(true);
         }
         final Switch pressure2Switch = (Switch) view.findViewById(R.id.switch_pressure2);
-        if (mBinding.pressure2TextView.getText().toString().equals("ON")) {
+        if (mBinding.pressure2TextView.getText().toString().equals("Yes")) {
             pressure1Switch.setChecked(true);
         }
         final Switch rgbSwitch = (Switch) view.findViewById(R.id.switch_rgb);
-        if (mBinding.rgbTextView.getText().toString().equals("ON")) {
+        if (mBinding.rgbTextView.getText().toString().equals("Yes")) {
             pressure1Switch.setChecked(true);
         }
         final Switch irySwitch = (Switch) view.findViewById(R.id.switch_iry);
-        if (mBinding.iryTextView.getText().toString().equals("ON")) {
+        if (mBinding.iryTextView.getText().toString().equals("Yes")) {
             pressure1Switch.setChecked(true);
         }
         final Switch accgyroSwitch = (Switch) view.findViewById(R.id.switch_accgyro);
-        if (mBinding.accgyroTextView.getText().toString().equals("ON")) {
+        if (mBinding.accgyroTextView.getText().toString().equals("Yes")) {
             pressure1Switch.setChecked(true);
         }
         final Switch timestampSwitch = (Switch) view.findViewById(R.id.switch_timestamp);
-        if (mBinding.timestampTextView.getText().toString().equals("ON")) {
+        if (mBinding.timestampTextView.getText().toString().equals("Yes")) {
             pressure1Switch.setChecked(true);
         }
 
