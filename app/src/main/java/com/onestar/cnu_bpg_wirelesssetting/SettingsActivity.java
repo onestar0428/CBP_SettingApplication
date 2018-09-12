@@ -215,7 +215,6 @@ public class SettingsActivity extends AppCompatActivity
     }
 
     private boolean sendCommand(String command) {
-        //TODO: Handle about QUERY more efficient
         boolean result = false;
         Log.d(TAG, "sendCommand: " + command);
 
@@ -234,7 +233,7 @@ public class SettingsActivity extends AppCompatActivity
         super.onResume();
 
         if (mGattConnected == ConnectionStatus.STATE_DISCONNECTED) {
-            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());//
+            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());//TODO: solve leak
         }
 
         if (mBluetoothLEService != null) {
@@ -264,7 +263,7 @@ public class SettingsActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
 
-        if (mDialog.isShowing()) {
+        if (mDialog != null && mDialog.isShowing()) {
             mDialog.hide();
             mDialog.dismiss();
         }

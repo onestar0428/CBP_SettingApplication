@@ -35,7 +35,7 @@ public class BluetoothLEService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
 
-    private final static int REQUEST_MAX_MTU = 100;
+    private final static int MAX_MTU = 23;
 
     public final static String ACTION_GATT_CONNECTED =
             "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
@@ -85,7 +85,7 @@ public class BluetoothLEService extends Service {
                 Log.d(TAG, "Gatt is connected, Attempting to start service discovery:" +
                         mBluetoothGatt.discoverServices());
 
-                gatt.requestMtu(REQUEST_MAX_MTU);
+                gatt.requestMtu(MAX_MTU);
                 broadcastUpdate(intentAction);
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
@@ -103,13 +103,12 @@ public class BluetoothLEService extends Service {
 
                 if (gatt != null) {
                     mBluetoothGattService = gatt.getService(SERVICE_UUID);
-
-                    Log.d(TAG, "Service characteristic UUID found: " + mBluetoothGattService.getUuid().toString());
                 }
 
                 if (mBluetoothGattService != null) {
                     mWriteCharacteristic = mBluetoothGattService.getCharacteristic(DATA_RECEIVE_UUID);
                     mNotifyCharacteristic = mBluetoothGattService.getCharacteristic(DATA_NOTIFY_UUID);
+                    Log.w(TAG, "onServicesDiscovered: " + mWriteCharacteristic + "," +mNotifyCharacteristic);
                 }
 
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
@@ -124,10 +123,10 @@ public class BluetoothLEService extends Service {
             broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
 
             // NOTIFY
-            //TODO: how about using broadcast instead of using interface?
+
+            Log.d(TAG, "onCharacteristicChanged(UUID): " + characteristic.getUuid());
             if (characteristic.getUuid().equals(DATA_NOTIFY_UUID)) {
                 String response = new String(characteristic.getValue());
-//                valueManagerListener.onBLEResponseReceived(response);
                 broadcastNotifyUpdate(characteristic);
 
                 Log.d(TAG, "onCharacteristicChanged(Notify): " + response);
@@ -229,13 +228,12 @@ public class BluetoothLEService extends Service {
             return;
         }
         mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
-        Log.d(TAG, "setCharacteristicNotification");
 
-        //TODO: ?
-        // This is specific to Heart Rate Measurement.
+        Log.d(TAG, "setCharacteristicNotification: " + characteristic.getUuid());
         if (DATA_NOTIFY_UUID.equals(characteristic.getUuid())) {
             BluetoothGattDescriptor descriptor = characteristic.getDescriptor(DATA_DESCRIPTOR_UUID);
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+            Log.d(TAG, "setCharacteristicNotification");
 
             mBluetoothGatt.writeDescriptor(descriptor);
         }
@@ -251,16 +249,16 @@ public class BluetoothLEService extends Service {
             return response;
         }
 
-        if ((mWriteCharacteristic.getProperties() & (BluetoothGattCharacteristic.PROPERTY_WRITE | BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) == 0) {
-            mWriteCharacteristic.setWriteType(BluetoothGattCharacteristic.PROPERTY_WRITE | BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE);
-        }
+//        if ((mWriteCharacteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_WRITE) == 0) {
+//            mWriteCharacteristic.setWriteType(BluetoothGattCharacteristic.PROPERTY_WRITE);
+//        }
 
         if (mBluetoothGatt == null) {
 //            if ((mBluetoothDeviceAddress != null && !mBluetoothDeviceAddress.equals(""))) {
 //                connect(mBluetoothDeviceAddress);
 //            } else {
-                Log.w(TAG, "BluetoothGatt is null and there is no info for device address");
-                return response;
+            Log.w(TAG, "BluetoothGatt is null and there is no info for device address");
+            return response;
 //            }
         } else {
             byte[] value = command.getBytes();

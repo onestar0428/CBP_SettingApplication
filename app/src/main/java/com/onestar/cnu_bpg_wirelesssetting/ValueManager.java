@@ -31,7 +31,7 @@ public class ValueManager extends BaseObservable {
 
     //TODO: static factory or singleton
 
-    public void ValueManager(){
+    public ValueManager(){
         Log.d(TAG, "ValueManager Constructor");
     }
     public void update(String key, String value) {
