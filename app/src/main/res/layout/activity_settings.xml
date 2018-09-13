@@ -14,18 +14,10 @@
             type="com.onestar.cnu_bpg_wirelesssetting.ValueManager" />
     </data>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
-        <Button
-            android:id="@+id/changeLayoutButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:onClick="@{activity::onButtonClick}"
-            android:text="→" />
 
 
         <!-- ////////////////////////////////////////////////////// -->
@@ -40,6 +32,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <Button
+                    android:id="@+id/changeLayoutButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:onClick="@{activity::onButtonClick}"
+                    android:text="→" />
                 <!-- ============= FREQUENCY ============= -->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -63,7 +62,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:text="Hz"
+                            android:text=" Hz"
                             android:textSize="15sp" />
 
                     </LinearLayout>
@@ -107,14 +106,14 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
+                                    android:layout_margin="8dp"
                                     android:text="@string/led_red" />
 
                                 <TextView
                                     android:id="@+id/redTextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
+                                    android:layout_margin="8dp"
                                     android:text="@{value.red}" />
                             </LinearLayout>
 
@@ -128,14 +127,14 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
+                                    android:layout_margin="8dp"
                                     android:text="@string/led_green" />
 
                                 <TextView
                                     android:id="@+id/greenTextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
+                                    android:layout_margin="8dp"
                                     android:text="@{value.green}" />
                             </LinearLayout>
 
@@ -149,14 +148,14 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
+                                    android:layout_margin="8dp"
                                     android:text="@string/led_blue" />
 
                                 <TextView
                                     android:id="@+id/blueTextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
+                                    android:layout_margin="8dp"
                                     android:text="@{value.blue}" />
                             </LinearLayout>
 
@@ -176,14 +175,14 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
+                                    android:layout_margin="8dp"
                                     android:text="@string/led_yellow" />
 
                                 <TextView
                                     android:id="@+id/yellowTextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
+                                    android:layout_margin="8dp"
                                     android:text="@{value.yellow}" />
                             </LinearLayout>
 
@@ -196,14 +195,14 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
+                                    android:layout_margin="8dp"
                                     android:text="@string/led_ir" />
 
                                 <TextView
                                     android:id="@+id/irTextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_margin="10dp"
+                                    android:layout_margin="8dp"
                                     android:text="@{value.ir}" />
                             </LinearLayout>
 
@@ -249,6 +248,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_margin="8dp"
                                     android:text="@string/pressure1"
                                     android:textSize="15sp" />
 
@@ -256,6 +256,7 @@
                                     android:id="@+id/pressure1TextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_margin="8dp"
                                     android:text="@{value.pressure1}"
                                     android:textSize="15sp" />
                             </LinearLayout>
@@ -269,6 +270,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_margin="8dp"
                                     android:text="@string/pressure2"
                                     android:textSize="15sp" />
 
@@ -276,6 +278,7 @@
                                     android:id="@+id/pressure2TextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_margin="8dp"
                                     android:text="@{value.pressure2}"
                                     android:textSize="15sp" />
                             </LinearLayout>
@@ -293,6 +296,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_margin="8dp"
                                     android:text="@string/rgb"
                                     android:textSize="15sp" />
 
@@ -300,6 +304,7 @@
                                     android:id="@+id/rgbTextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_margin="8dp"
                                     android:text="@{value.rgb}"
                                     android:textSize="15sp" />
                             </LinearLayout>
@@ -313,6 +318,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_margin="8dp"
                                     android:text="@string/iry"
                                     android:textSize="15sp" />
 
@@ -320,6 +326,7 @@
                                     android:id="@+id/iryTextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_margin="8dp"
                                     android:text="@{value.iry}"
                                     android:textSize="15sp" />
                             </LinearLayout>
@@ -337,6 +344,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_margin="8dp"
                                     android:text="@string/accgyro"
                                     android:textSize="15sp" />
 
@@ -344,6 +352,7 @@
                                     android:id="@+id/accgyroTextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_margin="8dp"
                                     android:text="@{value.accgyro}"
                                     android:textSize="15sp" />
                             </LinearLayout>
@@ -357,6 +366,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_margin="8dp"
                                     android:text="@string/timestamp"
                                     android:textSize="15sp" />
 
@@ -364,6 +374,7 @@
                                     android:id="@+id/timestampTextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_margin="8dp"
                                     android:text="@{value.timestamp}"
                                     android:textSize="15sp" />
                             </LinearLayout>
@@ -392,6 +403,7 @@
                         android:id="@+id/reportTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
                         android:layout_weight="4"
                         android:text="@{value.report}"
                         android:textSize="15sp" />
@@ -428,6 +440,7 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_margin="8dp"
                                 android:text="@string/ssid"
                                 android:textSize="15sp" />
 
@@ -435,6 +448,7 @@
                                 android:id="@+id/ssidTextView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_margin="8dp"
                                 android:text="@{value.ssid}"
                                 android:textSize="15sp" />
                         </LinearLayout>
@@ -447,6 +461,7 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_margin="8dp"
                                 android:text="@string/password"
                                 android:textSize="15sp" />
 
@@ -454,6 +469,7 @@
                                 android:id="@+id/passwordTextView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_margin="8dp"
                                 android:text="@{value.password}"
                                 android:textSize="15sp" />
                         </LinearLayout>
@@ -491,6 +507,7 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_margin="8dp"
                                 android:text="@string/protocol"
                                 android:textSize="15sp" />
 
@@ -498,6 +515,7 @@
                                 android:id="@+id/protocolTextView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_margin="8dp"
                                 android:text="@{value.protocol}"
                                 android:textSize="15sp" />
                         </LinearLayout>
@@ -510,12 +528,14 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_margin="8dp"
                                 android:text="@string/port" />
 
                             <TextView
                                 android:id="@+id/portTextView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_margin="8dp"
                                 android:text="@{value.port}" />
                         </LinearLayout>
                     </LinearLayout>
@@ -536,8 +556,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="3dp"
+                    android:gravity="center_vertical"
                     android:background="#ededed"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/setTimeTextView"
@@ -566,13 +587,26 @@
                     android:background="#ededed"
                     android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/rebootTextView"
+                    <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="4"
-                        android:text="@{value.delay}"
-                        android:textSize="15sp" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/rebootTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="4"
+                            android:text="@{value.delay}"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text=" sec"
+                            android:textSize="15sp" />
+                    </LinearLayout>
 
                     <Button
                         android:id="@+id/rebootButton"
@@ -597,6 +631,7 @@
             android:id="@+id/controlLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:gravity="center_vertical"
             android:orientation="vertical"
             android:visibility="invisible">
 
@@ -628,5 +663,5 @@
         </LinearLayout>
         <!-- //=*=*=*=*=*=*=*=*// CONTROL PANEL //=*=*=*=*=*=*=*=*// -->
         <!-- /////////////////////////////////////////////////////// -->
-    </LinearLayout>
+    </RelativeLayout>
 </layout>
