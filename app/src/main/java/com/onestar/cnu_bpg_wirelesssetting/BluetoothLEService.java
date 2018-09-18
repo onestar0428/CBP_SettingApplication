@@ -35,7 +35,7 @@ public class BluetoothLEService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
 
-    private final static int MAX_MTU = 23;
+    private final static int MAX_MTU = 22;
 
     public final static String ACTION_GATT_CONNECTED =
             "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
@@ -47,26 +47,6 @@ public class BluetoothLEService extends Service {
             "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
     public final static String EXTRA_DATA =
             "com.example.bluetooth.le.EXTRA_DATA";
-    public final static String ACTION_OTA_DATA_AVAILABLE =
-            "com.cysmart.bluetooth.le.ACTION_OTA_DATA_AVAILABLE";
-    public final static String ACTION_GATT_DISCONNECTED_OTA =
-            "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED_OTA";
-    public final static String ACTION_GATT_CONNECT_OTA =
-            "com.example.bluetooth.le.ACTION_GATT_CONNECT_OTA";
-    public final static String ACTION_GATT_SERVICES_DISCOVERED_OTA =
-            "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED_OTA";
-    public final static String ACTION_GATT_CHARACTERISTIC_ERROR =
-            "com.example.bluetooth.le.ACTION_GATT_CHARACTERISTIC_ERROR";
-    public final static String ACTION_GATT_SERVICE_DISCOVERY_UNSUCCESSFUL =
-            "com.example.bluetooth.le.ACTION_GATT_SERVICE_DISCOVERY_UNSUCCESSFUL";
-    public final static String ACTION_PAIR_REQUEST =
-            "android.bluetooth.device.action.PAIRING_REQUEST";
-    public final static String ACTION_WRITE_COMPLETED =
-            "android.bluetooth.device.action.ACTION_WRITE_COMPLETED";
-    public final static String ACTION_WRITE_FAILED =
-            "android.bluetooth.device.action.ACTION_WRITE_FAILED";
-    public final static String ACTION_WRITE_SUCCESS =
-            "android.bluetooth.device.action.ACTION_WRITE_SUCCESS";
 
     private final static UUID SERVICE_UUID = UUID.fromString("0000ABF0-0000-1000-8000-00805F9B34FB");
     private final static UUID DATA_RECEIVE_UUID = UUID.fromString("0000ABF1-0000-1000-8000-00805F9B34FB");
@@ -145,8 +125,7 @@ public class BluetoothLEService extends Service {
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt,
-                                          BluetoothGattCharacteristic characteristic,
-                                          int status) {
+                                          BluetoothGattCharacteristic characteristic, int status) {
             if (status == 0) {
                 if ((mNotifyCharacteristic.getProperties() | BluetoothGattCharacteristic.PROPERTY_READ | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                     if (mNotifyCharacteristic != null) {

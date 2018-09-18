@@ -18,8 +18,7 @@ import android.widget.Toast;
 
 import com.onestar.cnu_bpg_wirelesssetting.databinding.ActivitySettingsBinding;
 
-public class SettingsActivity extends AppCompatActivity
-        implements DialogBuilder.dialogBuilderListener {
+public class SettingsActivity extends AppCompatActivity implements DialogBuilder.dialogBuilderListener {
 
     private final static String TAG = SettingsActivity.class.getSimpleName();
 
@@ -40,7 +39,6 @@ public class SettingsActivity extends AppCompatActivity
     private ConnectionStatus mServiceConnected = ConnectionStatus.STATE_DISCONNECTED;
 
     private ProgressDialog mDialog;
-
 
     //TODO: Use StringBuilder instead of String
     //TODO: add a refresh button which sends QUERY command

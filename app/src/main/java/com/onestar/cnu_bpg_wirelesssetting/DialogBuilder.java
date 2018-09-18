@@ -126,6 +126,7 @@ public class DialogBuilder extends BaseObservable {
                 });
     }
 
+    //TODO: change NumberPicker into Number EditText
     private void buildLedDialog(AlertDialog.Builder builder) {
         final View view = mInflater.inflate(R.layout.dialog_led, null);
 
