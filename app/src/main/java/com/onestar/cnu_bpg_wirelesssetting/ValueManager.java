@@ -37,6 +37,7 @@ public class ValueManager extends BaseObservable {
     public void update(String key, String value) {
         //TODO: Consider how to reduce code lines
         //TODO: split "." doesn't effect to LED values. Need to consider another way ******************
+        //TODO: -> change numberPicker to editText to apply float point, need to check works well
         Log.d(TAG, "update" );
 
         if (!key.equals("")) {

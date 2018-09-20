@@ -2,81 +2,92 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
-    android:padding="5dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="5dp">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
+
         <TextView
             android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
+            android:text="@string/led_red"
             android:textAlignment="center"
-            android:textColor="#eb7d7d"
-            android:text="@string/led_red"/>
+            android:textColor="#eb7d7d" />
+
         <TextView
             android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
+            android:text="@string/led_blue"
             android:textAlignment="center"
-            android:textColor="#7db2eb"
-            android:text="@string/led_blue"/>
+            android:textColor="#7db2eb" />
+
         <TextView
             android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:textColor="#7deb84"
+            android:text="@string/led_green"
             android:textAlignment="center"
-            android:text="@string/led_green"/>
+            android:textColor="#7deb84" />
+
         <TextView
             android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:textColor="#ebe07d"
+            android:text="@string/led_yellow"
             android:textAlignment="center"
-            android:text="@string/led_yellow"/>
+            android:textColor="#ebe07d" />
+
         <TextView
             android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
+            android:text="@string/led_ir"
             android:textAlignment="center"
-            android:textColor="#c17deb"
-            android:text="@string/led_ir"/>
+            android:textColor="#c17deb" />
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <NumberPicker
-            android:id="@+id/numberPicker_red"
+        <EditText
+            android:id="@+id/editText_red"
             android:layout_width="60dp"
             android:layout_height="70dp"
-            android:layout_margin="4dp"/>
+            android:layout_margin="4dp"
+            android:inputType="numberDecimal" />
 
-        <NumberPicker
-            android:id="@+id/numberPicker_blue"
+        <EditText
+            android:id="@+id/editText_blue"
             android:layout_width="60dp"
             android:layout_height="70dp"
-            android:layout_margin="4dp"/>
+            android:layout_margin="4dp"
+            android:inputType="numberDecimal" />
 
-        <NumberPicker
-            android:id="@+id/numberPicker_green"
+        <EditText
+            android:id="@+id/editText_green"
             android:layout_width="60dp"
             android:layout_height="70dp"
-            android:layout_margin="4dp"/>
+            android:layout_margin="4dp"
+            android:inputType="numberDecimal" />
 
-        <NumberPicker
-            android:id="@+id/numberPicker_yellow"
+        <EditText
+            android:id="@+id/editText_yellow"
             android:layout_width="60dp"
             android:layout_height="70dp"
-            android:layout_margin="4dp"/>
+            android:layout_margin="4dp"
+            android:inputType="numberDecimal" />
 
-        <NumberPicker
-            android:id="@+id/numberPicker_ir"
+        <EditText
+            android:id="@+id/editText_ir"
             android:layout_width="60dp"
             android:layout_height="70dp"
-            android:layout_margin="4dp"/>
+            android:layout_margin="4dp"
+            android:inputType="numberDecimal" />
     </LinearLayout>
 </LinearLayout>

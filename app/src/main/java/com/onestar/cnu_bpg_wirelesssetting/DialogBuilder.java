@@ -126,44 +126,34 @@ public class DialogBuilder extends BaseObservable {
                 });
     }
 
-    //TODO: change NumberPicker into Number EditText
     private void buildLedDialog(AlertDialog.Builder builder) {
         final View view = mInflater.inflate(R.layout.dialog_led, null);
 
-        final NumberPicker redPicker = (NumberPicker) view.findViewById(R.id.numberPicker_red);
-        redPicker.setMinValue(0);
-        redPicker.setMaxValue(100);
-        redPicker.setValue(Integer.parseInt(mBinding.redTextView.getText().toString()));
+        final EditText redText = (EditText) view.findViewById(R.id.editText_red);
+        redText.setText(Integer.parseInt(mBinding.redTextView.getText().toString()));
 
-        final NumberPicker greenPicker = (NumberPicker) view.findViewById(R.id.numberPicker_green);
-        greenPicker.setMinValue(0);
-        greenPicker.setMaxValue(100);
-        greenPicker.setValue(Integer.parseInt(mBinding.greenTextView.getText().toString()));
+        final EditText greenText = (EditText) view.findViewById(R.id.editText_green);
+        greenText.setText(Integer.parseInt(mBinding.greenTextView.getText().toString()));
 
-        final NumberPicker bluePicker = (NumberPicker) view.findViewById(R.id.numberPicker_blue);
-        bluePicker.setMinValue(0);
-        bluePicker.setMaxValue(100);
-        bluePicker.setValue(Integer.parseInt(mBinding.blueTextView.getText().toString()));
+        final EditText blueText = (EditText) view.findViewById(R.id.editText_blue);
+        blueText.setText(Integer.parseInt(mBinding.blueTextView.getText().toString()));
 
-        final NumberPicker yellowPicker = (NumberPicker) view.findViewById(R.id.numberPicker_yellow);
-        yellowPicker.setMinValue(0);
-        yellowPicker.setMaxValue(100);
-        yellowPicker.setValue(Integer.parseInt(mBinding.yellowTextView.getText().toString()));
+        final EditText yellowText = (EditText) view.findViewById(R.id.editText_yellow);
+        yellowText.setText(Integer.parseInt(mBinding.yellowTextView.getText().toString()));
 
-        final NumberPicker irPicker = (NumberPicker) view.findViewById(R.id.numberPicker_ir);
-        irPicker.setMinValue(0);
-        irPicker.setMaxValue(100);
-        irPicker.setValue(Integer.parseInt(mBinding.irTextView.getText().toString()));
+        final EditText irText = (EditText) view.findViewById(R.id.editText_ir);
+        irText.setText(Integer.parseInt(mBinding.irTextView.getText().toString()));
 
         builder.setView(view)
-                .setTitle("Set mA of each LED")
+                .setTitle("Set (0 ~10)mA of each LED")
                 .setPositiveButton(R.string.yes_dialog, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
 
-                        passParameters(redPicker.getValue() + ":" + greenPicker.getValue() + ":" +
-                                bluePicker.getValue() + ":" + yellowPicker.getValue() + ":" +
-                                irPicker.getValue());
+                        //TODO: check the range of LED
+                        passParameters(redText.getText() + ":" + greenText.getText() + ":" +
+                                blueText.getText() + ":" + yellowText.getText() + ":" +
+                                irText.getText());
 
                         dismiss(dialog);
                     }
@@ -215,7 +205,11 @@ public class DialogBuilder extends BaseObservable {
         final Spinner protocolSpinner = (Spinner) view.findViewById(R.id.protocolSpinner);
         final EditText portEditText = (EditText) view.findViewById(R.id.portEditText);
 
-        //TODO: set spinner default value
+        if (mBinding.protocolTextView.getText().toString().equals(mContext.getResources().getString(R.string.tcp))){
+            protocolSpinner.setSelection(0);
+        }else{
+            protocolSpinner.setSelection(1);
+        }
         portEditText.setText(mBinding.portTextView.getText().toString());
 
         builder.setView(view)
@@ -224,8 +218,7 @@ public class DialogBuilder extends BaseObservable {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
 
-                        //TODO: spinner.getValue
-//                        passParameters(protocolSpinner.get().toString() + ":" + portEditText.getText().toString());
+                        passParameters(protocolSpinner.getSelectedItem().toString() + ":" + portEditText.getText().toString());
 
                         dismiss(dialog);
                     }
@@ -283,7 +276,7 @@ public class DialogBuilder extends BaseObservable {
         secondPicker.setMaxValue(60);
         secondPicker.setMinValue(0);
 
-        //TODO: set default
+        //TODO: set default (current time)
 
         builder.setTitle("Pick the date and time")
                 .setView(view)
