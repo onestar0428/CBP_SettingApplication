@@ -276,7 +276,12 @@ public class DialogBuilder extends BaseObservable {
         secondPicker.setMaxValue(60);
         secondPicker.setMinValue(0);
 
-        //TODO: set default (current time)
+        //TODO: set default (current time) from UTILS
+        // SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        // Long tsLong = System.currentTimeMillis() / 1000;
+        // String ts = tsLong.toString();
+        // String format = sdf.format(new Date());
+        // Logger.datalog(log + ts + " TIME " + format);
 
         builder.setTitle("Pick the date and time")
                 .setView(view)
