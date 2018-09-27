@@ -42,22 +42,20 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
 
     //TODO: Use StringBuilder instead of String
     //TODO: add a refresh button which sends QUERY command
-    //TODO: HANDLE DISCONNECTION WHEN REBOOT..
-
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             Bundle extras = intent.getExtras();
 
+            if (mDialog.isShowing()) {
+                mDialog.hide();
+            }
+
             if (action.equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)) {
                 final int state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR);
                 final int bondState = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1);
                 final int previousBondState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, -1);
-
-                if (mDialog.isShowing()) {
-                    mDialog.hide();
-                }
 
                 if (state == BluetoothDevice.BOND_BONDING) {
                     if (!mDialog.isShowing()) {
@@ -86,13 +84,10 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
 
             } else if (action.equals(BluetoothLEService.ACTION_DATA_AVAILABLE)) {
                 mGattConnected = ConnectionStatus.STATE_CONNECTED;
-                Log.d(TAG, "onReceive: Data Available");
 
                 if (extras.containsKey("value")) {
                     String key = "", value = "";
                     String response = extras.getString("value");
-
-                    Log.d(TAG, "OnReceive: " + response);
 
                     if (response.startsWith(" * ")) {
                         String[] parseAsterisk = response.replace(" * ", "").split(":");
@@ -124,8 +119,6 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         BluetoothLEService.exchangeGattMtu(50);
                     }
-                    // request for initialize the setting values for UI
-                    sendCommand(QUERY);
                 }
             } else if (action.equals(BluetoothLEService.ACTION_GATT_DISCONNECTED)) {
                 Log.d(TAG, "onReceive: Gatt is Disconnected");

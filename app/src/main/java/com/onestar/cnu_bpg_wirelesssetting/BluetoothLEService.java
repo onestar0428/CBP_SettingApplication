@@ -193,29 +193,11 @@ public class BluetoothLEService extends Service {
 
         @Override
         public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
+            // request for initialize the setting values for UI
+            sendCommand(SettingsActivity.QUERY);
             Log.d(TAG, "MTU changed: " + mtu);
         }
     };
-
-    //    private void requestMtu(final CallbackContext callbackContext, String macAddress, int mtuValue) {
-//        Peripheral peripheral = peripherals.get(macAddress);
-//
-//        BluetoothGattCallback bleCallBack = new BluetoothGattCallback() {
-//            @Override
-//            public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
-//                super.onMtuChanged(gatt, mtu, status);
-//                Log.d(TAG, "mtu changed");
-//                callbackContext.success();
-//            }
-//        };
-//
-//        BluetoothDevice device = peripheral.getDevice();
-//        BluetoothGatt bluetoothGatt = device.connectGatt(cordova.getActivity().getApplicationContext(), true, bleCallBack);
-//
-//        Log.d(TAG, "requestMTU");
-//        bluetoothGatt.requestMtu(mtuValue);
-//    }
-
 
     public static void exchangeGattMtu(int mtu) {
 
@@ -261,7 +243,7 @@ public class BluetoothLEService extends Service {
                 Bundle mBundle = new Bundle();
                 mBundle.putString("value", new String(characteristic.getValue()));
                 intent.putExtras(mBundle);
-                
+
                 Log.d(TAG, "broadcastUpdate: " + new String(characteristic.getValue()));
             }
         }
@@ -312,7 +294,7 @@ public class BluetoothLEService extends Service {
         }
     }
 
-    public boolean sendCommand(String command) {
+    public static boolean sendCommand(String command) {
         boolean response = false;
 
         Log.d(TAG, "sendCommand");
@@ -322,22 +304,16 @@ public class BluetoothLEService extends Service {
             return response;
         }
 
-//        if ((mWriteCharacteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_WRITE) == 0) {
-//            mWriteCharacteristic.setWriteType(BluetoothGattCharacteristic.PROPERTY_WRITE);
-//        }
-
         if (mBluetoothGatt == null) {
-//            if ((mBluetoothDeviceAddress != null && !mBluetoothDeviceAddress.equals(""))) {
-//                connect(mBluetoothDeviceAddress);
-//            } else {
             Log.w(TAG, "BluetoothGatt is null and there is no info for device address");
+
             return response;
-//            }
         } else {
             byte[] value = command.getBytes();
             mWriteCharacteristic.setValue(value);
             response = mBluetoothGatt.writeCharacteristic(mWriteCharacteristic);
 
+            Log.d(TAG, "sendCommand Result: " + command);
             Log.d(TAG, "sendCommand Result: " + response);
         }
 

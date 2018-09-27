@@ -130,19 +130,19 @@ public class DialogBuilder extends BaseObservable {
         final View view = mInflater.inflate(R.layout.dialog_led, null);
 
         final EditText redText = (EditText) view.findViewById(R.id.editText_red);
-        redText.setText(Integer.parseInt(mBinding.redTextView.getText().toString()));
+        redText.setText(mBinding.redTextView.getText().toString());
 
         final EditText greenText = (EditText) view.findViewById(R.id.editText_green);
-        greenText.setText(Integer.parseInt(mBinding.greenTextView.getText().toString()));
+        greenText.setText(mBinding.greenTextView.getText().toString());
 
         final EditText blueText = (EditText) view.findViewById(R.id.editText_blue);
-        blueText.setText(Integer.parseInt(mBinding.blueTextView.getText().toString()));
+        blueText.setText(mBinding.blueTextView.getText().toString());
 
         final EditText yellowText = (EditText) view.findViewById(R.id.editText_yellow);
-        yellowText.setText(Integer.parseInt(mBinding.yellowTextView.getText().toString()));
+        yellowText.setText(mBinding.yellowTextView.getText().toString());
 
         final EditText irText = (EditText) view.findViewById(R.id.editText_ir);
-        irText.setText(Integer.parseInt(mBinding.irTextView.getText().toString()));
+        irText.setText(mBinding.irTextView.getText().toString());
 
         builder.setView(view)
                 .setTitle("Set (0 ~10)mA of each LED")
