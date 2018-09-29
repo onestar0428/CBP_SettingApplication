@@ -77,6 +77,8 @@ public class BluetoothLEService extends Service {
     private final static UUID DATA_NOTIFY_UUID = UUID.fromString("0000ABF2-0000-1000-8000-00805F9B34FB");
     private final static UUID DATA_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
+    public final static String NOTIFY_KEY = "notify";
+
     private final static BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -131,11 +133,7 @@ public class BluetoothLEService extends Service {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
-            broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-
             // NOTIFY
-
-            Log.d(TAG, "onCharacteristicChanged(UUID): " + characteristic.getUuid());
             if (characteristic.getUuid().equals(DATA_NOTIFY_UUID)) {
                 String response = new String(characteristic.getValue());
                 broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
@@ -241,7 +239,7 @@ public class BluetoothLEService extends Service {
 
             if (data != null && data.length > 0) {
                 Bundle mBundle = new Bundle();
-                mBundle.putString("value", new String(characteristic.getValue()));
+                mBundle.putString(NOTIFY_KEY, new String(characteristic.getValue()));
                 intent.putExtras(mBundle);
 
                 Log.d(TAG, "broadcastUpdate: " + new String(characteristic.getValue()));

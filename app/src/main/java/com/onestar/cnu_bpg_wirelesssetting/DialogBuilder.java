@@ -83,23 +83,23 @@ public class DialogBuilder extends BaseObservable {
         }
         final Switch pressure2Switch = (Switch) view.findViewById(R.id.switch_pressure2);
         if (mBinding.pressure2TextView.getText().toString().equals("Yes")) {
-            pressure1Switch.setChecked(true);
+            pressure2Switch.setChecked(true);
         }
         final Switch rgbSwitch = (Switch) view.findViewById(R.id.switch_rgb);
         if (mBinding.rgbTextView.getText().toString().equals("Yes")) {
-            pressure1Switch.setChecked(true);
+            rgbSwitch.setChecked(true);
         }
         final Switch irySwitch = (Switch) view.findViewById(R.id.switch_iry);
         if (mBinding.iryTextView.getText().toString().equals("Yes")) {
-            pressure1Switch.setChecked(true);
+            irySwitch.setChecked(true);
         }
         final Switch accgyroSwitch = (Switch) view.findViewById(R.id.switch_accgyro);
         if (mBinding.accgyroTextView.getText().toString().equals("Yes")) {
-            pressure1Switch.setChecked(true);
+            accgyroSwitch.setChecked(true);
         }
         final Switch timestampSwitch = (Switch) view.findViewById(R.id.switch_timestamp);
         if (mBinding.timestampTextView.getText().toString().equals("Yes")) {
-            pressure1Switch.setChecked(true);
+            timestampSwitch.setChecked(true);
         }
 
         builder.setView(view)
@@ -226,7 +226,7 @@ public class DialogBuilder extends BaseObservable {
     }
 
     private void buildWifiDialog(AlertDialog.Builder builder) {
-        final View view = mInflater.inflate(R.layout.dialog_protocol, null);
+        final View view = mInflater.inflate(R.layout.dialog_wifi, null);
 
         final EditText ssidEditText = (EditText) view.findViewById(R.id.ssidEditText);
         final EditText passwordEditText = (EditText) view.findViewById(R.id.passwordEditText);

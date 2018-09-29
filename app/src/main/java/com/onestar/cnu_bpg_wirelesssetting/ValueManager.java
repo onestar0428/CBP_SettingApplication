@@ -34,11 +34,10 @@ public class ValueManager extends BaseObservable {
     public ValueManager(){
         Log.d(TAG, "ValueManager Constructor");
     }
-    public void update(String key, String value) {
-        //TODO: Consider how to reduce code lines
-        //TODO: split "." doesn't effect to LED values. Need to consider another way ******************
-        //TODO: -> change numberPicker to editText to apply float point, need to check works well
-        Log.d(TAG, "update" );
+
+    public void updateQuery(String key, String value) {
+        //TODO: Consider how to refactor
+        Log.d(TAG, "updateQuery" );
 
         if (!key.equals("")) {
             switch (key) {
@@ -90,10 +89,63 @@ public class ValueManager extends BaseObservable {
                 case "Port":
                     setPort(value.replaceAll("\n", ""));
                     break;
+                case "Pressure_1st Measurement is":
+                    break;
+                case "Pressure_2nd Measurement is":
+                    break;
+                case "Optical_RGB Measurement is":
+                    break;
+                case "Optical_IrY Measurement is":
+                    break;
             }
         }
     }
+    public void updateResponse(String key, String value) {
+        //TODO: Consider how to refactor
+        Log.d(TAG, "updateResponse" );
 
+        if (!key.equals("")) {
+            switch (key) {
+                // FREQUENCY: response x
+                // LED: 49.59 mA
+                // Target: OFF
+                case "New current for LED_RED":
+                    setRed(value.replace(" mA", ""));
+                    break;
+                case "New current for LED_GREEN":
+                    setGreen(value.replace(" mA", ""));
+                    break;
+                case "New current for LED_BLUE":
+                    setBlue(value.replace(" mA", ""));
+                    break;
+                case "New current for LED_YELLOW":
+                    setYellow(value.replace(" mA", ""));
+                    break;
+                case "New current for LED_IR":
+                    setIr(value.replace(" mA", ""));
+                    break;
+                case "Pressure_1st Measurement is":
+                    setPressure1(value.replace(".", ""));
+                    break;
+                case "Pressure_2nd Measurement is":
+                    setPressure2(value.replace(".", ""));
+                    break;
+                case "Optical_RGB Measurement is":
+                    setRgb(value.replace(".", ""));
+                    break;
+                case "Optical_IrY Measurement is":
+                    setIry(value.replace(".", ""));
+                    break;
+                case "Accel/Gyro Measurement is":
+                    setAccgyro(value.replace(".", ""));
+                    break;
+                case "Time Stamp is"://NOT included.
+                    setTimestamp(value.replace(".", ""));
+                    break;
+
+            }
+        }
+    }
     // -----------------------------------------------------------
     // --------------------- GETTER & SETTER ---------------------
     // -----------------------------------------------------------
@@ -224,7 +276,11 @@ public class ValueManager extends BaseObservable {
     }
 
     private void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+        if(timestamp.equals("NOT included")){
+            this.timestamp = "false";
+        } else{
+            this.timestamp = "true";
+        }
         notifyPropertyChanged(BR.timestamp);
     }
 

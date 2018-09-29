@@ -32,6 +32,9 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
 
     public static final String QUERY = "QUERY:", START = "START:", RESUME = "RESUME", STOP = "STOP";
 
+    private static boolean commandResponseFlag = false;
+    private static String commandResponseKey = "", commandResponseValue = "";
+
     private String mDeviceName = "DEVICE_NAME";
     private String mDeviceAddress = "DEVICE_ADDRESS";
 
@@ -85,26 +88,48 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
             } else if (action.equals(BluetoothLEService.ACTION_DATA_AVAILABLE)) {
                 mGattConnected = ConnectionStatus.STATE_CONNECTED;
 
-                if (extras.containsKey("value")) {
-                    String key = "", value = "";
-                    String response = extras.getString("value");
+                if (extras.containsKey(BluetoothLEService.NOTIFY_KEY)) {
+                    String response = extras.getString(BluetoothLEService.NOTIFY_KEY);
 
+                    // parsing response of QUERY
                     if (response.startsWith(" * ")) {
                         String[] parseAsterisk = response.replace(" * ", "").split(":");
 
-                        if (parseAsterisk.length > 1){
-                            key = parseAsterisk[0];
+                        if (parseAsterisk.length > 1) {
+                            commandResponseKey = parseAsterisk[0];
                             if (parseAsterisk[0].contains(" ")) {
-                                key = parseAsterisk[0].split(" ")[0];
+                                commandResponseKey = parseAsterisk[0].split(" ")[0];
                             }
 
-                            value = value.replaceAll("\n","");
-                            if (parseAsterisk[1].contains(" ")){
-                                value = parseAsterisk[1].replace(" ", "").replaceAll("\n","");
+                            commandResponseValue = commandResponseValue.replaceAll("\n", "");
+                            if (parseAsterisk[1].contains(" ")) {
+                                commandResponseValue = parseAsterisk[1].replace(" ", "").replaceAll("\n", "");
                             }
 
-                            mValueManager.update(key, value);
+                            mValueManager.updateQuery(commandResponseKey, commandResponseValue);
                         }
+                    }
+                    // parsing response of other commands
+                    if (response.startsWith(" !! ")) {
+                        String[] parseAsterisk = response.split(" !! ");
+
+                        if (parseAsterisk.length > 1) {
+                            commandResponseKey = parseAsterisk[1].replace(" ", "");
+                        }
+                        if (!commandResponseKey.equals("No parameters are changed.")) {
+                            commandResponseFlag = true;
+                        }
+                        if (!commandResponseKey.equals("The system will be rebooted in 3 secs.")) {
+                            // PROTOCOL:
+                            // TODO: Reconnect
+                            mBluetoothLEService.reConnect();
+                        }
+                    }
+                    if (commandResponseFlag && !commandResponseKey.equals("")) {
+                        commandResponseValue = response.replace(" ", "");
+                        mValueManager.updateResponse(commandResponseKey, commandResponseValue);
+
+                        commandResponseFlag = false;
                     }
                 }
             } else if (action.equals(BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED)) {
@@ -116,7 +141,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                     mValueManager = new ValueManager();
                     binding.setValue(mValueManager);
 
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         BluetoothLEService.exchangeGattMtu(50);
                     }
                 }
@@ -153,6 +178,8 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                 }
                 mServiceConnected = ConnectionStatus.STATE_CONNECTED;
                 mBluetoothLEService.connect(mDeviceAddress, SettingsActivity.this);
+
+                registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());//TODO: solve leak
 
                 Log.d(TAG, "ServiceConnection=" + mServiceConnected);
             }
@@ -196,6 +223,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
         String key = ((Button) view).getText().toString();
         String command = "";
 
+        //TODO: Ensure it to be worked
         if (key.equals(getResources().getString(R.string.start))) {
             ((Button) view).setText(getResources().getString(R.string.resume));
             command = START;
@@ -247,18 +275,15 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
 
         if (!command.equals("")) {
             result = mBluetoothLEService.sendCommand(command);
-
-            if (result && !command.startsWith(QUERY)) {
-                result = mBluetoothLEService.sendCommand(QUERY);
-            }
         }
         return result;
     }
 
     @Override
     protected void onResume() {
-        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());//TODO: solve leak
-
+//        if (mGattConnected != ConnectionStatus.STATE_CONNECTED) {
+//            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());//TODO: solve leak
+//        }
         super.onResume();
     }
 
@@ -295,17 +320,26 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
         if (mDialogBuilder == null ||
                 (mDialogBuilder != null && !mDialogBuilder.isShowing())) {
             Log.d(TAG, "onPause");
-            if (mGattUpdateReceiver != null && mGattConnected == ConnectionStatus.STATE_CONNECTED) {
-                unregisterReceiver(mGattUpdateReceiver);
-            }
-
-            if (mServiceConnected == ConnectionStatus.STATE_CONNECTED) {
-                unbindService(mServiceConnection);
-            }
 
             if (mBluetoothLEService != null) {
                 mBluetoothLEService.disconnect();
                 mBluetoothLEService = null;
+            }
+
+            try {
+                if (mGattUpdateReceiver != null && mGattConnected == ConnectionStatus.STATE_CONNECTED) {
+                    unregisterReceiver(mGattUpdateReceiver);
+                }
+            } catch (IllegalArgumentException e) {
+                Log.d(TAG, "There is no BroadcastReceiver to unregister.");
+            }
+
+            try {
+                if (mServiceConnected == ConnectionStatus.STATE_CONNECTED) {
+                    unbindService(mServiceConnection);
+                }
+            } catch (IllegalArgumentException e) {
+                Log.d(TAG, "There is no Service to unbind.");
             }
         }
     }

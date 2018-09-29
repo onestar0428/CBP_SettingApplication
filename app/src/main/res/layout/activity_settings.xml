@@ -99,10 +99,9 @@
                             android:orientation="horizontal">
 
                             <LinearLayout
-                                android:layout_width="wrap_content"
+                                android:layout_width="100dp"
                                 android:layout_height="wrap_content"
                                 android:background="#f1dcdc"
-                                android:gravity="center"
                                 android:orientation="horizontal">
 
                                 <TextView
@@ -121,10 +120,9 @@
                             </LinearLayout>
 
                             <LinearLayout
-                                android:layout_width="wrap_content"
+                                android:layout_width="100dp"
                                 android:layout_height="wrap_content"
                                 android:background="#dcf1e1"
-                                android:gravity="center"
                                 android:orientation="horizontal">
 
                                 <TextView
@@ -143,10 +141,9 @@
                             </LinearLayout>
 
                             <LinearLayout
-                                android:layout_width="wrap_content"
+                                android:layout_width="100dp"
                                 android:layout_height="wrap_content"
                                 android:background="#dce6f1"
-                                android:gravity="center"
                                 android:orientation="horizontal">
 
                                 <TextView
@@ -172,7 +169,7 @@
                             android:orientation="horizontal">
 
                             <LinearLayout
-                                android:layout_width="wrap_content"
+                                android:layout_width="120dp"
                                 android:layout_height="wrap_content"
                                 android:background="#f1eedc"
                                 android:orientation="horizontal">
@@ -193,7 +190,7 @@
                             </LinearLayout>
 
                             <LinearLayout
-                                android:layout_width="wrap_content"
+                                android:layout_width="120dp"
                                 android:layout_height="wrap_content"
                                 android:background="#eadcf1"
                                 android:orientation="horizontal">
@@ -253,7 +250,7 @@
                                 android:orientation="horizontal">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="80dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="8dp"
                                     android:layout_marginBottom="8dp"
@@ -262,7 +259,7 @@
 
                                 <TextView
                                     android:id="@+id/pressure1TextView"
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="50dp"
                                     android:layout_height="wrap_content"
                                     android:layout_margin="8dp"
                                     android:text="@{value.pressure1}"
@@ -276,7 +273,7 @@
                                 android:paddingLeft="10dp">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="80dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="8dp"
                                     android:layout_marginBottom="8dp"
@@ -285,7 +282,7 @@
 
                                 <TextView
                                     android:id="@+id/pressure2TextView"
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="50dp"
                                     android:layout_height="wrap_content"
                                     android:layout_margin="8dp"
                                     android:text="@{value.pressure2}"
@@ -303,7 +300,7 @@
                                 android:orientation="horizontal">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="80dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="8dp"
                                     android:layout_marginBottom="8dp"
@@ -312,7 +309,7 @@
 
                                 <TextView
                                     android:id="@+id/rgbTextView"
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="50dp"
                                     android:layout_height="wrap_content"
                                     android:layout_margin="8dp"
                                     android:text="@{value.rgb}"
@@ -326,7 +323,7 @@
                                 android:paddingLeft="10dp">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="80dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="8dp"
                                     android:layout_marginBottom="8dp"
@@ -335,7 +332,7 @@
 
                                 <TextView
                                     android:id="@+id/iryTextView"
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="50dp"
                                     android:layout_height="wrap_content"
                                     android:layout_margin="8dp"
                                     android:text="@{value.iry}"
@@ -353,7 +350,7 @@
                                 android:orientation="horizontal">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="80dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="8dp"
                                     android:layout_marginBottom="8dp"
@@ -362,7 +359,7 @@
 
                                 <TextView
                                     android:id="@+id/accgyroTextView"
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="50dp"
                                     android:layout_height="wrap_content"
                                     android:layout_margin="8dp"
                                     android:text="@{value.accgyro}"
@@ -376,7 +373,7 @@
                                 android:paddingLeft="10dp">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="80dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="8dp"
                                     android:layout_marginBottom="8dp"
@@ -385,7 +382,7 @@
 
                                 <TextView
                                     android:id="@+id/timestampTextView"
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="50dp"
                                     android:layout_height="wrap_content"
                                     android:layout_margin="8dp"
                                     android:text="@{value.timestamp}"
