@@ -16,6 +16,9 @@ import android.widget.TimePicker;
 
 import com.onestar.cnu_bpg_wirelesssetting.databinding.ActivitySettingsBinding;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public class DialogBuilder extends BaseObservable {
     private final static String TAG = DialogBuilder.class.getSimpleName();
@@ -272,33 +275,36 @@ public class DialogBuilder extends BaseObservable {
 
     private void buildTimeDialog(AlertDialog.Builder builder) {
         final View view = mInflater.inflate(R.layout.dialog_time, null);
+        final DatePicker datePicker = (DatePicker) view.findViewById(R.id.datePicker);
+        final NumberPicker hourPicker = (NumberPicker) view.findViewById(R.id.hourPicker);
+        final NumberPicker minutePicker = (NumberPicker) view.findViewById(R.id.minutePicker);
         final NumberPicker secondPicker = (NumberPicker) view.findViewById(R.id.secondPicker);
+
+        hourPicker.setMaxValue(60);
+        hourPicker.setMinValue(0);
+
+        minutePicker.setMaxValue(60);
+        minutePicker.setMinValue(0);
+
         secondPicker.setMaxValue(60);
         secondPicker.setMinValue(0);
 
-        //TODO: set default (current time) from UTILS
-        // SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        // Long tsLong = System.currentTimeMillis() / 1000;
-        // String ts = tsLong.toString();
-        // String format = sdf.format(new Date());
-        // Logger.datalog(log + ts + " TIME " + format);
+        String[] currentTime = new SimpleDateFormat("HH:mm:ss").format(new Date()).split(":");
+        hourPicker.setValue(Integer.parseInt(currentTime[0]));
+        minutePicker.setValue(Integer.parseInt(currentTime[1]));
+        secondPicker.setValue(Integer.parseInt(currentTime[2]));
 
         builder.setTitle("Pick the date and time")
                 .setView(view)
                 .setPositiveButton(R.string.yes_dialog, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        DatePicker datePicker = (DatePicker) view.findViewById(R.id.datePicker);
-                        TimePicker timePicker = (TimePicker) view.findViewById(R.id.timePicker);
 
                         //yyyy:m:dd:hh:mm:ss
-                        //cannot support 0 for front space..
-
-                        //TODO: getHour & getMinute
                         String params = datePicker.getYear() + ":" + datePicker.getMonth() + ":" + datePicker.getDayOfMonth() + ":" +
-                                timePicker.getHour() + ":" + timePicker.getMinute() + ":" + secondPicker.getValue();
+                                hourPicker.getValue() + ":" + minutePicker.getValue() + ":" + secondPicker.getValue();
 
-                        passParameters("");
+                        passParameters(params);
                         dismiss(dialog);
                     }
                 });

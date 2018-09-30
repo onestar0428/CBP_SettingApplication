@@ -277,9 +277,9 @@ public class ValueManager extends BaseObservable {
 
     private void setTimestamp(String timestamp) {
         if(timestamp.equals("NOT included")){
-            this.timestamp = "false";
+            this.timestamp = "No";
         } else{
-            this.timestamp = "true";
+            this.timestamp = "Yes";
         }
         notifyPropertyChanged(BR.timestamp);
     }
@@ -340,8 +340,9 @@ public class ValueManager extends BaseObservable {
     }
 
     private void setTime(String time) {
-//                        command = "SET_TIME:" + new SimpleDateFormat("yyyy:MM:dd:hh:mm:ss").format(new Date()).toString();
-//        new SimpleDateFormat("yyyy.MM.dd").format(date);
+        // SET DATA EX: 01 Jan. 2017, 00:03:55
+        // Just set the response as displaying data
+
         this.time = time;
         notifyPropertyChanged(BR.time);
     }

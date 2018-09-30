@@ -37,7 +37,7 @@ public class BluetoothLEService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
 
-    private final static int MAX_MTU = 50;
+    private final static int MAX_MTU = 80;
 
     public final static String ACTION_GATT_CONNECTED =
             "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
@@ -93,7 +93,6 @@ public class BluetoothLEService extends Service {
                 Log.d(TAG, "Gatt is connected, Attempting to start service discovery:" +
                         mBluetoothGatt.discoverServices());
 
-//                gatt.requestMtu(MAX_MTU);
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
                 synchronized (mGattCallback) {
@@ -146,7 +145,6 @@ public class BluetoothLEService extends Service {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
-            String characteristicValue = " " + Utils.ByteArraytoHex(characteristic.getValue()) + " ";
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
@@ -197,18 +195,17 @@ public class BluetoothLEService extends Service {
         }
     };
 
-    public static void exchangeGattMtu(int mtu) {
-
+    public static void exchangeGattMtu() {
         int retry = 5;
         boolean status = false;
         while (!status && retry > 0) {
-            status = mBluetoothGatt.requestMtu(mtu);
+            status = mBluetoothGatt.requestMtu(MAX_MTU);
             retry--;
         }
         if (status) {
-            Log.d(TAG, "requestMtu " + mtu + " success");
+            Log.d(TAG, "requestMtu " + MAX_MTU + " success");
         } else {
-            Log.d(TAG, "requestMtu " + mtu + " fail");
+            Log.d(TAG, "requestMtu " + MAX_MTU + " fail");
         }
     }
 
@@ -241,8 +238,6 @@ public class BluetoothLEService extends Service {
                 Bundle mBundle = new Bundle();
                 mBundle.putString(NOTIFY_KEY, new String(characteristic.getValue()));
                 intent.putExtras(mBundle);
-
-                Log.d(TAG, "broadcastUpdate: " + new String(characteristic.getValue()));
             }
         }
 
@@ -301,7 +296,8 @@ public class BluetoothLEService extends Service {
 
             return response;
         }
-
+        //TODO: check Connection after send command which need to reboot
+        //TODO: do reboot for specific commands
         if (mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothGatt is null and there is no info for device address");
 

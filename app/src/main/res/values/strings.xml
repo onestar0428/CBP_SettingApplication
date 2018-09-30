@@ -69,4 +69,8 @@
     <string name="yes_dialog">YES</string>
     <string name="no_dialog">NO</string>
     <string name="close_dialog">CLOSE</string>
+
+    <string name="am">AM</string>
+    <string name="pm">PM</string>
+
 </resources>

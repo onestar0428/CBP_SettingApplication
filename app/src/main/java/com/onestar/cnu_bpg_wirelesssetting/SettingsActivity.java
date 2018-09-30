@@ -30,7 +30,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
     private static ValueManager mValueManager;
     private static DialogBuilder mDialogBuilder;
 
-    public static final String QUERY = "QUERY:", START = "START:", RESUME = "RESUME", STOP = "STOP";
+    public static final String QUERY = "QUERY:", START = "START:", RESUME = "RESUME:", STOP = "STOP:";
 
     private static boolean commandResponseFlag = false;
     private static String commandResponseKey = "", commandResponseValue = "";
@@ -109,6 +109,12 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                             mValueManager.updateQuery(commandResponseKey, commandResponseValue);
                         }
                     }
+
+                    // parsing response of SET_TIME
+                    if (response.startsWith(" ** ")){
+                        //TODO: add FUCKING new parse rule..
+                    }
+
                     // parsing response of other commands
                     if (response.startsWith(" !! ")) {
                         String[] parseAsterisk = response.split(" !! ");
@@ -121,7 +127,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                         }
                         if (!commandResponseKey.equals("The system will be rebooted in 3 secs.")) {
                             // PROTOCOL:
-                            // TODO: Reconnect
+                            // TODO: Reconnect & verify
                             mBluetoothLEService.reConnect();
                         }
                     }
@@ -142,7 +148,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                     binding.setValue(mValueManager);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        BluetoothLEService.exchangeGattMtu(50);
+                        BluetoothLEService.exchangeGattMtu();
                     }
                 }
             } else if (action.equals(BluetoothLEService.ACTION_GATT_DISCONNECTED)) {
@@ -158,7 +164,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
             }
 
             if (mGattConnected == ConnectionStatus.STATE_DISCONNECTED) {
-                registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());//TODO: solve leak
+                registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
             }
         }
     };
@@ -177,9 +183,8 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                     Log.d(TAG, "Gets BluetoothLEService");
                 }
                 mServiceConnected = ConnectionStatus.STATE_CONNECTED;
+                registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
                 mBluetoothLEService.connect(mDeviceAddress, SettingsActivity.this);
-
-                registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());//TODO: solve leak
 
                 Log.d(TAG, "ServiceConnection=" + mServiceConnected);
             }
@@ -223,7 +228,6 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
         String key = ((Button) view).getText().toString();
         String command = "";
 
-        //TODO: Ensure it to be worked
         if (key.equals(getResources().getString(R.string.start))) {
             ((Button) view).setText(getResources().getString(R.string.resume));
             command = START;
@@ -277,14 +281,6 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
             result = mBluetoothLEService.sendCommand(command);
         }
         return result;
-    }
-
-    @Override
-    protected void onResume() {
-//        if (mGattConnected != ConnectionStatus.STATE_CONNECTED) {
-//            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());//TODO: solve leak
-//        }
-        super.onResume();
     }
 
     @Override
