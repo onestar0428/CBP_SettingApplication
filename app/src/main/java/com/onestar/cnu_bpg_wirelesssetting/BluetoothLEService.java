@@ -37,7 +37,7 @@ public class BluetoothLEService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
 
-    private final static int MAX_MTU = 80;
+    private final static int MAX_MTU = 150;
 
     public final static String ACTION_GATT_CONNECTED =
             "com.example.bluetooth.le.ACTION_GATT_CONNECTED";

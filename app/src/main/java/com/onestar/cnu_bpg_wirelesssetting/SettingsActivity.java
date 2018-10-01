@@ -33,7 +33,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
     public static final String QUERY = "QUERY:", START = "START:", RESUME = "RESUME:", STOP = "STOP:";
 
     private static boolean commandResponseFlag = false;
-    private static String commandResponseKey = "", commandResponseValue = "";
+    private static String commandResponseKey = "", commandResponseValue = ""; // TODO: Use StringBuilder instead
 
     private String mDeviceName = "DEVICE_NAME";
     private String mDeviceAddress = "DEVICE_ADDRESS";
@@ -111,8 +111,24 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                     }
 
                     // parsing response of SET_TIME
-                    if (response.startsWith(" ** ")){
+                    if (response.startsWith(" ** ")) {
                         //TODO: add FUCKING new parse rule..
+
+                        String[] parseAsterisk = response.split(" \\*\\* ");
+
+                        if (parseAsterisk.length > 1) {
+                            commandResponseKey = parseAsterisk[1].split(":")[0];
+                            commandResponseFlag = true;
+                        }
+                    }
+                    if (response.startsWith("    : Present") && commandResponseFlag){
+                        if (!commandResponseKey.equals("")){
+                            commandResponseValue = response.replace(" ", "").split(":")[1]; // TODO: check whether [1] or [2] is right
+                        }
+                        mValueManager.updateSetTime(commandResponseKey, commandResponseKey);
+
+                        commandResponseFlag = false;
+                        commandResponseKey = "";
                     }
 
                     // parsing response of other commands
@@ -136,6 +152,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                         mValueManager.updateResponse(commandResponseKey, commandResponseValue);
 
                         commandResponseFlag = false;
+                        commandResponseKey = "";
                     }
                 }
             } else if (action.equals(BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED)) {
@@ -164,7 +181,11 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
             }
 
             if (mGattConnected == ConnectionStatus.STATE_DISCONNECTED) {
-                registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+                try {
+                    registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+                } catch (IllegalArgumentException e) {
+                    Log.d(TAG, "Fail to register Broadcast Receiver");
+                }
             }
         }
     };
@@ -183,10 +204,15 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                     Log.d(TAG, "Gets BluetoothLEService");
                 }
                 mServiceConnected = ConnectionStatus.STATE_CONNECTED;
-                registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-                mBluetoothLEService.connect(mDeviceAddress, SettingsActivity.this);
-
                 Log.d(TAG, "ServiceConnection=" + mServiceConnected);
+
+                try {
+                    registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+                } catch (IllegalArgumentException e) {
+                    Log.d(TAG, "Fail to register Broadcast Receiver");
+                }
+
+                mBluetoothLEService.connect(mDeviceAddress, SettingsActivity.this);
             }
         }
 

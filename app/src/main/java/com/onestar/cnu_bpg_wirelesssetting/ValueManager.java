@@ -100,6 +100,30 @@ public class ValueManager extends BaseObservable {
             }
         }
     }
+    public void updateSetTime(String key, String value) {
+        //TODO: Consider how to refactor
+        Log.d(TAG, "updateQuery" );
+
+        if (!key.equals("")) {
+            switch (key) {
+                case "FREQUENCY":
+                    setFreq(value.replaceAll("Hz", "").replaceAll("\n", ""));
+                    break;
+//                case "TARGET":
+//                    break;
+                case "REPORT_TO":
+                    setReport(value.replaceAll("\n", ""));
+                    break;
+//                case "WIFI":
+//                    break;
+//                case "PROTOCOL":
+//                    break;
+                case "SET_TIME":
+                    setTime(value.replaceAll("\n", ""));
+                    break;
+            }
+        }
+    }
     public void updateResponse(String key, String value) {
         //TODO: Consider how to refactor
         Log.d(TAG, "updateResponse" );

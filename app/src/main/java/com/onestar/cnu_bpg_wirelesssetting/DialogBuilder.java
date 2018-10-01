@@ -73,7 +73,29 @@ public class DialogBuilder extends BaseObservable {
             buildRebootDialog(mBuilder);
         }
 
-        mBuilder.create().show();
+        mBuilder.create().show(); //TODO
+        /*
+        * 10-01 22:24:13.491 17658-17658/com.onestar.cnu_bpg_wirelesssetting E/AndroidRuntime: FATAL EXCEPTION: main
+    Process: com.onestar.cnu_bpg_wirelesssetting, PID: 17658
+    android.view.WindowManager$BadTokenException: Unable to add window -- token android.os.BinderProxy@61de3f8 is not valid; is your activity running?
+        at android.view.ViewRootImpl.setView(ViewRootImpl.java:687)
+        at android.view.WindowManagerGlobal.addView(WindowManagerGlobal.java:288)
+        at android.view.WindowManagerImpl.addView(WindowManagerImpl.java:69)
+        at android.app.Dialog.show(Dialog.java:312)
+        at com.onestar.cnu_bpg_wirelesssetting.DialogBuilder.makeDialog(DialogBuilder.java:76)
+        at com.onestar.cnu_bpg_wirelesssetting.SettingsActivity.onButtonClick(SettingsActivity.java:271)
+        at com.onestar.cnu_bpg_wirelesssetting.databinding.ActivitySettingsBinding$OnClickListenerImpl.onClick(ActivitySettingsBinding.java:661)
+        at android.view.View.performClick(View.java:5194)
+        at android.view.View$PerformClick.run(View.java:20903)
+        at android.os.Handler.handleCallback(Handler.java:739)
+        at android.os.Handler.dispatchMessage(Handler.java:95)
+        at android.os.Looper.loop(Looper.java:145)
+        at android.app.ActivityThread.main(ActivityThread.java:5942)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at java.lang.reflect.Method.invoke(Method.java:372)
+        at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:1399)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1194)
+*/
     }
 
     private void buildTargetDialog(AlertDialog.Builder builder) {
