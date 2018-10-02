@@ -39,6 +39,7 @@
                     android:layout_gravity="right"
                     android:onClick="@{activity::onButtonClick}"
                     android:text="→" />
+
                 <!-- ============= FREQUENCY ============= -->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -56,14 +57,16 @@
                             android:id="@+id/frequencyTextView"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:layout_marginTop="8dp"
                             android:layout_marginBottom="8dp"
+                            android:layout_marginTop="8dp"
                             android:text="@{value.freq}"
                             android:textSize="15sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
+                            android:layout_marginBottom="8dp"
+                            android:layout_marginTop="8dp"
                             android:text=" Hz"
                             android:textSize="15sp" />
 
@@ -105,18 +108,13 @@
                                 android:orientation="horizontal">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:text="@string/led_red" />
-
-                                <TextView
                                     android:id="@+id/redTextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_margin="8dp"
-                                    android:text="@{value.red}" />
+                                    android:text="@{value.red}"
+                                    android:textAlignment="center"
+                                    android:textColor="#861b17" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -126,18 +124,13 @@
                                 android:orientation="horizontal">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:text="@string/led_green" />
-
-                                <TextView
                                     android:id="@+id/greenTextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_margin="8dp"
-                                    android:text="@{value.green}" />
+                                    android:text="@{value.green}"
+                                    android:textAlignment="center"
+                                    android:textColor="#10733b" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -147,18 +140,13 @@
                                 android:orientation="horizontal">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:text="@string/led_blue" />
-
-                                <TextView
                                     android:id="@+id/blueTextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_margin="8dp"
-                                    android:text="@{value.blue}" />
+                                    android:text="@{value.blue}"
+                                    android:textAlignment="center"
+                                    android:textColor="#153283" />
                             </LinearLayout>
 
                         </LinearLayout>
@@ -175,18 +163,13 @@
                                 android:orientation="horizontal">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:text="@string/led_yellow" />
-
-                                <TextView
                                     android:id="@+id/yellowTextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_margin="8dp"
-                                    android:text="@{value.yellow}" />
+                                    android:text="@{value.yellow}"
+                                    android:textAlignment="center"
+                                    android:textColor="#886610" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -196,18 +179,13 @@
                                 android:orientation="horizontal">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:text="@string/led_ir" />
-
-                                <TextView
                                     android:id="@+id/irTextView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_margin="8dp"
-                                    android:text="@{value.ir}" />
+                                    android:text="@{value.ir}"
+                                    android:textAlignment="center"
+                                    android:textColor="#771486" />
                             </LinearLayout>
 
 
@@ -252,8 +230,8 @@
                                 <TextView
                                     android:layout_width="80dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
                                     android:layout_marginBottom="8dp"
+                                    android:layout_marginTop="8dp"
                                     android:text="@string/pressure1"
                                     android:textSize="15sp" />
 
@@ -275,8 +253,8 @@
                                 <TextView
                                     android:layout_width="80dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
                                     android:layout_marginBottom="8dp"
+                                    android:layout_marginTop="8dp"
                                     android:text="@string/pressure2"
                                     android:textSize="15sp" />
 
@@ -302,8 +280,8 @@
                                 <TextView
                                     android:layout_width="80dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
                                     android:layout_marginBottom="8dp"
+                                    android:layout_marginTop="8dp"
                                     android:text="@string/rgb"
                                     android:textSize="15sp" />
 
@@ -325,8 +303,8 @@
                                 <TextView
                                     android:layout_width="80dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
                                     android:layout_marginBottom="8dp"
+                                    android:layout_marginTop="8dp"
                                     android:text="@string/iry"
                                     android:textSize="15sp" />
 
@@ -352,8 +330,8 @@
                                 <TextView
                                     android:layout_width="80dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
                                     android:layout_marginBottom="8dp"
+                                    android:layout_marginTop="8dp"
                                     android:text="@string/accgyro"
                                     android:textSize="15sp" />
 
@@ -375,8 +353,8 @@
                                 <TextView
                                     android:layout_width="80dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
                                     android:layout_marginBottom="8dp"
+                                    android:layout_marginTop="8dp"
                                     android:text="@string/timestamp"
                                     android:textSize="15sp" />
 
@@ -450,8 +428,8 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
+                                android:layout_marginTop="8dp"
                                 android:text="@string/ssid"
                                 android:textSize="15sp" />
 
@@ -472,8 +450,8 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
+                                android:layout_marginTop="8dp"
                                 android:text="@string/password"
                                 android:textSize="15sp" />
 
@@ -519,8 +497,8 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
+                                android:layout_marginTop="8dp"
                                 android:text="@string/protocol"
                                 android:textSize="15sp" />
 
@@ -541,8 +519,8 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
+                                android:layout_marginTop="8dp"
                                 android:text="@string/port" />
 
                             <TextView
@@ -570,8 +548,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="3dp"
-                    android:gravity="center_vertical"
                     android:background="#ededed"
+                    android:gravity="center_vertical"
                     android:orientation="vertical">
 
                     <TextView
@@ -648,15 +626,27 @@
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:gravity="center_vertical"
             android:orientation="vertical"
             android:visibility="invisible">
 
-            <TextView
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/changeLayoutButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:text="CONTROL" />
+                android:layout_gravity="right"
+                android:onClick="@{activity::onButtonClick}"
+                android:text="←" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_margin="20dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="DATA GRAPH HERE?" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

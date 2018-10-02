@@ -31,9 +31,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
     private static DialogBuilder mDialogBuilder;
 
     public static final String QUERY = "QUERY:", START = "START:", RESUME = "RESUME:", STOP = "STOP:";
-
-    private static boolean commandResponseFlag = false;
-    private static String commandResponseKey = "", commandResponseValue = ""; // TODO: Use StringBuilder instead
+    private static String commandKey = QUERY; // TODO: Use StringBuilder instead
 
     private String mDeviceName = "DEVICE_NAME";
     private String mDeviceAddress = "DEVICE_ADDRESS";
@@ -90,70 +88,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
 
                 if (extras.containsKey(BluetoothLEService.NOTIFY_KEY)) {
                     String response = extras.getString(BluetoothLEService.NOTIFY_KEY);
-
-                    // parsing response of QUERY
-                    if (response.startsWith(" * ")) {
-                        String[] parseAsterisk = response.replace(" * ", "").split(":");
-
-                        if (parseAsterisk.length > 1) {
-                            commandResponseKey = parseAsterisk[0];
-                            if (parseAsterisk[0].contains(" ")) {
-                                commandResponseKey = parseAsterisk[0].split(" ")[0];
-                            }
-
-                            commandResponseValue = commandResponseValue.replaceAll("\n", "");
-                            if (parseAsterisk[1].contains(" ")) {
-                                commandResponseValue = parseAsterisk[1].replace(" ", "").replaceAll("\n", "");
-                            }
-
-                            mValueManager.updateQuery(commandResponseKey, commandResponseValue);
-                        }
-                    }
-
-                    // parsing response of SET_TIME
-                    if (response.startsWith(" ** ")) {
-                        //TODO: add FUCKING new parse rule..
-
-                        String[] parseAsterisk = response.split(" \\*\\* ");
-
-                        if (parseAsterisk.length > 1) {
-                            commandResponseKey = parseAsterisk[1].split(":")[0];
-                            commandResponseFlag = true;
-                        }
-                    }
-                    if (response.startsWith("    : Present") && commandResponseFlag){
-                        if (!commandResponseKey.equals("")){
-                            commandResponseValue = response.replace(" ", "").split(":")[1]; // TODO: check whether [1] or [2] is right
-                        }
-                        mValueManager.updateSetTime(commandResponseKey, commandResponseKey);
-
-                        commandResponseFlag = false;
-                        commandResponseKey = "";
-                    }
-
-                    // parsing response of other commands
-                    if (response.startsWith(" !! ")) {
-                        String[] parseAsterisk = response.split(" !! ");
-
-                        if (parseAsterisk.length > 1) {
-                            commandResponseKey = parseAsterisk[1].replace(" ", "");
-                        }
-                        if (!commandResponseKey.equals("No parameters are changed.")) {
-                            commandResponseFlag = true;
-                        }
-                        if (!commandResponseKey.equals("The system will be rebooted in 3 secs.")) {
-                            // PROTOCOL:
-                            // TODO: Reconnect & verify
-                            mBluetoothLEService.reConnect();
-                        }
-                    }
-                    if (commandResponseFlag && !commandResponseKey.equals("")) {
-                        commandResponseValue = response.replace(" ", "");
-                        mValueManager.updateResponse(commandResponseKey, commandResponseValue);
-
-                        commandResponseFlag = false;
-                        commandResponseKey = "";
-                    }
+                    mValueManager.update(commandKey, response);
                 }
             } else if (action.equals(BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED)) {
                 Log.d(TAG, "onReceive: Gatt Services Discovered");
@@ -161,7 +96,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                 if (mBluetoothLEService != null && mValueManager == null) {
                     Log.d(TAG, "onBLEServiceConnected");
 
-                    mValueManager = new ValueManager();
+                    mValueManager = new ValueManager(SettingsActivity.this);
                     binding.setValue(mValueManager);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -305,6 +240,9 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
 
         if (!command.equals("")) {
             result = mBluetoothLEService.sendCommand(command);
+            if(result){
+                commandKey = command.split(":")[0];
+            }
         }
         return result;
     }

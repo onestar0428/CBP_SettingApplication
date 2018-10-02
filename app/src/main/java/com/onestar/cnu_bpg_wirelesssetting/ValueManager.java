@@ -1,5 +1,6 @@
 package com.onestar.cnu_bpg_wirelesssetting;
 
+import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.util.Log;
@@ -8,6 +9,9 @@ import com.android.databinding.library.baseAdapters.BR;
 
 public class ValueManager extends BaseObservable {
     private final static String TAG = ValueManager.class.getSimpleName();
+
+    private static Context mContext;
+    private static ResponseParser mResponseParser;
 
     private String freq = Default.DEFAULT_FREQ.value,
             delay = Default.DEFAULT_DELAY.value,
@@ -31,13 +35,72 @@ public class ValueManager extends BaseObservable {
 
     //TODO: static factory or singleton
 
-    public ValueManager(){
+    public ValueManager(Context context) {
         Log.d(TAG, "ValueManager Constructor");
+        mContext = context;
+        mResponseParser = new ResponseParser(mContext);
     }
 
-    public void updateQuery(String key, String value) {
+    public void update(String key, String response) {
+        Log.d(TAG, "updateQuery");
+
+
+        if (key.equals(mContext.getResources().getString(R.string.freq))) {
+            // NO RESPONSE TO PARSE FOR FREQ COMMAND
+        } else if (key.equals(mContext.getResources().getString(R.string.led))) {
+            updateLed(key, response);
+        } else if (key.equals(mContext.getResources().getString(R.string.target))) {
+            updateTarget(key, response);
+        } else if (key.equals(mContext.getResources().getString(R.string.report_to))) {
+            String newValue = mResponseParser.parse(key, response);
+
+            if (!newValue.equals("")) {
+                setReport(newValue); //response = report_option
+            } else {
+                Log.d(TAG, "update(report) gets abnormal new value: " + newValue);
+            }
+        } else if (key.equals(mContext.getResources().getString(R.string.protocol))) {
+            String newValue = mResponseParser.parse(key, response);
+            String[] value =  newValue.split(":"); //response = protocol:port
+
+            if (value.length == 2) {
+                setProtocol(value[0]);
+                setPort(value[1]);
+            } else {
+                Log.d(TAG, "update(protocol) gets abnormal new value: " + newValue);
+            }
+        } else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
+            // TIME VALUE ISN'T CHANGED IN RESPONSE, BUT ACTUALLY CHANGED
+            // = NO VALUE TO PARSE AND DISPLAY IN RESPONSE
+        } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
+            // THERE IS NO OPTION VALUE TO PARSE OUT IN RESPONSE
+            // !! Rebooting MCU to apply new AP Connection in 3 secs !!
+        } else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
+            String newValue = mResponseParser.parse(key, response);
+
+            if (!newValue.equals("")) {
+                setReport(newValue); //response = delay
+            } else {
+                Log.d(TAG, "update(reboot) gets abnormal new value: " + newValue);
+            }
+        } else if (key.equals(mContext.getResources().getString(R.string.query))) {
+            updateQuery(key, response);
+        }
+    }
+
+    private void updateLed(String key, String value) {
+        // TODO: update each led parsing line by line
+    }
+
+    private void updateTarget(String key, String value){
+        // TODO: update each led parsing line by line
+    }
+
+    private void updateQuery(String key, String value) {
         //TODO: Consider how to refactor
-        Log.d(TAG, "updateQuery" );
+        Log.d(TAG, "updateQuery");
+
+        mResponseParser.parseQuery(value);
 
         if (!key.equals("")) {
             switch (key) {
@@ -89,87 +152,10 @@ public class ValueManager extends BaseObservable {
                 case "Port":
                     setPort(value.replaceAll("\n", ""));
                     break;
-                case "Pressure_1st Measurement is":
-                    break;
-                case "Pressure_2nd Measurement is":
-                    break;
-                case "Optical_RGB Measurement is":
-                    break;
-                case "Optical_IrY Measurement is":
-                    break;
             }
         }
     }
-    public void updateSetTime(String key, String value) {
-        //TODO: Consider how to refactor
-        Log.d(TAG, "updateQuery" );
 
-        if (!key.equals("")) {
-            switch (key) {
-                case "FREQUENCY":
-                    setFreq(value.replaceAll("Hz", "").replaceAll("\n", ""));
-                    break;
-//                case "TARGET":
-//                    break;
-                case "REPORT_TO":
-                    setReport(value.replaceAll("\n", ""));
-                    break;
-//                case "WIFI":
-//                    break;
-//                case "PROTOCOL":
-//                    break;
-                case "SET_TIME":
-                    setTime(value.replaceAll("\n", ""));
-                    break;
-            }
-        }
-    }
-    public void updateResponse(String key, String value) {
-        //TODO: Consider how to refactor
-        Log.d(TAG, "updateResponse" );
-
-        if (!key.equals("")) {
-            switch (key) {
-                // FREQUENCY: response x
-                // LED: 49.59 mA
-                // Target: OFF
-                case "New current for LED_RED":
-                    setRed(value.replace(" mA", ""));
-                    break;
-                case "New current for LED_GREEN":
-                    setGreen(value.replace(" mA", ""));
-                    break;
-                case "New current for LED_BLUE":
-                    setBlue(value.replace(" mA", ""));
-                    break;
-                case "New current for LED_YELLOW":
-                    setYellow(value.replace(" mA", ""));
-                    break;
-                case "New current for LED_IR":
-                    setIr(value.replace(" mA", ""));
-                    break;
-                case "Pressure_1st Measurement is":
-                    setPressure1(value.replace(".", ""));
-                    break;
-                case "Pressure_2nd Measurement is":
-                    setPressure2(value.replace(".", ""));
-                    break;
-                case "Optical_RGB Measurement is":
-                    setRgb(value.replace(".", ""));
-                    break;
-                case "Optical_IrY Measurement is":
-                    setIry(value.replace(".", ""));
-                    break;
-                case "Accel/Gyro Measurement is":
-                    setAccgyro(value.replace(".", ""));
-                    break;
-                case "Time Stamp is"://NOT included.
-                    setTimestamp(value.replace(".", ""));
-                    break;
-
-            }
-        }
-    }
     // -----------------------------------------------------------
     // --------------------- GETTER & SETTER ---------------------
     // -----------------------------------------------------------
@@ -300,9 +286,9 @@ public class ValueManager extends BaseObservable {
     }
 
     private void setTimestamp(String timestamp) {
-        if(timestamp.equals("NOT included")){
+        if (timestamp.equals("NOT included")) {
             this.timestamp = "No";
-        } else{
+        } else {
             this.timestamp = "Yes";
         }
         notifyPropertyChanged(BR.timestamp);
