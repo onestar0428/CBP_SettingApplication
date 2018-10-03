@@ -1,35 +1,34 @@
 package com.onestar.cnu_bpg_wirelesssetting;
 
-import android.content.Context;
+
+import com.onestar.cnu_bpg_wirelesssetting.Enum.Command;
 
 import java.util.AbstractMap;
 
 public class ResponseParser {
 
-    private static Context mContext;
-
-    public ResponseParser(Context context) {
-        mContext = context;
+    public ResponseParser() {
     }
 
     public static String parse(String key, String response) {
         String newValue = "";
 
-        if (key.equals(mContext.getResources().getString(R.string.freq))) {
+        if (key.equals(Command.FREQ.value)) {
             // NO RESPONSE TO PARSE FOR FREQ COMMAND
-        } else if (key.equals(mContext.getResources().getString(R.string.led))) {
+        } else if (key.equals(Command.LED.value)) {
             newValue = parseLED(response);
-        } else if (key.equals(mContext.getResources().getString(R.string.target))) {
+        } else if (key.equals(Command.TARGET.value)) {
             newValue = parseTarget(response);
-        } else if (key.equals(mContext.getResources().getString(R.string.report_to))) {
+        } else if (key.equals(Command.REPORT.value)) {
             newValue = parseReport(response);
-        } else if (key.equals(mContext.getResources().getString(R.string.protocol))) {
-            newValue = parseProtocol(response);
-        } else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
+        } else if (key.equals(Command.PROTOCOL.value)) {
+            // newValue = parseProtocol(response);
+            // NO RESPONSE TO PARSE FOR PROTOCOL COMMAND
+        } else if (key.equals(Command.SET_TIME.value)) {
+            newValue = parseTime(response);
+        } else if (key.equals(Command.WIFI.value)) {
             // NO RESPONSE TO PARSE FOR FREQ COMMAND
-        } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
-            // NO RESPONSE TO PARSE FOR FREQ COMMAND
-        } else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
+        } else if (key.equals(Command.REBOOT.value)) {
             newValue = parseReboot(response);
         }
 
@@ -37,63 +36,15 @@ public class ResponseParser {
     }
 
     private static String parseLED(String response) {
-        String red = "", green = "", blue = "", yellow = "", ir = "";
-
-        //TODO
-        switch (response) {
-            // LED: 49.59 mA
-            case "New current for LED_RED":
-                //setRed(value.replace(" mA", ""));
-                break;
-            case "New current for LED_GREEN":
-                //setGreen(value.replace(" mA", ""));
-                break;
-            case "New current for LED_BLUE":
-                //setBlue(value.replace(" mA", ""));
-                break;
-            case "New current for LED_YELLOW":
-                //setYellow(value.replace(" mA", ""));
-                break;
-            case "New current for LED_IR":
-                //setIr(value.replace(" mA", ""));
-                break;
-        }
-
-
-        return red + ":" + green + ":" + blue + ":" + yellow + ":" + ir;
+        return response.replace(" mA", "").replace("\n", "");
     }
 
     private static String parseTarget(String response) {
-        String pressure1="", pressure2="", rgb="", iry="", timestamp="";
-
-        //TODO
-        switch (response) {
-            // Target: OFF
-            case "Pressure_1st Measurement is":
-//                setPressure1(value.replace(".", ""));
-                break;
-            case "Pressure_2nd Measurement is":
-//                setPressure2(value.replace(".", ""));
-                break;
-            case "Optical_RGB Measurement is":
-//                setRgb(value.replace(".", ""));
-                break;
-            case "Optical_IrY Measurement is":
-//                setIry(value.replace(".", ""));
-                break;
-            case "Accel/Gyro Measurement is":
-//                setAccgyro(value.replace(".", ""));
-                break;
-            case "Time Stamp is"://NOT included.
-//                setTimestamp(value.replace(".", ""));
-                break;
-        }
-
-        return pressure1 + ":" + pressure2 + ":" + rgb + ":" + iry + ":" + timestamp;
+        return response.replace(".", "").replace("\n", "");
     }
 
-    public static AbstractMap.SimpleEntry<String, String> parseQuery(String response) {
-        String key = "", value="";
+    public static AbstractMap.SimpleEntry<String, String> parseQuery(String header, String response) {
+        String key = "", value = "";
 
         if (response.startsWith(" * ")) {
             String[] parseAsterisk = response.replace(" * ", "").split(":");
@@ -101,7 +52,7 @@ public class ResponseParser {
             if (parseAsterisk.length > 1) {
                 key = parseAsterisk[0];
                 if (parseAsterisk[0].contains(" ")) {
-                    key= parseAsterisk[0].split(" ")[0];
+                    key = parseAsterisk[0].split(" ")[0];
                 }
 
                 value = response.replaceAll("\n", "");
@@ -112,32 +63,6 @@ public class ResponseParser {
         }
         return new AbstractMap.SimpleEntry<>(key, value);
     }
-
-//    private static String parseOther(String response){
-//        // parsing response of other commands
-//        if (response.startsWith(" !! ")) {
-//            String[] parseAsterisk = response.split(" !! ");
-//
-//            if (parseAsterisk.length > 1) {
-//                commandResponseKey = parseAsterisk[1].replace(" ", "");
-//            }
-//            if (!commandResponseKey.equals("No parameters are changed.")) {
-//                commandResponseFlag = true;
-//            }
-//            if (!commandResponseKey.equals("The system will be rebooted in 3 secs.")) {
-//                // PROTOCOL:
-//                // TODO: Reconnect & verify
-//                mBluetoothLEService.reConnect();
-//            }
-//        }
-//        if (commandResponseFlag && !commandResponseKey.equals("")) {
-//            commandResponseValue = response.replace(" ", "");
-//            mValueManager.updateResponse(commandResponseKey, commandResponseValue);
-//
-//            commandResponseFlag = false;
-//            commandResponseKey = "";
-//        }
-//    }
 
     private static String parseProtocol(String response) {
         // !! Please wait until reboot is completed and re-connect to UDP Server(0.0.0.0:5000)
@@ -156,7 +81,13 @@ public class ResponseParser {
 
     private static String parseReport(String response) {
         String result = "";
-        //TODO
+
+        if (response.startsWith(": ")) {
+            if (response.contains("console") || response.contains("nw")
+                    || response.contains("both") || response.contains("none")) {
+                result = response.replace(" ", "");
+            }
+        }
         return result;
     }
 
@@ -165,5 +96,10 @@ public class ResponseParser {
         // !! Send "CANCEL:" to cancel the rebooting.
 
         return response.split("secs")[0].split("in")[1].replace(" ", "");
+    }
+
+    private static String parseTime(String response) {
+        // !! Updated Current time : Mon, 03 Sep. 2018, 16:32:56
+        return response.split(" : ")[1].replace("\n", "");
     }
 }

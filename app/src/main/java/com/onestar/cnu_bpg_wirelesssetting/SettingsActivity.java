@@ -19,7 +19,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.onestar.cnu_bpg_wirelesssetting.Enum.Command;
+import com.onestar.cnu_bpg_wirelesssetting.Enum.ConnectionStatus;
 import com.onestar.cnu_bpg_wirelesssetting.databinding.ActivitySettingsBinding;
+
+import javax.sql.CommonDataSource;
 
 public class SettingsActivity extends AppCompatActivity implements DialogBuilder.dialogBuilderListener {
 
@@ -30,8 +34,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
     private static ValueManager mValueManager;
     private static DialogBuilder mDialogBuilder;
 
-    public static final String QUERY = "QUERY:", START = "START:", RESUME = "RESUME:", STOP = "STOP:";
-    private static String commandKey = QUERY; // TODO: Use StringBuilder instead
+    private static String commandKey = Command.QUERY.value; // TODO: Use StringBuilder instead
 
     private String mDeviceName = "DEVICE_NAME";
     private String mDeviceAddress = "DEVICE_ADDRESS";
@@ -41,8 +44,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
 
     private ProgressDialog mDialog;
 
-    //TODO: Use StringBuilder instead of String
-    //TODO: add a refresh button which sends QUERY command
+
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -53,28 +55,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                 mDialog.hide();
             }
 
-            if (action.equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)) {
-                final int state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR);
-                final int bondState = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1);
-                final int previousBondState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, -1);
-
-                if (state == BluetoothDevice.BOND_BONDING) {
-                    if (!mDialog.isShowing()) {
-                        mDialog.show();
-                    }
-                } else if (state == BluetoothDevice.BOND_BONDED) {
-                    Log.d(TAG, "onReceive: bonded");
-                } else if (state == BluetoothDevice.BOND_NONE) {
-                    if (bondState == BluetoothDevice.BOND_NONE && previousBondState == BluetoothDevice.BOND_BONDED) {
-                        Log.d(TAG, "onReceive: bonded->bond_none");
-                    } else {
-                        Log.d(TAG, "onReceive: bond_none");
-                    }
-                } else {
-                    Log.d(TAG, "onReceive: error");
-                }
-            } else if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
-                // Logger.i("BluetoothAdapter.ACTION_STATE_CHANGED.");
+            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
                 if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) ==
                         BluetoothAdapter.STATE_OFF) {
                     Log.d(TAG, "BluetoothAdapter.STATE_OFF");
@@ -86,22 +67,22 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
             } else if (action.equals(BluetoothLEService.ACTION_DATA_AVAILABLE)) {
                 mGattConnected = ConnectionStatus.STATE_CONNECTED;
 
+                // Get notify (response) of command
                 if (extras.containsKey(BluetoothLEService.NOTIFY_KEY)) {
                     String response = extras.getString(BluetoothLEService.NOTIFY_KEY);
                     mValueManager.update(commandKey, response);
+
+                    if (response.contains("reboot") || response.contains("Rebooted")
+                            || response.contains("Rebooting")) {
+                        mBluetoothLEService.reboot();
+                        commandKey = Command.QUERY.value;
+                    }
                 }
             } else if (action.equals(BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED)) {
                 Log.d(TAG, "onReceive: Gatt Services Discovered");
 
-                if (mBluetoothLEService != null && mValueManager == null) {
-                    Log.d(TAG, "onBLEServiceConnected");
-
-                    mValueManager = new ValueManager(SettingsActivity.this);
-                    binding.setValue(mValueManager);
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        BluetoothLEService.exchangeGattMtu();
-                    }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    BluetoothLEService.exchangeGattMtu();
                 }
             } else if (action.equals(BluetoothLEService.ACTION_GATT_DISCONNECTED)) {
                 Log.d(TAG, "onReceive: Gatt is Disconnected");
@@ -113,15 +94,27 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
 
                 Toast.makeText(SettingsActivity.this, "BLE Connection is Unstable.", Toast.LENGTH_SHORT).show();
                 finish();
-            }
+            } else if (action.equals(BluetoothLEService.ACTION_GATT_CONNECTED)) {
+                mGattConnected = ConnectionStatus.STATE_CONNECTED;
 
-            if (mGattConnected == ConnectionStatus.STATE_DISCONNECTED) {
-                try {
-                    registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-                } catch (IllegalArgumentException e) {
-                    Log.d(TAG, "Fail to register Broadcast Receiver");
+                if (mBluetoothLEService != null) {
+                    if (mValueManager == null) {
+                        Log.d(TAG, "onBLEServiceConnected(new)");
+
+                        mValueManager = new ValueManager();
+                        binding.setValue(mValueManager);
+
+                    } else {
+                        Log.d(TAG, "onBLEServiceConnected(re)");
+                        mBluetoothLEService.sendCommand(Command.QUERY.command);
+                    }
                 }
             }
+
+//            if (mGattConnected == ConnectionStatus.STATE_DISCONNECTED) {
+//                Log.d(TAG, "Gatt Connection is disconnected. Try to reconnect");
+//                mBluetoothLEService.reboot();
+//            }
         }
     };
 
@@ -142,6 +135,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                 Log.d(TAG, "ServiceConnection=" + mServiceConnected);
 
                 try {
+                    Log.d(TAG, "Try to register Broadcast Receiver");
                     registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
                 } catch (IllegalArgumentException e) {
                     Log.d(TAG, "Fail to register Broadcast Receiver");
@@ -153,7 +147,6 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            mBluetoothLEService = null;
             mValueManager = null;
             mDialogBuilder = null;
             mServiceConnected = ConnectionStatus.STATE_DISCONNECTED;
@@ -189,30 +182,26 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
         String key = ((Button) view).getText().toString();
         String command = "";
 
-        if (key.equals(getResources().getString(R.string.start))) {
-            ((Button) view).setText(getResources().getString(R.string.resume));
-            command = START;
-        } else if (key.equals(getResources().getString(R.string.resume))) {
-            ((Button) view).setText(getResources().getString(R.string.start));
-            command = RESUME;
-        } else if (key.equals(getResources().getString(R.string.stop))) {
-            command = STOP;
+        if (key.equals(Command.START.value)) {
+            ((Button) view).setText(Command.RESUME.value);
+            command = Command.START.command;
+        } else if (key.equals(Command.RESUME.value)) {
+            ((Button) view).setText(Command.START.value);
+            command = Command.RESUME.command;
+        } else if (key.equals(Command.STOP.value)) {
+            command = Command.STOP.command;
         }
 
         sendCommand(command);
     }
 
     public void onButtonClick(View view) {
-        if (view.getId() == R.id.changeLayoutButton) {
-            if (binding.buttonLayout.getVisibility() == View.VISIBLE) {
-                binding.buttonLayout.setVisibility(View.INVISIBLE);
-                binding.controlLayout.setVisibility(View.VISIBLE);
-                binding.changeLayoutButton.setText("←");
-            } else {
-                binding.buttonLayout.setVisibility(View.VISIBLE);
-                binding.controlLayout.setVisibility(View.INVISIBLE);
-                binding.changeLayoutButton.setText("→");
-            }
+        if (view.getId() == R.id.changeToControlButton) {
+            binding.buttonLayout.setVisibility(View.INVISIBLE);
+            binding.controlLayout.setVisibility(View.VISIBLE);
+        } else if (view.getId() == R.id.changeToSettingButton) {
+            binding.buttonLayout.setVisibility(View.VISIBLE);
+            binding.controlLayout.setVisibility(View.INVISIBLE);
         } else {
             String key = ((Button) view).getText().toString();
 
@@ -240,22 +229,11 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
 
         if (!command.equals("")) {
             result = mBluetoothLEService.sendCommand(command);
-            if(result){
+            if (result) {
                 commandKey = command.split(":")[0];
             }
         }
         return result;
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        if (mBluetoothLEService != null) {
-            Log.d(TAG, "onStop");
-            mBluetoothLEService.disconnect();
-            mBluetoothLEService = null;
-        }
     }
 
     @Override
@@ -266,7 +244,6 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
 
     @Override
     public void onBackPressed() {
-        activity_finish();
         finish();
         super.onBackPressed();
     }
@@ -281,26 +258,23 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                 (mDialogBuilder != null && !mDialogBuilder.isShowing())) {
             Log.d(TAG, "onPause");
 
-            if (mBluetoothLEService != null) {
-                mBluetoothLEService.disconnect();
-                mBluetoothLEService = null;
-            }
-
             try {
                 if (mGattUpdateReceiver != null && mGattConnected == ConnectionStatus.STATE_CONNECTED) {
+                    Log.d(TAG, "Unregister BroadcastReceiver");
                     unregisterReceiver(mGattUpdateReceiver);
                 }
             } catch (IllegalArgumentException e) {
                 Log.d(TAG, "There is no BroadcastReceiver to unregister.");
             }
-
             try {
                 if (mServiceConnected == ConnectionStatus.STATE_CONNECTED) {
+                    Log.d(TAG, "Unbind Service Connection");
                     unbindService(mServiceConnection);
                 }
             } catch (IllegalArgumentException e) {
                 Log.d(TAG, "There is no Service to unbind.");
             }
+
         }
     }
 }

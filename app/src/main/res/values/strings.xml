@@ -13,7 +13,7 @@
     <!-- Setting name -->
     <string name="query">QUERY</string>
     <string name="query_summary">Query Present Configuration</string>
-    <string name="freq">FREQUENCY</string>
+    <string name="freq">FREQ</string>
     <string name="freq_summary">PRF(Pulse Repetition Freq.) Change</string>
 
     <string name="start">START</string>
@@ -32,8 +32,8 @@
     <string name="target">TARGET</string>
     <string name="pressure1">Pressure 1</string>
     <string name="pressure2">Pressure 2</string>
-    <string name="rgb">Optical RGB</string>
-    <string name="iry">Optical IrY</string>
+    <string name="rgb">RGB</string>
+    <string name="iry">IrY</string>
     <string name="accgyro">AccGyro</string>
     <string name="timestamp">TimeStamp</string>
 
@@ -41,7 +41,7 @@
     <string name="ssid">SSID</string>
     <string name="password">PASSWORD</string>
 
-    <string name="set_time">SET TIME</string>
+    <string name="set_time">SET_TIME</string>
     <string name="current_summary">Set Current Date and Time</string>
 
     <string name="report_to">REPORT</string>

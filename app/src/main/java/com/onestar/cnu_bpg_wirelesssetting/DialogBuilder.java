@@ -12,8 +12,8 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.TimePicker;
 
+import com.onestar.cnu_bpg_wirelesssetting.Enum.Command;
 import com.onestar.cnu_bpg_wirelesssetting.databinding.ActivitySettingsBinding;
 
 import java.text.SimpleDateFormat;
@@ -55,21 +55,21 @@ public class DialogBuilder extends BaseObservable {
             }
         });
 
-        if (key.equals(mContext.getResources().getString(R.string.freq))) {
+        if (key.equals(Command.FREQ.value)) {
             buildFrequencyDialog(mBuilder);
-        } else if (key.equals(mContext.getResources().getString(R.string.led))) {
+        } else if (key.equals(Command.LED.value)) {
             buildLedDialog(mBuilder);
-        } else if (key.equals(mContext.getResources().getString(R.string.target))) {
+        } else if (key.equals(Command.TARGET.value)) {
             buildTargetDialog(mBuilder);
-        } else if (key.equals(mContext.getResources().getString(R.string.report_to))) {
+        } else if (key.equals(Command.REPORT.value)) {
             buildReportDialog(mBuilder);
-        } else if (key.equals(mContext.getResources().getString(R.string.protocol))) {
+        } else if (key.equals(Command.PROTOCOL.value)) {
             buildProtocolDialog(mBuilder);
-        } else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
+        } else if (key.equals(Command.SET_TIME.value)) {
             buildTimeDialog(mBuilder);
-        } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
+        } else if (key.equals(Command.WIFI.value)) {
             buildWifiDialog(mBuilder);
-        } else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
+        } else if (key.equals(Command.REBOOT.value)) {
             buildRebootDialog(mBuilder);
         }
 

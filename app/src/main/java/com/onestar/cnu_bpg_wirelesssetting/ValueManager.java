@@ -6,11 +6,15 @@ import android.databinding.Bindable;
 import android.util.Log;
 
 import com.android.databinding.library.baseAdapters.BR;
+import com.onestar.cnu_bpg_wirelesssetting.Enum.Command;
+import com.onestar.cnu_bpg_wirelesssetting.Enum.Led;
+import com.onestar.cnu_bpg_wirelesssetting.Enum.Target;
+
+import java.util.AbstractMap;
 
 public class ValueManager extends BaseObservable {
     private final static String TAG = ValueManager.class.getSimpleName();
 
-    private static Context mContext;
     private static ResponseParser mResponseParser;
 
     private String freq = Default.DEFAULT_FREQ.value,
@@ -35,31 +39,26 @@ public class ValueManager extends BaseObservable {
 
     //TODO: static factory or singleton
 
-    public ValueManager(Context context) {
+    public ValueManager() {
         Log.d(TAG, "ValueManager Constructor");
-        mContext = context;
-        mResponseParser = new ResponseParser(mContext);
+        mResponseParser = new ResponseParser();
     }
 
     public void update(String key, String response) {
-        Log.d(TAG, "updateQuery");
 
-
-        if (key.equals(mContext.getResources().getString(R.string.freq))) {
+        if (key.equals(Command.FREQ.value)) {
             // NO RESPONSE TO PARSE FOR FREQ COMMAND
-        } else if (key.equals(mContext.getResources().getString(R.string.led))) {
+        } else if (key.equals(Command.LED.value)) {
             updateLed(key, response);
-        } else if (key.equals(mContext.getResources().getString(R.string.target))) {
+        } else if (key.equals(Command.TARGET.value)) {
             updateTarget(key, response);
-        } else if (key.equals(mContext.getResources().getString(R.string.report_to))) {
+        } else if (key.equals(Command.REPORT.value)) {
             String newValue = mResponseParser.parse(key, response);
 
             if (!newValue.equals("")) {
                 setReport(newValue); //response = report_option
-            } else {
-                Log.d(TAG, "update(report) gets abnormal new value: " + newValue);
             }
-        } else if (key.equals(mContext.getResources().getString(R.string.protocol))) {
+        } else if (key.equals(Command.PROTOCOL.value)) {
             String newValue = mResponseParser.parse(key, response);
             String[] value =  newValue.split(":"); //response = protocol:port
 
@@ -69,13 +68,15 @@ public class ValueManager extends BaseObservable {
             } else {
                 Log.d(TAG, "update(protocol) gets abnormal new value: " + newValue);
             }
-        } else if (key.equals(mContext.getResources().getString(R.string.set_time))) {
-            // TIME VALUE ISN'T CHANGED IN RESPONSE, BUT ACTUALLY CHANGED
-            // = NO VALUE TO PARSE AND DISPLAY IN RESPONSE
-        } else if (key.equals(mContext.getResources().getString(R.string.wifi))) {
+        } else if (key.equals(Command.SET_TIME.value)) {
+            String newValue = mResponseParser.parse(key, response);
+            if (!newValue.equals("")){
+                setTime(newValue);
+            }
+        } else if (key.equals(Command.WIFI.value)) {
             // THERE IS NO OPTION VALUE TO PARSE OUT IN RESPONSE
             // !! Rebooting MCU to apply new AP Connection in 3 secs !!
-        } else if (key.equals(mContext.getResources().getString(R.string.reboot))) {
+        } else if (key.equals(Command.REBOOT.value)) {
             String newValue = mResponseParser.parse(key, response);
 
             if (!newValue.equals("")) {
@@ -83,74 +84,156 @@ public class ValueManager extends BaseObservable {
             } else {
                 Log.d(TAG, "update(reboot) gets abnormal new value: " + newValue);
             }
-        } else if (key.equals(mContext.getResources().getString(R.string.query))) {
+        } else if (key.equals(Command.QUERY.value)) {
             updateQuery(key, response);
         }
     }
 
-    private void updateLed(String key, String value) {
-        // TODO: update each led parsing line by line
+    private void updateLed(String header, String response) {
+        if (response.startsWith(" !! ")){
+            response =response.replace(" !! ", "");
+                // LED: 49.59 mA
+                if (response.contains("LED_RED")) {
+                    Led.RED.setParseFlag(true);
+                } else if(response.contains("LED_GREEN")) {
+                    Led.GREEN.setParseFlag(true);
+                } else if(response.contains("LED_BLUE")) {
+                    Led.BLUE.setParseFlag(true);
+                }else if(response.contains("LED_YELLOW")) {
+                    Led.YELLOW.setParseFlag(true);
+                }else if(response.contains("LED_IR")) {
+                    Led.IR.setParseFlag(true);
+                }
+        } else{
+            if (response.contains("mA")){
+                if (Led.RED.parseFlag){
+                    setRed(mResponseParser.parse(header, response));
+                    Led.RED.setParseFlag(false);
+                }
+                if (Led.GREEN.parseFlag){
+                    setGreen(mResponseParser.parse(header, response));
+                    Led.GREEN.setParseFlag(false);
+                }
+                if (Led.BLUE.parseFlag){
+                    setBlue(mResponseParser.parse(header, response));
+                    Led.BLUE.setParseFlag(false);
+                }
+                if (Led.YELLOW.parseFlag){
+                    setYellow(mResponseParser.parse(header, response));
+                    Led.YELLOW.setParseFlag(false);
+                }
+                if (Led.IR.parseFlag){
+                    setIr(mResponseParser.parse(header, response));
+                    Led.IR.setParseFlag(false);
+                }
+            }
+        }
     }
 
-    private void updateTarget(String key, String value){
-        // TODO: update each led parsing line by line
+    private void updateTarget(String header, String response){
+        if (response.startsWith("!! ")){
+            response =response.replace("!! ", "");
+            // LED: 49.59 mA
+
+            if (response.contains("Pressure_1st")) {
+                Target.PRESSURE1.setParseFlag(true);
+            } else if(response.contains("Pressure_2nd")) {
+                Target.PRESSURE2.setParseFlag(true);
+            } else if(response.contains("Optical_RGB")) {
+                Target.RGB.setParseFlag(true);
+            }else if(response.contains("Optical_IrY")) {
+                Target.IRY.setParseFlag(true);
+            }else if(response.contains("Accel/Gyro")) {
+                Target.ACCGYRO.setParseFlag(true);
+            }else if(response.contains("Stamp")) {
+                Target.TIMESTAMP.setParseFlag(true);
+            }
+            Log.d(TAG, "TARGET:" + response + "," + Target.RGB.parseFlag);
+        } else{
+            if (response.contains(".")){
+                if (Target.PRESSURE1.parseFlag){
+                    setPressure1(mResponseParser.parse(header, response));
+                    Target.PRESSURE1.setParseFlag(false);
+                }
+                if (Target.PRESSURE2.parseFlag){
+                    setPressure2(mResponseParser.parse(header, response));
+                    Target.PRESSURE2.setParseFlag(false);
+                }
+                if (Target.RGB.parseFlag){
+                    setRgb(mResponseParser.parse(header, response));
+                    Target.RGB.setParseFlag(false);
+                }
+                if (Target.IRY.parseFlag){
+                    setIry(mResponseParser.parse(header, response));
+                    Target.IRY.setParseFlag(false);
+                }
+                if (Target.ACCGYRO.parseFlag){
+                    setAccgyro(mResponseParser.parse(header, response));
+                    Target.ACCGYRO.setParseFlag(false);
+                }
+                if (Target.TIMESTAMP.parseFlag){
+                    setTimestamp(mResponseParser.parse(header, response));
+                    Target.TIMESTAMP.setParseFlag(false);
+                }
+            }
+        }
     }
 
-    private void updateQuery(String key, String value) {
-        //TODO: Consider how to refactor
-        Log.d(TAG, "updateQuery");
+    private void updateQuery(String header, String response) {
 
-        mResponseParser.parseQuery(value);
+        AbstractMap.SimpleEntry<String, String> pair = mResponseParser.parseQuery(header, response);
+        String responseKey = pair.getKey();
+        String responseValue = pair.getValue();
 
-        if (!key.equals("")) {
-            switch (key) {
+        if (!responseKey.equals("")) {
+            switch (responseKey) {
                 case "Pulse":
-                    setFreq(value.replaceAll("Hz", "").replaceAll("\n", ""));
+                    setFreq(responseValue.replaceAll("Hz", "").replaceAll("\n", ""));
                     break;
                 case "RED":
-                    setRed(value.replaceAll("mA", "").replaceAll("\n", ""));
+                    setRed(responseValue.replaceAll("mA", "").replaceAll("\n", ""));
                     break;
                 case "GRN":
-                    setGreen(value.replaceAll("mA", "").replaceAll("\n", ""));
+                    setGreen(responseValue.replaceAll("mA", "").replaceAll("\n", ""));
                     break;
                 case "BLU":
-                    setBlue(value.replaceAll("mA", "").replaceAll("\n", ""));
+                    setBlue(responseValue.replaceAll("mA", "").replaceAll("\n", ""));
                     break;
                 case "YEL":
-                    setYellow(value.replaceAll("mA", "").replaceAll("\n", ""));
+                    setYellow(responseValue.replaceAll("mA", "").replaceAll("\n", ""));
                     break;
                 case "IR":
-                    setIr(value.replaceAll("mA", "").replaceAll("\n", ""));
+                    setIr(responseValue.replaceAll("mA", "").replaceAll("\n", ""));
                     break;
                 case "Pressure_1st":
-                    setPressure1(value);
+                    setPressure1(responseValue);
                     break;
                 case "Pressure_2nd":
-                    setPressure2(value);
+                    setPressure2(responseValue);
                     break;
                 case "Optical_RGB":
-                    setRgb(value);
+                    setRgb(responseValue);
                     break;
                 case "Optical_IrY":
-                    setIry(value);
+                    setIry(responseValue);
                     break;
                 case "Acc/Gyro":
-                    setAccgyro(value);
+                    setAccgyro(responseValue);
                     break;
                 case "Include":
-                    setTimestamp(value);
+                    setTimestamp(responseValue);
                     break;
                 case "Report":
-                    setReport(value.replaceAll("\n", ""));
+                    setReport(responseValue.replaceAll("\n", ""));
                     break;
                 case "Current":
-                    setTime(value.replaceAll("\n", ""));
+                    setTime(responseValue.replaceAll("\n", ""));
                     break;
                 case "UDP/TCP":
-                    setProtocol(value.replaceAll("\n", ""));
+                    setProtocol(responseValue.replaceAll("\n", ""));
                     break;
                 case "Port":
-                    setPort(value.replaceAll("\n", ""));
+                    setPort(responseValue.replaceAll("\n", ""));
                     break;
             }
         }
@@ -237,6 +320,12 @@ public class ValueManager extends BaseObservable {
 
     private void setPressure1(String pressure1) {
         this.pressure1 = pressure1;
+
+        if (pressure1.equals("ON")) {
+            this.pressure1 = "Yes";
+        } else if (pressure1.equals("OFF")){
+            this.pressure1 = "No";
+        }
         notifyPropertyChanged(BR.pressure1);
     }
 
@@ -247,6 +336,12 @@ public class ValueManager extends BaseObservable {
 
     private void setPressure2(String pressure2) {
         this.pressure2 = pressure2;
+
+        if (pressure2.equals("ON")) {
+            this.pressure2 = "Yes";
+        } else if (pressure2.equals("OFF")){
+            this.pressure2 = "No";
+        }
         notifyPropertyChanged(BR.pressure2);
     }
 
@@ -257,6 +352,12 @@ public class ValueManager extends BaseObservable {
 
     private void setRgb(String rgb) {
         this.rgb = rgb;
+
+        if (rgb.equals("ON")) {
+            this.rgb = "Yes";
+        } else if (rgb.equals("OFF")){
+            this.rgb = "No";
+        }
         notifyPropertyChanged(BR.rgb);
     }
 
@@ -267,6 +368,12 @@ public class ValueManager extends BaseObservable {
 
     public void setIry(String iry) {
         this.iry = iry;
+
+        if (iry.equals("ON")) {
+            this.iry = "Yes";
+        } else if (iry.equals("OFF")){
+            this.iry = "No";
+        }
         notifyPropertyChanged(BR.iry);
     }
 
@@ -277,6 +384,12 @@ public class ValueManager extends BaseObservable {
 
     private void setAccgyro(String accgyro) {
         this.accgyro = accgyro;
+
+        if (accgyro.equals("ON")) {
+            this.accgyro = "Yes";
+        } else if (accgyro.equals("OFF")){
+            this.accgyro = "No";
+        }
         notifyPropertyChanged(BR.accgyro);
     }
 

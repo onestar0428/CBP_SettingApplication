@@ -33,7 +33,7 @@
                 android:orientation="vertical">
 
                 <Button
-                    android:id="@+id/changeLayoutButton"
+                    android:id="@+id/changeToControlButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
@@ -44,14 +44,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="3dp"
-                    android:background="#ededed"
+                    android:layout_marginBottom="8dp"
+                    android:background="#d7e4e6"
                     android:orientation="horizontal">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_weight="4">
+                        android:layout_weight="9">
 
                         <TextView
                             android:id="@+id/frequencyTextView"
@@ -68,13 +68,14 @@
                             android:layout_marginBottom="8dp"
                             android:layout_marginTop="8dp"
                             android:text=" Hz"
-                            android:textSize="15sp" />
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
 
                     <Button
                         android:id="@+id/frequencyButton"
-                        android:layout_width="wrap_content"
+                        android:layout_width="70dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:onClick="@{activity::onButtonClick}"
@@ -86,14 +87,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="3dp"
-                    android:background="#ededed"
+                    android:layout_marginBottom="8dp"
+                    android:background="#d7e4e6"
                     android:orientation="horizontal">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="4"
+                        android:layout_weight="9"
                         android:orientation="vertical">
 
                         <LinearLayout
@@ -207,14 +208,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="3dp"
-                    android:background="#ededed"
+                    android:layout_marginBottom="8dp"
+                    android:background="#d7e4e6"
                     android:orientation="horizontal">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="4"
+                        android:layout_weight="9"
                         android:orientation="vertical">
 
                         <LinearLayout
@@ -233,7 +234,8 @@
                                     android:layout_marginBottom="8dp"
                                     android:layout_marginTop="8dp"
                                     android:text="@string/pressure1"
-                                    android:textSize="15sp" />
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:id="@+id/pressure1TextView"
@@ -256,7 +258,8 @@
                                     android:layout_marginBottom="8dp"
                                     android:layout_marginTop="8dp"
                                     android:text="@string/pressure2"
-                                    android:textSize="15sp" />
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:id="@+id/pressure2TextView"
@@ -283,7 +286,8 @@
                                     android:layout_marginBottom="8dp"
                                     android:layout_marginTop="8dp"
                                     android:text="@string/rgb"
-                                    android:textSize="15sp" />
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:id="@+id/rgbTextView"
@@ -306,7 +310,8 @@
                                     android:layout_marginBottom="8dp"
                                     android:layout_marginTop="8dp"
                                     android:text="@string/iry"
-                                    android:textSize="15sp" />
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:id="@+id/iryTextView"
@@ -333,7 +338,8 @@
                                     android:layout_marginBottom="8dp"
                                     android:layout_marginTop="8dp"
                                     android:text="@string/accgyro"
-                                    android:textSize="15sp" />
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:id="@+id/accgyroTextView"
@@ -341,7 +347,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_margin="8dp"
                                     android:text="@{value.accgyro}"
-                                    android:textSize="15sp" />
+                                    android:textSize="15sp"/>
                             </LinearLayout>
 
                             <LinearLayout
@@ -356,7 +362,8 @@
                                     android:layout_marginBottom="8dp"
                                     android:layout_marginTop="8dp"
                                     android:text="@string/timestamp"
-                                    android:textSize="15sp" />
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:id="@+id/timestampTextView"
@@ -383,8 +390,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="3dp"
-                    android:background="#ededed"
+                    android:layout_marginBottom="8dp"
+                    android:background="#d7e4e6"
                     android:orientation="horizontal">
 
                     <TextView
@@ -392,13 +399,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
-                        android:layout_weight="4"
+                        android:layout_weight="9"
                         android:text="@{value.report}"
                         android:textSize="15sp" />
 
                     <Button
                         android:id="@+id/reportButton"
-                        android:layout_width="wrap_content"
+                        android:layout_width="70dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
                         android:layout_weight="1"
@@ -407,100 +414,52 @@
                 </LinearLayout>
                 <!-- ============= REPORT ============= -->
 
-                <!-- ============= WIFI ============= -->
+                <!-- ============= SET TIME ============= -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="3dp"
-                    android:background="#ededed">
+                    android:layout_marginBottom="8dp"
+                    android:background="#d7e4e6"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/setTimeTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="4"
-                        android:orientation="vertical">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
-                                android:layout_marginTop="8dp"
-                                android:text="@string/ssid"
-                                android:textSize="15sp" />
-
-                            <TextView
-                                android:id="@+id/ssidTextView"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_margin="8dp"
-                                android:text="@{value.ssid}"
-                                android:textSize="15sp" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
-                                android:layout_marginTop="8dp"
-                                android:text="@string/password"
-                                android:textSize="15sp" />
-
-                            <TextView
-                                android:id="@+id/passwordTextView"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_margin="8dp"
-                                android:text="@{value.password}"
-                                android:textSize="15sp" />
-                        </LinearLayout>
-                    </LinearLayout>
+                        android:layout_margin="8dp"
+                        android:layout_weight="9"
+                        android:text="@{value.time}"
+                        android:textSize="15sp" />
 
                     <Button
-                        android:id="@+id/wifiButton"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/setTimeButton"
+                        android:layout_width="70dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
                         android:layout_weight="1"
                         android:onClick="@{activity::onButtonClick}"
-                        android:text="@string/wifi" />
+                        android:text="@string/set_time" />
                 </LinearLayout>
-                <!-- ============= WIFI ============= -->
+                <!-- ============= SET TIME ============= -->
 
                 <!-- ============= PROTOCOL ============= -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="3dp"
-                    android:background="#ededed">
+                    android:layout_marginBottom="8dp"
+                    android:background="#d7e4e6">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="4"
+                        android:layout_weight="9"
                         android:orientation="vertical">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
-                                android:layout_marginTop="8dp"
-                                android:text="@string/protocol"
-                                android:textSize="15sp" />
 
                             <TextView
                                 android:id="@+id/protocolTextView"
@@ -517,13 +476,6 @@
                             android:orientation="horizontal">
 
                             <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
-                                android:layout_marginTop="8dp"
-                                android:text="@string/port" />
-
-                            <TextView
                                 android:id="@+id/portTextView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -534,7 +486,7 @@
 
                     <Button
                         android:id="@+id/protocolButton"
-                        android:layout_width="wrap_content"
+                        android:layout_width="70dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
                         android:layout_weight="1"
@@ -543,54 +495,77 @@
                 </LinearLayout>
                 <!-- ============= PROTOCOL ============= -->
 
-                <!-- ============= SET TIME ============= -->
+                <!-- ============= WIFI ============= -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="3dp"
-                    android:background="#ededed"
-                    android:gravity="center_vertical"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="8dp"
+                    android:background="#d7e4e6">
 
-                    <TextView
-                        android:id="@+id/setTimeTextView"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:layout_weight="4"
-                        android:text="@{value.time}"
-                        android:textSize="15sp" />
+                        android:layout_weight="9"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/ssidTextView"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="8dp"
+                                android:text="@{value.ssid}"
+                                android:textSize="15sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/passwordTextView"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="8dp"
+                                android:text="@{value.password}"
+                                android:textSize="15sp" />
+                        </LinearLayout>
+                    </LinearLayout>
 
                     <Button
-                        android:id="@+id/setTimeButton"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/wifiButton"
+                        android:layout_width="70dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
                         android:layout_weight="1"
                         android:onClick="@{activity::onButtonClick}"
-                        android:text="@string/set_time" />
+                        android:text="@string/wifi" />
                 </LinearLayout>
-                <!-- ============= SET TIME ============= -->
+                <!-- ============= WIFI ============= -->
 
                 <!-- ============= REBOOT ============= -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="3dp"
-                    android:background="#ededed"
+                    android:layout_marginBottom="8dp"
+                    android:background="#d7e4e6"
                     android:orientation="horizontal">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_weight="4"
-                        android:orientation="vertical">
+                        android:layout_weight="9"
+                        android:orientation="horizontal">
 
                         <TextView
                             android:id="@+id/rebootTextView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="4"
                             android:text="@{value.delay}"
                             android:textSize="15sp" />
 
@@ -598,12 +573,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text=" sec"
-                            android:textSize="15sp" />
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
 
                     <Button
                         android:id="@+id/rebootButton"
-                        android:layout_width="wrap_content"
+                        android:layout_width="70dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
                         android:layout_weight="1"
@@ -630,7 +606,7 @@
             android:visibility="invisible">
 
             <Button
-                android:id="@+id/changeLayoutButton"
+                android:id="@+id/changeToSettingButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
@@ -640,7 +616,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:layout_margin="20dp">
+                android:layout_margin="20dp"
+                android:background="#c8c8c8">
 
                 <TextView
                     android:layout_width="match_parent"
