@@ -26,7 +26,7 @@ import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
-    private static final long SCAN_PERIOD = 8000; // Stops scanning after 10 seconds
+    private static final long SCAN_PERIOD = 8000; // Stops scanning after 8 seconds
     private static final int REQUEST_ENABLE_BT = 1;
 
     private BluetoothAdapter mBluetoothAdapter;
@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
     private String mDeviceAddress = "DEVICE_ADDRESS";
 
     private Button btnSearch;
-    private TextView txtState;
     private ListView listDevice;
 
     @Override
@@ -49,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        txtState = (TextView) findViewById(R.id.stateTextView);
         btnSearch = (Button) findViewById(R.id.searchButton);
         btnSearch.setText(R.string.bluetooth_search_default);
         btnSearch.setOnClickListener(new View.OnClickListener() {
@@ -74,16 +72,16 @@ public class MainActivity extends AppCompatActivity {
         mLeDeviceListAdapter = new SimpleAdapter(MainActivity.this, mLeDevices, android.R.layout.simple_list_item_2, new String[]{"name", "address"}, new int[]{android.R.id.text1, android.R.id.text2});
         listDevice.setAdapter(mLeDeviceListAdapter);
 
-        // check if device supports BLE
-        final BluetoothManager bluetoothManager =
-                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        // Check if device supports BLE
+        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
+
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
             finish();
         }
 
-        // check if device supports Bluetooth
+        // Check if device supports Bluetooth
         mBLEScanner = mBluetoothAdapter.getBluetoothLeScanner();
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
@@ -91,9 +89,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-//        bindService(new Intent(this, BluetoothLEService.class), mServiceConnection, BIND_AUTO_CREATE);
-//        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-
+        // Start SettingsActivity when one of a list item in listDevice is clicked
         listDevice.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -114,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void scanLeDevice(final boolean enable) {
         if (enable) {
-            // Stops scanning after a pre-defined MainActivity period.
+            // Stops scanning after a pre-defined period
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -135,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Device MainActivity callback.
+    // Device Scan callback
     private ScanCallback mLeScanCallback = new ScanCallback() {
         Map map = new HashMap();
 
