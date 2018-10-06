@@ -60,7 +60,7 @@ public class BluetoothLEService extends Service {
     private final static UUID DATA_NOTIFY_UUID = UUID.fromString("0000ABF2-0000-1000-8000-00805F9B34FB");
     private final static UUID DATA_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
-    public final static String NOTIFY_KEY = "notify"; // replace to using uuid
+    public final static String NOTIFY_KEY = "notify"; // TODO: replace to using uuid
 
     private final static BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
@@ -180,33 +180,51 @@ public class BluetoothLEService extends Service {
         }
     };
 
-    public static void exchangeGattMtu() {
-        int retry = 5;
+    /**
+     * Request changing MTU value (~ 512 bytes).
+     * Request at most 3 times until success.
+     *
+     * @return Return true if changing MTU value is success
+     */
+    public static boolean exchangeGattMtu() {
+        int retry = 3;
         boolean status = false;
 
         while (!status && retry > 0) {
             status = mBluetoothGatt.requestMtu(MAX_MTU);
             retry--;
         }
+
         if (status) {
             Log.d(TAG, "requestMtu " + MAX_MTU + " success");
         } else {
             Log.d(TAG, "requestMtu " + MAX_MTU + " fail");
         }
+
+        return status;
     }
 
+    // TODO : check if it is needed
+    /**
+     * Create bonding device with BluetoothGatt method.
+     */
     public static void bondDevice() {
         try {
             Class class1 = Class.forName("android.bluetooth.BluetoothDevice");
             Method createBondMethod = class1.getMethod("createBond");
             Boolean returnValue = (Boolean) createBondMethod.invoke(mBluetoothGatt.getDevice());
-//            Logger.e("Pair initates status-->" + returnValue);
+            Log.d(TAG, "Initiate pair status-->" + returnValue);
         } catch (Exception e) {
-//            Logger.e("Exception Pair" + e.getMessage());
+            Log.d(TAG, "Exception Pair" + e.getMessage());
         }
 
     }
 
+    /**
+     * Sends action to BroadcastReceiver to announce of BluetoothLEService status.
+     *
+     * @param action action to be sent to BroadcastReceiver
+     */
     private static void broadcastUpdate(final String action) {
         final Intent intent = new Intent(action);
 
@@ -214,6 +232,13 @@ public class BluetoothLEService extends Service {
         mContext.sendBroadcast(intent);
     }
 
+    /**
+     * Sends action to BroadcastReceiver with notification from BluetoothGattCharacteristic.
+     * Usually uses for sending response of command.
+     *
+     * @param action action to be sent to BroadcastReceiver
+     * @param characteristic BluetoothGattCharacteristic for NOTIFY
+     */
     private static void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
 
@@ -246,7 +271,7 @@ public class BluetoothLEService extends Service {
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind");
         disconnect();
-//        return super.onUnbind(intent);
+
         return true;
     }
 
@@ -273,7 +298,12 @@ public class BluetoothLEService extends Service {
             mBluetoothGatt.writeDescriptor(descriptor);
         }
     }
-
+    /**
+     * Check the state of BluetoothLEService and send input command.
+     *
+     * @param command command which consists of user input from DialogBuilder
+     * @return Return true if the initialization is successful.
+     */
     public static boolean sendCommand(String command) {
         boolean response = false;
 
@@ -358,7 +388,9 @@ public class BluetoothLEService extends Service {
     }
 
     /**
-     * Reconnect method to connect to already connected device
+     * Reconnect only BluetoothLEService to re-connect with already connected device.
+     * Suppose that BroadcastReceiver is registered and Service is connected.
+     * Usually used after receive response of command needs reboot.
      */
     public boolean reboot() {
         initialize();
@@ -369,6 +401,7 @@ public class BluetoothLEService extends Service {
         }
 
         final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(mBluetoothDeviceAddress);
+
         if (device == null) {
             return false;
         }

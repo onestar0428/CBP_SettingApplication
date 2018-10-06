@@ -37,7 +37,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
-                    android:onClick="@{activity::onButtonClick}"
+                    android:onClick="@{activity::onLayoutButtonClick}"
                     android:text="→" />
 
                 <!-- ============= FREQUENCY ============= -->
@@ -78,7 +78,7 @@
                         android:layout_width="70dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:onClick="@{activity::onButtonClick}"
+                        android:onClick="@{activity::onSettingButtonClick}"
                         android:text="@string/freq" />
                 </LinearLayout>
                 <!-- ============= FREQUENCY ============= -->
@@ -199,7 +199,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:onClick="@{activity::onButtonClick}"
+                        android:onClick="@{activity::onSettingButtonClick}"
                         android:text="@string/led" />
                 </LinearLayout>
                 <!-- ============= LED ============= -->
@@ -381,7 +381,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:onClick="@{activity::onButtonClick}"
+                        android:onClick="@{activity::onSettingButtonClick}"
                         android:text="@string/target" />
                 </LinearLayout>
                 <!-- ============= TARGET ============= -->
@@ -409,7 +409,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
                         android:layout_weight="1"
-                        android:onClick="@{activity::onButtonClick}"
+                        android:onClick="@{activity::onSettingButtonClick}"
                         android:text="@string/report_to" />
                 </LinearLayout>
                 <!-- ============= REPORT ============= -->
@@ -438,7 +438,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
                         android:layout_weight="1"
-                        android:onClick="@{activity::onButtonClick}"
+                        android:onClick="@{activity::onSettingButtonClick}"
                         android:text="@string/set_time" />
                 </LinearLayout>
                 <!-- ============= SET TIME ============= -->
@@ -490,7 +490,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
                         android:layout_weight="1"
-                        android:onClick="@{activity::onButtonClick}"
+                        android:onClick="@{activity::onSettingButtonClick}"
                         android:text="@string/protocol" />
                 </LinearLayout>
                 <!-- ============= PROTOCOL ============= -->
@@ -543,7 +543,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
                         android:layout_weight="1"
-                        android:onClick="@{activity::onButtonClick}"
+                        android:onClick="@{activity::onSettingButtonClick}"
                         android:text="@string/wifi" />
                 </LinearLayout>
                 <!-- ============= WIFI ============= -->
@@ -583,7 +583,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
                         android:layout_weight="1"
-                        android:onClick="@{activity::onButtonClick}"
+                        android:onClick="@{activity::onSettingButtonClick}"
                         android:text="@string/reboot" />
                 </LinearLayout>
                 <!-- ============= REBOOT ============= -->
@@ -610,7 +610,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:onClick="@{activity::onButtonClick}"
+                android:onClick="@{activity::onLayoutButtonClick}"
                 android:text="←" />
 
             <LinearLayout

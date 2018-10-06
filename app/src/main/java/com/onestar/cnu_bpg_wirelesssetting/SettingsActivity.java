@@ -56,8 +56,6 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
             }
 
             if (action.equals(BluetoothLEService.ACTION_DATA_AVAILABLE)) {
-                mGattConnected = ConnectionStatus.STATE_CONNECTED;
-
                 // Get notify (response) of command
                 if (extras.containsKey(BluetoothLEService.NOTIFY_KEY)) {
                     String response = extras.getString(BluetoothLEService.NOTIFY_KEY);
@@ -129,10 +127,6 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
             } else {
                 mDialog = ProgressDialog.show(SettingsActivity.this, mDeviceName, "Connecting ...", true, true);
 
-//                if (mBluetoothLEService != null) {
-//                    Log.d(TAG, "Connect BLE Service");
-//                }
-
                 mServiceConnected = ConnectionStatus.STATE_CONNECTED;
                 Log.d(TAG, "ServiceConnection=" + mServiceConnected);
 
@@ -149,7 +143,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            // BLE Service is disconnected, deallocate objects and changed state
+            // BLE Service is disconnected, deallocate objects and change state
 
             mValueManager = null;
             mDialogBuilder = null;
@@ -157,6 +151,9 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
         }
     };
 
+    /**
+     * BluetoothLEService action filter for BroadcastReceiver.
+     */
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
 
@@ -188,6 +185,8 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
     /**
      * onClick event callback method
      * Send START/STOP command
+     *
+     * @param view Id of each control button
      */
     public void onControlButtonClick(View view) {
         String key = ((Button) view).getText().toString();
@@ -207,30 +206,41 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
     }
 
     /**
-     * onClick event callback method
-     * Build a dialog for user input according to option value
+     * onClick event callback method.
+     * Change view layout into ControlLayout <-> SettingLayout.
+     *
+     * @param view Id of each button changes view layout
      */
-    public void onButtonClick(View view) {
+    public void onLayoutButtonClick(View view) {
         if (view.getId() == R.id.changeToControlButton) {
             binding.buttonLayout.setVisibility(View.INVISIBLE);
             binding.controlLayout.setVisibility(View.VISIBLE);
         } else if (view.getId() == R.id.changeToSettingButton) {
             binding.buttonLayout.setVisibility(View.VISIBLE);
-            binding.controlLayout.setVisibility(View.INVISIBLE);
-        } else {
-            String key = ((Button) view).getText().toString();
-
-            if (mDialogBuilder == null) {
-                mDialogBuilder = new DialogBuilder(this, this, binding);
-            }
-
-            mDialogBuilder.makeDialog(key);
+            binding.buttonLayout.setVisibility(View.INVISIBLE);
         }
     }
 
     /**
-     * Interface
-     * Called when user pressed POSITIVE button in dialog
+     * onClick event callback method.
+     * Build a dialog for user input according to option value.
+     *
+     * @param view Id of each setting button
+     */
+    public void onSettingButtonClick(View view) {
+
+        String key = ((Button) view).getText().toString();
+
+        if (mDialogBuilder == null) {
+            mDialogBuilder = new DialogBuilder(this, this, binding);
+        }
+
+        mDialogBuilder.makeDialog(key);
+    }
+
+    /**
+     * Interface.
+     * Called when user pressed POSITIVE button in dialog.
      *
      * @param key    Header for command
      * @param params Values for command which user inputs
@@ -245,8 +255,8 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
     }
 
     /**
-     * Interface
-     * Called when user pressed POSITIVE button in dialog
+     * Interface.
+     * Called when user pressed POSITIVE("Yes") button in dialog.
      *
      * @param command Header for command
      * @return Returns boolean according to result of sending command
@@ -271,7 +281,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
     }
 
     /**
-     * Deallocate static objects, Service, BroadcastReceiver before exit activity
+     * Deallocate static objects, Service, BroadcastReceiver before exit activity.
      */
     private void activity_finish() {
         if (mDialog != null && mDialog.isShowing()) {

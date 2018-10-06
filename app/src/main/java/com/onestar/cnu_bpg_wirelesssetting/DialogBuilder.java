@@ -41,6 +41,11 @@ public class DialogBuilder extends BaseObservable {
         Log.d(TAG, "DialogBuilder Constructor");
     }
 
+    /**
+     * Build dialog for receive user input according to option value.
+     *
+     * @param key option key
+     */
     public void makeDialog(String key) {
         mKey = key;
         isShowing = true;
@@ -73,7 +78,9 @@ public class DialogBuilder extends BaseObservable {
             buildRebootDialog(mBuilder);
         }
 
-        mBuilder.create().show(); //TODO
+        mBuilder.create().show();
+
+        //TODO
         /*
         * 10-01 22:24:13.491 17658-17658/com.onestar.cnu_bpg_wirelesssetting E/AndroidRuntime: FATAL EXCEPTION: main
     Process: com.onestar.cnu_bpg_wirelesssetting, PID: 17658
@@ -98,6 +105,12 @@ public class DialogBuilder extends BaseObservable {
 */
     }
 
+    /**
+     * Build TARGET dialog.
+     * It receives user input with each Switch UI.
+     *
+     * @param builder dialog builder
+     */
     private void buildTargetDialog(AlertDialog.Builder builder) {
         final View view = mInflater.inflate(R.layout.dialog_switch, null);
 
@@ -151,6 +164,12 @@ public class DialogBuilder extends BaseObservable {
                 });
     }
 
+    /**
+     * Build LED dialog.
+     * It receives user input with each EditText UI.
+     *
+     * @param builder dialog builder
+     */
     private void buildLedDialog(AlertDialog.Builder builder) {
         final View view = mInflater.inflate(R.layout.dialog_led, null);
 
@@ -185,6 +204,12 @@ public class DialogBuilder extends BaseObservable {
                 });
     }
 
+    /**
+     * Build REBOOT dialog.
+     * It receives user input with NumberPicker UI.
+     *
+     * @param builder dialog builder
+     */
     private void buildRebootDialog(AlertDialog.Builder builder) {
         final View view = mInflater.inflate(R.layout.dialog_numpick, null);
 
@@ -205,6 +230,12 @@ public class DialogBuilder extends BaseObservable {
                 });
     }
 
+    /**
+     * Build FREQ dialog.
+     * It receives user input with NumberPicker UI.
+     *
+     * @param builder dialog builder
+     */
     private void buildFrequencyDialog(AlertDialog.Builder builder) {
         final View view = mInflater.inflate(R.layout.dialog_numpick, null);
 
@@ -225,6 +256,12 @@ public class DialogBuilder extends BaseObservable {
                 });
     }
 
+    /**
+     * Build PROTOCOL dialog.
+     * It receives user input with Spinner and EditText UI.
+     *
+     * @param builder dialog builder
+     */
     private void buildProtocolDialog(AlertDialog.Builder builder) {
         final View view = mInflater.inflate(R.layout.dialog_protocol, null);
         final Spinner protocolSpinner = (Spinner) view.findViewById(R.id.protocolSpinner);
@@ -250,6 +287,12 @@ public class DialogBuilder extends BaseObservable {
                 });
     }
 
+    /**
+     * Build WIFI dialog.
+     * It receives user input with each EditText UI.
+     *
+     * @param builder dialog builder
+     */
     private void buildWifiDialog(AlertDialog.Builder builder) {
         final View view = mInflater.inflate(R.layout.dialog_wifi, null);
 
@@ -273,6 +316,13 @@ public class DialogBuilder extends BaseObservable {
 
     }
 
+
+    /**
+     * Build REPORT dialog.
+     * It receives user input with each Single Choice UI.
+     *
+     * @param builder dialog builder
+     */
     // TODO: improve list of report
     private void buildReportDialog(AlertDialog.Builder builder) {
         final String[] reportList = {"console", "nw", "both", "none"}; //TODO: enum?
@@ -295,6 +345,12 @@ public class DialogBuilder extends BaseObservable {
                 });
     }
 
+    /**
+     * Build SET_TIME dialog.
+     * It receives user input with DatePicker and NumberPicker UI.
+     *
+     * @param builder dialog builder
+     */
     private void buildTimeDialog(AlertDialog.Builder builder) {
         final View view = mInflater.inflate(R.layout.dialog_time, null);
         final DatePicker datePicker = (DatePicker) view.findViewById(R.id.datePicker);
@@ -332,19 +388,38 @@ public class DialogBuilder extends BaseObservable {
                 });
     }
 
+    /**
+     * Hand over user input value from each dialog in a String.
+     *
+     * @param params user input values in one String (concat with ":")
+     */
     private void passParameters(String params) {
         mListener.onDialogValueChanged(mKey, params);
     }
 
+    /**
+     * Change dialog showing status to false when it was closed.
+     *
+     * @param dialog DialogInterface
+     */
     private void dismiss(DialogInterface dialog) {
         isShowing = false;
         dialog.dismiss();
     }
 
+    /**
+     * Getter method if isShowing variable.
+     *
+     * @return isShowing
+     */
     public boolean isShowing() {
         return isShowing;
     }
 
+    /**
+     * Interface.
+     * Notify to SettingsActivity method when option value was updated.
+     */
     public interface dialogBuilderListener {
         void onDialogValueChanged(String key, String params);
     }

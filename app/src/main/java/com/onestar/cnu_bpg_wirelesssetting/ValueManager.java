@@ -17,6 +17,8 @@ public class ValueManager extends BaseObservable {
 
     private static ResponseParser mResponseParser;
 
+    // initialize each value into Default Enum value
+    // If connection is abnormal, UI shown these Default Enum values
     private String freq = Default.DEFAULT_FREQ.value,
             delay = Default.DEFAULT_DELAY.value,
             red = Default.DEFAULT_LED.value,
@@ -39,13 +41,28 @@ public class ValueManager extends BaseObservable {
 
     //TODO: static factory or singleton
 
+    /**
+     * Allocate ResponseParser object in constructor
+     */
     public ValueManager() {
         Log.d(TAG, "ValueManager Constructor");
-        mResponseParser = new ResponseParser();
+        if (mResponseParser == null) {
+            mResponseParser = new ResponseParser();
+        }
     }
 
+    /**
+     * Updates each option value according to parsed result of command response.
+     * <p>
+     * (CAUTION) Some setting options won't be updated even though successful sending command.
+     * - FREQUENCY: get un-proper result to extract updated value
+     * - WIFI: (TODO) don't know how to test about it
+     * - PROTOCOL: get un-proper result to extract updated value
+     *
+     * @param key      command header
+     * @param response response of command
+     */
     public void update(String key, String response) {
-
         if (key.equals(Command.FREQ.value)) {
             // NO RESPONSE TO PARSE FOR FREQ COMMAND
         } else if (key.equals(Command.LED.value)) {
@@ -56,11 +73,11 @@ public class ValueManager extends BaseObservable {
             String newValue = mResponseParser.parse(key, response);
 
             if (!newValue.equals("")) {
-                setReport(newValue); //response = report_option
+                setReport(newValue);
             }
         } else if (key.equals(Command.PROTOCOL.value)) {
             String newValue = mResponseParser.parse(key, response);
-            String[] value =  newValue.split(":"); //response = protocol:port
+            String[] value = newValue.split(":");
 
             if (value.length == 2) {
                 setProtocol(value[0]);
@@ -70,7 +87,7 @@ public class ValueManager extends BaseObservable {
             }
         } else if (key.equals(Command.SET_TIME.value)) {
             String newValue = mResponseParser.parse(key, response);
-            if (!newValue.equals("")){
+            if (!newValue.equals("")) {
                 setTime(newValue);
             }
         } else if (key.equals(Command.WIFI.value)) {
@@ -85,44 +102,54 @@ public class ValueManager extends BaseObservable {
                 Log.d(TAG, "update(reboot) gets abnormal new value: " + newValue);
             }
         } else if (key.equals(Command.QUERY.value)) {
-            updateQuery(key, response);
+            updateQuery(response);
         }
     }
 
+    /**
+     * Update extracted value from LED response.
+     * Each LED option gets 2 lines of response String.
+     * e.g.) !! New current for LED_RED    :
+     * 29.01 mA
+     * Therefore, set flag of LED Enum true if response String starts with " !! "
+     * is detected, and parse real updated value when next response line comes in.
+     *
+     * @param header   command header
+     * @param response command response
+     */
     private void updateLed(String header, String response) {
-        if (response.startsWith(" !! ")){
-            response =response.replace(" !! ", "");
-                // LED: 49.59 mA
-                if (response.contains("LED_RED")) {
-                    Led.RED.setParseFlag(true);
-                } else if(response.contains("LED_GREEN")) {
-                    Led.GREEN.setParseFlag(true);
-                } else if(response.contains("LED_BLUE")) {
-                    Led.BLUE.setParseFlag(true);
-                }else if(response.contains("LED_YELLOW")) {
-                    Led.YELLOW.setParseFlag(true);
-                }else if(response.contains("LED_IR")) {
-                    Led.IR.setParseFlag(true);
-                }
-        } else{
-            if (response.contains("mA")){
-                if (Led.RED.parseFlag){
+        if (response.startsWith(" !! ")) {
+            response = response.replace(" !! ", "");
+            if (response.contains("LED_RED")) {
+                Led.RED.setParseFlag(true);
+            } else if (response.contains("LED_GREEN")) {
+                Led.GREEN.setParseFlag(true);
+            } else if (response.contains("LED_BLUE")) {
+                Led.BLUE.setParseFlag(true);
+            } else if (response.contains("LED_YELLOW")) {
+                Led.YELLOW.setParseFlag(true);
+            } else if (response.contains("LED_IR")) {
+                Led.IR.setParseFlag(true);
+            }
+        } else {
+            if (response.contains("mA")) {
+                if (Led.RED.parseFlag) {
                     setRed(mResponseParser.parse(header, response));
                     Led.RED.setParseFlag(false);
                 }
-                if (Led.GREEN.parseFlag){
+                if (Led.GREEN.parseFlag) {
                     setGreen(mResponseParser.parse(header, response));
                     Led.GREEN.setParseFlag(false);
                 }
-                if (Led.BLUE.parseFlag){
+                if (Led.BLUE.parseFlag) {
                     setBlue(mResponseParser.parse(header, response));
                     Led.BLUE.setParseFlag(false);
                 }
-                if (Led.YELLOW.parseFlag){
+                if (Led.YELLOW.parseFlag) {
                     setYellow(mResponseParser.parse(header, response));
                     Led.YELLOW.setParseFlag(false);
                 }
-                if (Led.IR.parseFlag){
+                if (Led.IR.parseFlag) {
                     setIr(mResponseParser.parse(header, response));
                     Led.IR.setParseFlag(false);
                 }
@@ -130,48 +157,59 @@ public class ValueManager extends BaseObservable {
         }
     }
 
-    private void updateTarget(String header, String response){
-        if (response.startsWith("!! ")){
-            response =response.replace("!! ", "");
+    /**
+     * Update extracted value from TARGET response.
+     * Each TARGET option gets 2 lines of response String.
+     * e.g.) !! Pressure_1st Measurement is
+     * ON.
+     * Therefore, set flag of TARGET Enum true if response String starts with " !! "
+     * is detected, and parse real updated value when next response line comes in.
+     *
+     * @param header   command header
+     * @param response command response
+     */
+    private void updateTarget(String header, String response) {
+        if (response.startsWith("!! ")) {
+            response = response.replace("!! ", "");
             // LED: 49.59 mA
 
             if (response.contains("Pressure_1st")) {
                 Target.PRESSURE1.setParseFlag(true);
-            } else if(response.contains("Pressure_2nd")) {
+            } else if (response.contains("Pressure_2nd")) {
                 Target.PRESSURE2.setParseFlag(true);
-            } else if(response.contains("Optical_RGB")) {
+            } else if (response.contains("Optical_RGB")) {
                 Target.RGB.setParseFlag(true);
-            }else if(response.contains("Optical_IrY")) {
+            } else if (response.contains("Optical_IrY")) {
                 Target.IRY.setParseFlag(true);
-            }else if(response.contains("Accel/Gyro")) {
+            } else if (response.contains("Accel/Gyro")) {
                 Target.ACCGYRO.setParseFlag(true);
-            }else if(response.contains("Stamp")) {
+            } else if (response.contains("Stamp")) {
                 Target.TIMESTAMP.setParseFlag(true);
             }
             Log.d(TAG, "TARGET:" + response + "," + Target.RGB.parseFlag);
-        } else{
-            if (response.contains(".")){
-                if (Target.PRESSURE1.parseFlag){
+        } else {
+            if (response.contains(".")) {
+                if (Target.PRESSURE1.parseFlag) {
                     setPressure1(mResponseParser.parse(header, response));
                     Target.PRESSURE1.setParseFlag(false);
                 }
-                if (Target.PRESSURE2.parseFlag){
+                if (Target.PRESSURE2.parseFlag) {
                     setPressure2(mResponseParser.parse(header, response));
                     Target.PRESSURE2.setParseFlag(false);
                 }
-                if (Target.RGB.parseFlag){
+                if (Target.RGB.parseFlag) {
                     setRgb(mResponseParser.parse(header, response));
                     Target.RGB.setParseFlag(false);
                 }
-                if (Target.IRY.parseFlag){
+                if (Target.IRY.parseFlag) {
                     setIry(mResponseParser.parse(header, response));
                     Target.IRY.setParseFlag(false);
                 }
-                if (Target.ACCGYRO.parseFlag){
+                if (Target.ACCGYRO.parseFlag) {
                     setAccgyro(mResponseParser.parse(header, response));
                     Target.ACCGYRO.setParseFlag(false);
                 }
-                if (Target.TIMESTAMP.parseFlag){
+                if (Target.TIMESTAMP.parseFlag) {
                     setTimestamp(mResponseParser.parse(header, response));
                     Target.TIMESTAMP.setParseFlag(false);
                 }
@@ -179,9 +217,17 @@ public class ValueManager extends BaseObservable {
         }
     }
 
-    private void updateQuery(String header, String response) {
+    /**
+     * Update extracted value from TARGET response.
+     * Each option which contains value starts with " * " and contains " : ".
+     * e.g.) * Pulse Rep. freq. :   100 Hz
+     * Therefore, remove " * " and divide into key and value with " : ", and then set each option.
+     *
+     * @param response
+     */
+    private void updateQuery(String response) {
 
-        AbstractMap.SimpleEntry<String, String> pair = mResponseParser.parseQuery(header, response);
+        AbstractMap.SimpleEntry<String, String> pair = mResponseParser.parseQuery(response);
         String responseKey = pair.getKey();
         String responseValue = pair.getValue();
 
@@ -240,7 +286,7 @@ public class ValueManager extends BaseObservable {
     }
 
     // -----------------------------------------------------------
-    // --------------------- GETTER & SETTER ---------------------
+    // --------------- GETTER & SETTER for Binding ---------------
     // -----------------------------------------------------------
 
     @Bindable
@@ -323,7 +369,7 @@ public class ValueManager extends BaseObservable {
 
         if (pressure1.equals("ON")) {
             this.pressure1 = "Yes";
-        } else if (pressure1.equals("OFF")){
+        } else if (pressure1.equals("OFF")) {
             this.pressure1 = "No";
         }
         notifyPropertyChanged(BR.pressure1);
@@ -339,7 +385,7 @@ public class ValueManager extends BaseObservable {
 
         if (pressure2.equals("ON")) {
             this.pressure2 = "Yes";
-        } else if (pressure2.equals("OFF")){
+        } else if (pressure2.equals("OFF")) {
             this.pressure2 = "No";
         }
         notifyPropertyChanged(BR.pressure2);
@@ -355,7 +401,7 @@ public class ValueManager extends BaseObservable {
 
         if (rgb.equals("ON")) {
             this.rgb = "Yes";
-        } else if (rgb.equals("OFF")){
+        } else if (rgb.equals("OFF")) {
             this.rgb = "No";
         }
         notifyPropertyChanged(BR.rgb);
@@ -371,7 +417,7 @@ public class ValueManager extends BaseObservable {
 
         if (iry.equals("ON")) {
             this.iry = "Yes";
-        } else if (iry.equals("OFF")){
+        } else if (iry.equals("OFF")) {
             this.iry = "No";
         }
         notifyPropertyChanged(BR.iry);
@@ -387,7 +433,7 @@ public class ValueManager extends BaseObservable {
 
         if (accgyro.equals("ON")) {
             this.accgyro = "Yes";
-        } else if (accgyro.equals("OFF")){
+        } else if (accgyro.equals("OFF")) {
             this.accgyro = "No";
         }
         notifyPropertyChanged(BR.accgyro);
