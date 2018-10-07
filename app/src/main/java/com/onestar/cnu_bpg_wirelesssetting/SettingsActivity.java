@@ -67,7 +67,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                         commandKey = Command.QUERY.value;
                     }
 
-                    Toast.makeText(SettingsActivity.this, commandKey + " is updated with " + response, Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(SettingsActivity.this, commandKey + " is updated with " + response, Toast.LENGTH_SHORT).show();
                 }
             } else if (action.equals(BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED)) {
                 Log.d(TAG, "onReceive: Gatt Services Discovered");
@@ -103,9 +103,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
                         Toast.makeText(SettingsActivity.this, "BLE Service is connected", Toast.LENGTH_SHORT).show();
                     } else {
                         Log.d(TAG, "onBLEServiceConnected(re)");
-
-                        // Reconnect Service so just send command without make a new object
-                        mBluetoothLEService.sendCommand(Command.QUERY.command);
+                        commandKey = Command.QUERY.value;
 
                         Toast.makeText(SettingsActivity.this, "BLE Service is re-connected", Toast.LENGTH_SHORT).show();
                     }
@@ -129,13 +127,6 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
 
                 mServiceConnected = ConnectionStatus.STATE_CONNECTED;
                 Log.d(TAG, "ServiceConnection=" + mServiceConnected);
-
-                try {
-                    Log.d(TAG, "Try to register Broadcast Receiver");
-                    registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-                } catch (IllegalArgumentException e) {
-                    Log.d(TAG, "Fail to register Broadcast Receiver");
-                }
 
                 mBluetoothLEService.connect(mDeviceAddress, SettingsActivity.this);
             }
@@ -180,6 +171,13 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
 
         // Bind Service to connect BLE Service
         bindService(new Intent(this, BluetoothLEService.class), mServiceConnection, BIND_AUTO_CREATE);
+
+        try {
+            Log.d(TAG, "Try to register Broadcast Receiver");
+            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        } catch (IllegalArgumentException e) {
+            Log.d(TAG, "Fail to register Broadcast Receiver");
+        }
     }
 
     /**
@@ -273,6 +271,8 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
             if (result) {
                 commandKey = command.split(":")[0];
             }
+
+            return result;
         }
 
         Toast.makeText(SettingsActivity.this, "Fail to send command", Toast.LENGTH_SHORT).show();

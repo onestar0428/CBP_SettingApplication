@@ -156,6 +156,6 @@ public class ResponseParser {
      * @return Updated time value
      */
     private static String parseTime(String response) {
-        return response.split(" : ")[1].replace("\n", "");
+        return response.split("time : ")[1].replace("\n", "");
     }
 }

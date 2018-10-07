@@ -106,6 +106,7 @@ public class BluetoothLEService extends Service {
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
             } else {
                 Log.w(TAG, "onServicesDiscovered: " + status);
+
                 if (status == BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION ||
                         status == BluetoothGatt.GATT_INSUFFICIENT_ENCRYPTION) {
                     bondDevice();
@@ -133,9 +134,11 @@ public class BluetoothLEService extends Service {
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+
                 Log.d(TAG, "onCharacteristicRead(Read)");
             } else {
                 Log.d(TAG, "onCharacteristicRead(Read): fail");
+
                 if (status == BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION
                         || status == BluetoothGatt.GATT_INSUFFICIENT_ENCRYPTION) {
                     bondDevice();
@@ -204,7 +207,6 @@ public class BluetoothLEService extends Service {
         return status;
     }
 
-    // TODO : check if it is needed
     /**
      * Create bonding device with BluetoothGatt method.
      */
@@ -213,11 +215,11 @@ public class BluetoothLEService extends Service {
             Class class1 = Class.forName("android.bluetooth.BluetoothDevice");
             Method createBondMethod = class1.getMethod("createBond");
             Boolean returnValue = (Boolean) createBondMethod.invoke(mBluetoothGatt.getDevice());
+
             Log.d(TAG, "Initiate pair status-->" + returnValue);
         } catch (Exception e) {
             Log.d(TAG, "Exception Pair" + e.getMessage());
         }
-
     }
 
     /**
@@ -323,7 +325,7 @@ public class BluetoothLEService extends Service {
             mWriteCharacteristic.setValue(value);
             response = mBluetoothGatt.writeCharacteristic(mWriteCharacteristic);
 
-            Log.d(TAG, "sendCommand Result: " + command);
+            Log.d(TAG, "sendCommand: " + command);
             Log.d(TAG, "sendCommand Result: " + response);
         }
 
