@@ -215,7 +215,7 @@ public class SettingsActivity extends AppCompatActivity implements DialogBuilder
             binding.controlLayout.setVisibility(View.VISIBLE);
         } else if (view.getId() == R.id.changeToSettingButton) {
             binding.buttonLayout.setVisibility(View.VISIBLE);
-            binding.buttonLayout.setVisibility(View.INVISIBLE);
+            binding.controlLayout.setVisibility(View.INVISIBLE);
         }
     }
 
